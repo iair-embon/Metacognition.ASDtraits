@@ -92,21 +92,25 @@ basename(getwd())
 #filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
 
 ## exp2:
-filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
-
-load(file= filepath)
-
-# ## ambos df_total:
-# filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
-# load(file= filepath)
-# a <- df_total
-# # le saco la columna sujetos
-# #a <- a[,!(names(a) %in% c("sujetos"))]
 # filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
+
+## cargo el df elegido
 # load(file= filepath)
-# b <- df_total
-# #b <- b[,!(names(b) %in% c("sujetos"))]
-# df_total <- rbind(a,b)
+
+## ambos df_total:
+filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
+load(file= filepath)
+a <- df_total
+
+filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
+load(file= filepath)
+b <- df_total
+# sumo 100 a la columna sujetos, para que no se pisen los nros y este nro sea unico
+b$sujetos <- b$sujetos + 1000 
+
+### cambio la columna sujetos por una nueva, para que no se pisen los nros y este nro sea unico
+# uno los df
+df_total <- rbind(a,b)
 
 
 # tomo las variables de interes
@@ -185,5 +189,7 @@ summary(a)
 
 a=lm(mc~ hs, data = d)
 summary(a)
+
+##
 
 
