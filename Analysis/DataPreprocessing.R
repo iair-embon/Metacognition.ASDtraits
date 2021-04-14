@@ -455,8 +455,8 @@ df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discriminati
 # save(df_total,file = filepath)
 
 # RESULTS_EXP2(REPLICA)
-filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
-save(df_total,file = filepath)
+
+
 
 # save the df in .txt format, it is saved in the mail folder
 write.table(df_total, file= 'df_total.txt')

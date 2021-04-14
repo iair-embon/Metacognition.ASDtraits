@@ -192,4 +192,5 @@ summary(a)
 
 ##
 
-
+filepath <- root$find_file("Data/d_sin_normalizar.Rda")
+save(d,file = filepath)
