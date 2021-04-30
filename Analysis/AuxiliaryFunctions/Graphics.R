@@ -227,3 +227,70 @@ display(a)
 
 plot (solo.m$aq, solo.m$mc, xlab="aq", ylab="mc")
 curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############# ESTA PARTE AGREGAR AL GIT
+# to know the aq quantiles
+cuantiles <- quantile(d$aq) ### revisar funcion, anda mal, no los cuartiles 
+#no dejan por debajo lo que deberian
+
+aq.quartile <- rep(NaN, nrow(d))
+
+for (i in 1:length(aq.quartile)) {
+  if (d$aq[i] <= 23){
+    aq.quartile[i] <- 4
+  } else if (d$aq[i] > 23 & d$aq[i] <= 25){
+    aq.quartile[i] <- 3
+  }else if (d$aq[i] > 25 & d$aq[i] <= 28){
+    aq.quartile[i] <- 2
+  }else if (d$aq[i] > 28 & d$aq[i] <= 37){
+    aq.quartile[i] <- 1
+  }
+}
+
+table(aq.quartile) # aca se ve el error
+
+d$aq.quartile <- as.factor(aq.quartile)
+
+
+# plot violin grouped
+library(ggplot2)
+library(dplyr)
+library(forcats)
+library(hrbrthemes)
+library(viridis)
+
+
+
+d %>%
+  mutate(aq.quartile = fct_reorder(aq.quartile, mc)) %>%
+  mutate(aq.quartile = factor(aq.quartile, levels=c("1", "2", "3", "4"))) %>%
+  ggplot(aes(fill=Im, y=mc, x=aq.quartile)) + 
+  geom_violin(position="dodge", alpha=0.5, outlier.colour="transparent") +
+  scale_fill_viridis(discrete=T, name="") +
+  theme_ipsum()  +
+  xlab("AQ: 1= high, 2= low") +
+  ylab("Metacog") +
+  ylim(0,1)
+  
