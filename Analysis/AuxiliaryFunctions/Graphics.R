@@ -1,17 +1,24 @@
+##### Graphics and analysis
+
+
+################
+### Graphics ###
+################
+
 # jugando con graficos del libro https://r4ds.had.co.nz/data-visualisation.html 
 # y los datos del exp de metacog
 
 library(tidyverse)
 
 ### ggplot 1
-ggplot(data = df_DatosUnicos_mod2) + 
-  geom_point(mapping = aes(x = AQ, y =auc2))
+ggplot(data = d) + 
+  geom_point(mapping = aes(x = mc, y =tr_d))
 
 ### ggplot 2 
 
 # segun genero
-ggplot(data = df_DatosUnicos_mod2) + 
-  geom_point(mapping = aes(x = auc2, y = AQ, color = genero))
+ggplot(data = d) + 
+  geom_point(mapping = aes(x = mc, y = aq, color = Im))
 
 # segun estudio
 ggplot(data = df_DatosUnicos_mod2) + 
@@ -30,9 +37,9 @@ ggplot(data = df_DatosUnicos_mod7) +
 ### ggplot 4
 
 # facet estudios
-ggplot(data = df_DatosUnicos_mod7) + 
-  geom_point(mapping = aes(x = auc2, y = AQ)) + 
-  facet_wrap(~ estudio, nrow = 2)
+ggplot(data = d) + 
+  geom_point(mapping = aes(x = mc, y = aq)) + 
+  facet_wrap(~ Im, nrow = 2)
 
 # facet genero
 ggplot(data = df_DatosUnicos_mod2) + 
@@ -78,6 +85,11 @@ ggplot(data = df_DatosUnicos_mod2, mapping = aes(x = estudio, y = auc2)) +
 ggplot(data = df_DatosUnicos_mod2, mapping = aes(x = genero, y = sd_tr_confi)) + 
   geom_boxplot()
 
+# plotear 
+
+################
+### analysis ###
+################
 
 ### lineas para normalizar variables y hacer regresion 
 
@@ -152,14 +164,14 @@ d = data.frame(mc  = auc2,
                tr_c = media_tr_confi)
 
 d$pc <- (d$pc - mean(d$pc)) / sd(d$pc)
-d$hs <- (d$hs - mean(d$hs)) / sd(d$hs)
-d$pc <- (d$pc - mean(d$pc)) / sd(d$pc)
+#d$hs <- (d$hs - mean(d$hs)) / sd(d$hs)
+d$edad <- (d$edad - mean(d$edad)) / sd(d$edad)
 d$mc <- (d$mc - mean(d$mc)) / sd(d$mc)
 d$aq <- (d$aq - mean(d$aq)) / sd(d$aq)
 d$tr_d <- (d$tr_d - mean(d$tr_d)) / sd(d$tr_d)
 d$tr_c <- (d$tr_c - mean(d$tr_c)) / sd(d$tr_c)
 
-a=lm(mc~ aq+Im + aq:Im  , data = d)
+a=lm(mc~ aq+as.factor(Im) + aq: as.factor(Im)  , data = d)
 summary(a)
 display(a)
 
@@ -168,7 +180,7 @@ plot(fitted(a), res)
 abline(0,0)
 hist(res)
 
-a=lm(tr_d ~ aq  , data = d)
+a=lm(mc ~ edad  , data = d)
 summary(a)
 display(a)
 
@@ -194,3 +206,24 @@ summary(a)
 
 filepath <- root$find_file("Data/d_sin_normalizar.Rda")
 save(d,file = filepath)
+
+
+## 
+solo.f <- d[d$Im == "Femenino",]
+solo.m <- d[d$Im == "Masculino",]
+
+# solo f
+a=lm(mc~ aq, data = solo.f)
+summary(a)
+display(a)
+
+plot (solo.f$aq, solo.f$mc, xlab="aq", ylab="mc")
+curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
+
+# solo m
+a=lm(mc~ aq, data = solo.m)
+summary(a)
+display(a)
+
+plot (solo.m$aq, solo.m$mc, xlab="aq", ylab="mc")
+curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)

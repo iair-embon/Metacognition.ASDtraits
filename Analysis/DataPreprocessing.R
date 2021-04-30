@@ -541,7 +541,7 @@ for(i in 1:nrow(df_DatosUnicos_mod2)){
 # hay algunos con muy pocos ensayos ej: 7, 12, 8, considerar sacarlos de esta comparacion
 
 # filtro a los sujetos quienes tienen menos de 20 trials QUEDE ACA!!!!
-df_exp_mod3_1_contrast <- df_exp_mod2_1_contrast[df_exp_mod2_1_contrast$sujetos == ]
+#df_exp_mod3_1_contrast <- df_exp_mod2_1_contrast[df_exp_mod2_1_contrast$sujetos == ]
 
 ## ahora si, indice de metacog en df de un contraste
 
