@@ -12,7 +12,7 @@ library(tidyverse)
 
 ### ggplot 1
 ggplot(data = d) + 
-  geom_point(mapping = aes(x = mc, y =tr_d))
+  geom_point(mapping = aes(x = aq, y =m_c))
 
 ### ggplot 2 
 
@@ -82,10 +82,89 @@ ggplot(data = df_DatosUnicos_mod2, mapping = aes(x = estudio, y = auc2)) +
 
 # boxplot genero
 
-ggplot(data = df_DatosUnicos_mod2, mapping = aes(x = genero, y = sd_tr_confi)) + 
+ggplot(data = d.sin.normalizar, mapping = aes(x = Im, y = m_c)) + 
   geom_boxplot()
 
+# boxplot gruped
+ggplot(d.sin.normalizar, aes(x=aq.quartile, y=mc, fill=Im)) + 
+  xlab("AQ: 1= high, 4= low") +
+  ylab("Metacognition") +
+  geom_boxplot()
+
+
 # plotear 
+
+## violin plots r
+# to know the aq quantiles
+cuantiles <- quantile(d.sin.normalizar$aq) ### revisar funcion, anda mal, no los cuartiles 
+#no dejan por debajo lo que deberian
+
+aq.quartile <- rep(NaN, nrow(d))
+
+for (i in 1:length(aq.quartile)) {
+  if (d.sin.normalizar$aq[i] <= 23){
+    aq.quartile[i] <- 4
+  } else if (d.sin.normalizar$aq[i] > 23 & d.sin.normalizar$aq[i] <= 25){
+    aq.quartile[i] <- 3
+  }else if (d.sin.normalizar$aq[i] > 25 & d.sin.normalizar$aq[i] <= 28){
+    aq.quartile[i] <- 2
+  }else if (d.sin.normalizar$aq[i] > 28 & d.sin.normalizar$aq[i] <= 37){
+    aq.quartile[i] <- 1
+  }
+}
+
+table(aq.quartile) # aca se ve el error
+
+d.sin.normalizar$aq.quartile <- as.factor(aq.quartile)
+
+
+# plot violin grouped
+library(ggplot2)
+library(dplyr)
+library(forcats)
+library(hrbrthemes)
+library(viridis)
+
+
+
+d.sin.normalizar %>%
+  mutate(aq.quartile = fct_reorder(aq.quartile, m_c)) %>%
+  mutate(aq.quartile = factor(aq.quartile, levels=c("1", "2", "3", "4"))) %>%
+  ggplot(aes(fill=Im, y=m_c, x=aq.quartile)) + 
+  geom_violin(position="dodge", alpha=0.5, outlier.colour="transparent") +
+  scale_fill_viridis(discrete=T, name="") +
+  theme_ipsum()  +
+  xlab("AQ: 1= high, 4= low") +
+  ylab("confidence") +
+  ylim(0,5)
+
+## density plots
+
+library(ggridges)
+library(ggplot2)
+
+# Metacognition with F and M
+ggplot(d.sin.normalizar, aes(x = mc, y = aq.quartile, fill = Im)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = "none")
+
+# metacognition with F
+solo.f <- d[d$Im == "Femenino",]
+
+ggplot(solo.f, aes(x = mc, y = aq.quartile, fill = aq.quartile)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = "none")
+
+# metacognition with M
+solo.m <- d[d$Im == "Masculino",]
+
+ggplot(solo.m, aes(x = mc, y = aq.quartile, fill = aq.quartile)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = "none")
+
 
 ################
 ### analysis ###
@@ -135,6 +214,8 @@ edad <- rep(NaN, length(unique(df_total$sujetos)))
 estudio <- rep(NaN, length(unique(df_total$sujetos)))
 media_tr_discri <- rep(NaN, length(unique(df_total$sujetos)))
 media_tr_confi <- rep(NaN, length(unique(df_total$sujetos)))
+media_confidence <- rep(NaN, length(unique(df_total$sujetos)))
+sd_confidence <- rep(NaN, length(unique(df_total$sujetos)))
 
 # sujetos que quedaron
 ExistingSubjects <- unique(df_total$sujetos)
@@ -150,10 +231,12 @@ for (i in 1:length(unique(df_total$sujetos))) {
   estudio[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"estudio"])
   media_tr_discri[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"media_tr_discri"])
   media_tr_confi[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"media_tr_confi"])
+  media_confidence[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"media_confidence"])
+  sd_confidence[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"sd_confidence"])
 }
 
 
-d = data.frame(mc  = auc2,
+d.sin.normalizar = data.frame(mc  = auc2,
                Im = genero, 
                pc  = PC,
                aq = AQ,
@@ -161,8 +244,11 @@ d = data.frame(mc  = auc2,
                edad = edad,
                es = estudio,
                tr_d = media_tr_discri,
-               tr_c = media_tr_confi)
+               tr_c = media_tr_confi,
+               m_c = media_confidence,
+               sd_c = sd_confidence)
 
+d <- d.sin.normalizar 
 d$pc <- (d$pc - mean(d$pc)) / sd(d$pc)
 #d$hs <- (d$hs - mean(d$hs)) / sd(d$hs)
 d$edad <- (d$edad - mean(d$edad)) / sd(d$edad)
@@ -170,8 +256,10 @@ d$mc <- (d$mc - mean(d$mc)) / sd(d$mc)
 d$aq <- (d$aq - mean(d$aq)) / sd(d$aq)
 d$tr_d <- (d$tr_d - mean(d$tr_d)) / sd(d$tr_d)
 d$tr_c <- (d$tr_c - mean(d$tr_c)) / sd(d$tr_c)
+d$m_c <- (d$m_c - mean(d$m_c)) / sd(d$m_c)
+d$sd_c <- (d$sd_c - mean(d$sd_c)) / sd(d$sd_c)
 
-a=lm(mc~ aq+as.factor(Im) + aq: as.factor(Im)  , data = d)
+a=lm(sd_c~ aq+as.factor(Im) + aq: as.factor(Im)  , data = d)
 summary(a)
 display(a)
 
@@ -180,7 +268,7 @@ plot(fitted(a), res)
 abline(0,0)
 hist(res)
 
-a=lm(mc ~ edad  , data = d)
+a=lm(sd_c ~ aq  , data = d)
 summary(a)
 display(a)
 
@@ -230,67 +318,3 @@ curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-############# ESTA PARTE AGREGAR AL GIT
-# to know the aq quantiles
-cuantiles <- quantile(d$aq) ### revisar funcion, anda mal, no los cuartiles 
-#no dejan por debajo lo que deberian
-
-aq.quartile <- rep(NaN, nrow(d))
-
-for (i in 1:length(aq.quartile)) {
-  if (d$aq[i] <= 23){
-    aq.quartile[i] <- 4
-  } else if (d$aq[i] > 23 & d$aq[i] <= 25){
-    aq.quartile[i] <- 3
-  }else if (d$aq[i] > 25 & d$aq[i] <= 28){
-    aq.quartile[i] <- 2
-  }else if (d$aq[i] > 28 & d$aq[i] <= 37){
-    aq.quartile[i] <- 1
-  }
-}
-
-table(aq.quartile) # aca se ve el error
-
-d$aq.quartile <- as.factor(aq.quartile)
-
-
-# plot violin grouped
-library(ggplot2)
-library(dplyr)
-library(forcats)
-library(hrbrthemes)
-library(viridis)
-
-
-
-d %>%
-  mutate(aq.quartile = fct_reorder(aq.quartile, mc)) %>%
-  mutate(aq.quartile = factor(aq.quartile, levels=c("1", "2", "3", "4"))) %>%
-  ggplot(aes(fill=Im, y=mc, x=aq.quartile)) + 
-  geom_violin(position="dodge", alpha=0.5, outlier.colour="transparent") +
-  scale_fill_viridis(discrete=T, name="") +
-  theme_ipsum()  +
-  xlab("AQ: 1= high, 2= low") +
-  ylab("Metacog") +
-  ylim(0,1)
-  
