@@ -12,7 +12,12 @@ library(tidyverse)
 
 ### ggplot 1
 ggplot(data = d) + 
-  geom_point(mapping = aes(x = aq, y =m_c))
+  geom_point(mapping = aes(x = aq, y =mc))+
+  xlab("AQ")+
+  ylab("Metacognition")+
+  ggtitle("AQ and Metacognition")+
+  theme(plot.title = element_text(hjust = 0.5)) 
+  
 
 ### ggplot 2 
 
@@ -58,10 +63,31 @@ ggplot(data = df_DatosUnicos_mod7) +
 
 ### ggplot 6
 
-# histogramas
+## histogramas
 
-ggplot(data = df_DatosUnicos_mod2) + 
-  geom_bar(mapping = aes(x = AQ))
+ggplot(data = d.sin.normalizar) + 
+  geom_bar(mapping = aes(x = aq))
+
+# AQ by sex
+# metacognition with F
+solo.f <- d.sin.normalizar[d.sin.normalizar$Im == "Femenino",]
+solo.m <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" |d.sin.normalizar$Im == "Masculino",]
+solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" |d.sin.normalizar$Im == "Femenino",]
+
+
+ggplot(d.sin.normalizar,aes(x=aq)) + 
+  geom_bar(data=subset(d.sin.normalizar,Im == 'Femenino'),fill = "red", alpha = 0.2) +
+  geom_bar(data=subset(d.sin.normalizar,Im == 'Masculino'),fill = "blue", alpha = 0.2) +
+  xlab("AQ") +
+  ggtitle("AQ by Sex")+
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+ggplot(solo.FyM, aes(x=aq, fill = Im)) + 
+  geom_bar(alpha = 0.5) + 
+  scale_fill_manual(name="Sex",values=c("red","blue"),labels=c("F","M"))+
+  ggtitle("AQ by Sex")+
+  theme(plot.title = element_text(hjust = 0.5)) 
+
 
 # con estadisticos para una discreta
 ggplot(data = df_DatosUnicos_mod2) + 
@@ -77,8 +103,10 @@ ggplot(data = df_DatosUnicos_mod2) +
 
 # boxplot estudio
 
-ggplot(data = df_DatosUnicos_mod2, mapping = aes(x = estudio, y = auc2)) + 
-  geom_boxplot()
+ggplot(data = solo.FyM, mapping = aes(x = Im, y = aq)) + 
+  geom_boxplot()+
+  
+
 
 # boxplot genero
 
@@ -86,13 +114,30 @@ ggplot(data = d.sin.normalizar, mapping = aes(x = Im, y = m_c)) +
   geom_boxplot()
 
 # boxplot gruped
-ggplot(d.sin.normalizar, aes(x=aq.quartile, y=mc, fill=Im)) + 
+ggplot(solo.FyM, aes(x=aq.quartile, y=mc, fill=Im)) + 
   xlab("AQ: 1= high, 4= low") +
   ylab("Metacognition") +
-  geom_boxplot()
+  geom_boxplot()+
+  ggtitle("AQ and Metacognition by Sex")+
+  theme(plot.title = element_text(hjust = 0.5)) 
 
 
-# plotear 
+## metacognition and performance plot
+
+mc.sorted <-  d.sin.normalizar[order(mc),]
+subjects <- 1:nrow(mc.sorted)
+mc.sorted$s <- subjects
+
+ggplot(mc.sorted, aes(s)) +                   
+  geom_point(aes(y=mc), colour="red") +  
+  geom_point(aes(y=pc), colour="green") +  
+  labs(title="Metacognition and performance", x="Subjects", y="Performance (green) - Metacognition (red) ", color = "Leyenda\n") +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 14), axis.title.x = element_text(size = 16),
+      axis.text.y = element_text(size = 14), axis.title.y = element_text(size = 16),
+         plot.title = element_text(size = 20, face = "bold", hjust = 0.5))
+
+
 
 ## violin plots r
 # to know the aq quantiles
@@ -144,10 +189,13 @@ library(ggridges)
 library(ggplot2)
 
 # Metacognition with F and M
-ggplot(d.sin.normalizar, aes(x = mc, y = aq.quartile, fill = Im)) +
+ggplot(solo.FyM, aes(x = mc, y = aq.quartile, fill = Im, colour = Im, alpha=0.5)) +
   geom_density_ridges() +
   theme_ridges() + 
-  theme(legend.position = "none")
+  theme(legend.title = element_text(colour="blue", size=10, 
+                                      face="bold"))+
+  theme(legend.text = element_text(colour="blue", size=10, 
+                                     face="bold"))
 
 # metacognition with F
 solo.f <- d[d$Im == "Femenino",]
@@ -309,12 +357,15 @@ plot (solo.f$aq, solo.f$mc, xlab="aq", ylab="mc")
 curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
 
 # solo m
-a=lm(mc~ aq, data = solo.m)
+a=lm(mc~ aq, data = d.sin.normalizar)
 summary(a)
 display(a)
 
 plot (solo.m$aq, solo.m$mc, xlab="aq", ylab="mc")
 curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
 
+
+plot (d.sin.normalizar$aq, d.sin.normalizar$mc, xlab="aq", ylab="mc")
+curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
 
 

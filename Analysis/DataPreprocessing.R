@@ -177,23 +177,63 @@ puntaje_AQ_sujetos <- puntaje_AQ(cant_sujetos,cant_componentes_por_sujetos,ubica
 # add to df_DatosUnicos
 df_DatosUnicos$AQ <- puntaje_AQ_sujetos 
 
-####### metacognitive sensivity 
 
-# load the type 2 ROC analysis function
-source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+#### Explore the reaction times
+
+## Histograms of reaction times 
+
+library(ggplot2)
+library(dplyr)
+
+df.tiempos <- data_frame(tiempo.ensayo.discriminacion = df_exp$discrimination_t_keydown - df_exp$discrimination_t_onset,
+                         tiempo.ensayo.confianza = df_exp$confidence_t_keydown -df_exp$confidence_t_onset)
+
+# plot
+ggplot(df.tiempos, aes(x=tiempo.ensayo.discriminacion))+
+  geom_histogram(color="darkblue", fill="lightblue", bins = 100)+
+  ylab("count")+
+  xlab("RT in discrimination task (ms)")
+
+ggplot(df.tiempos, aes(x=tiempo.ensayo.confianza))+
+  geom_histogram(color="darkblue", fill="lightblue", bins = 100)+
+  ylab("count")+
+  xlab("RT in confidence task (ms)")
 
 ## Filter reaction times greater than 5000ms and less than 200ms in the discrimination task
 df_exp_mod <- df_exp
 t_ensayo_discriminacion <- df_exp_mod$discrimination_t_keydown - df_exp_mod$discrimination_t_onset
 df_exp_mod$t_ensayo_discriminacion <- t_ensayo_discriminacion 
+tiempo.ensayo.discriminacion <- df_exp_mod$t_ensayo_discriminacion
 df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_discriminacion < 5001 & 
                      df_exp_mod$t_ensayo_discriminacion > 199,]
 
 ## Filter reaction times greater than 5000ms and less than 200ms in the confidence task
 t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -df_exp_mod$confidence_t_onset
 df_exp_mod$t_ensayo_confianza <- t_ensayo_confianza 
+tiempo.ensayo.confianza <- df_exp_mod$t_ensayo_confianza
 df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_confianza < 5001 &
                      df_exp_mod$t_ensayo_confianza > 199,]
+
+## Histograms of reaction times 
+
+# after filter by reaction time
+# plot
+ggplot(df_exp_mod, aes(x=t_ensayo_discriminacion))+
+  geom_histogram(color="darkred", fill="red", bins = 100)+
+  ylab("count")+
+  xlab("RT in discrimination task (ms)")
+
+ggplot(df_exp_mod, aes(x=t_ensayo_confianza))+
+  geom_histogram(color="darkred", fill="red", bins = 100)+
+  ylab("count")+
+  xlab("RT in confidence task (ms)")
+
+
+
+####### metacognitive sensivity 
+
+# load the type 2 ROC analysis function
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
 
 ## get metacognitive sensivity
 library(dplyr)
