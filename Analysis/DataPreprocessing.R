@@ -17,7 +17,7 @@ basename(getwd())
 # REEMPLAZAR:
 #read each line and convert
 #content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
-content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210413232920.txt"))
+content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
 res<-lapply(content,fromJSON)
 
 # each subject has 6 lists in order of arrival and by subjects.
@@ -454,8 +454,9 @@ df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$medicacion ==
 ## Filter by performance, leaving only those who have PC > 60 
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$PC > 0.60,] 
 
-## Filter by age, leaving only those who are age > 17 and are not NA
-df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$edad > 17,] 
+## Filter by age, leaving only those who are age > 17, < 100, and are not NA
+df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$edad > 17,]
+df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$edad < 100,]
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[!is.na(df_DatosUnicos_mod2$edad),]
 
 ## filter in df_exp those who survived the filters applied to df_DatosUnicos_mod2

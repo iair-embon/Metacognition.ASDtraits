@@ -49,7 +49,7 @@ sd_confidence <- rep(NaN, length(unique(df_total$sujetos)))
 # sujetos que quedaron
 ExistingSubjects <- unique(df_total$sujetos)
 
-for (i in 1:length(unique(df_total$sujetos))) { # ACA ESTA EL ERROR EN GENERO 
+for (i in 1:length(unique(df_total$sujetos))) { # ACA ESTA EL ERROR EN GENERO, solucion: https://swcarpentry.github.io/r-novice-inflammation/12-supp-factors/
   
   auc2[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"auc2"])
   PC[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"PC"])
