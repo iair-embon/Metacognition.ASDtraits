@@ -204,15 +204,15 @@ df_exp_mod <- df_exp
 t_ensayo_discriminacion <- df_exp_mod$discrimination_t_keydown - df_exp_mod$discrimination_t_onset
 df_exp_mod$t_ensayo_discriminacion <- t_ensayo_discriminacion 
 tiempo.ensayo.discriminacion <- df_exp_mod$t_ensayo_discriminacion
-df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_discriminacion < 5001 & 
-                     df_exp_mod$t_ensayo_discriminacion > 199,]
+df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_discriminacion <= 5000 & 
+                     df_exp_mod$t_ensayo_discriminacion >= 200,]
 
 ## Filter reaction times greater than 5000ms and less than 200ms in the confidence task
 t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -df_exp_mod$confidence_t_onset
 df_exp_mod$t_ensayo_confianza <- t_ensayo_confianza 
 tiempo.ensayo.confianza <- df_exp_mod$t_ensayo_confianza
-df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_confianza < 5001 &
-                     df_exp_mod$t_ensayo_confianza > 199,]
+df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_confianza <= 5000 &
+                     df_exp_mod$t_ensayo_confianza >= 200,]
 
 ## Histograms of reaction times 
 
@@ -485,18 +485,21 @@ for (i in ExistingSubjects) {
 
 # combino las columnas de df_exp_mod2 que me interesan con el df_total
 df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discrimination_is_correct,
-                  confidence_key = df_exp_mod2$confidence_key, trials = df_exp_mod2$trials,
-                  diferencia_puntitos = df_exp_mod2$diferencia_puntitos)
+                  confidence_key = df_exp_mod2$confidence_key, 
+                  trials = df_exp_mod2$trials,
+                  diferencia_puntitos = df_exp_mod2$diferencia_puntitos, 
+                  t_ensayo_discriminacion = df_exp_mod2$t_ensayo_discriminacion,
+                  t_ensayo_confianza = df_exp_mod2$t_ensayo_confianza)
 
 ## save the df_total
 
 # RESULTS_EXP1
-# filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
-# save(df_total,file = filepath)
+#filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
+#save(df_total,file = filepath)
 
 # RESULTS_EXP2(REPLICA)
-
-
+filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
+save(df_total,file = filepath)
 
 # save the df in .txt format, it is saved in the mail folder
 write.table(df_total, file= 'df_total.txt')
