@@ -1,5 +1,9 @@
 #### EJERCICIO 4
 
+
+df_total.solo.FyM <- df_total[df_total$genero == "Masculino" | df_total$genero == "Femenino",]
+
+
 ### lineas para normalizar variables y hacer regresion 
 
 library(arm)
@@ -22,12 +26,13 @@ fit.4.0 <- glm (discrimination_is_correct ~ confidence_key,
 display(fit.4.0)
 
 fit.4.1 <- glm (discrimination_is_correct ~ confidence_key + AQ + genero +
-                  confidence_key:genero + confidence.key:AQ, family=binomial(link="logit"), 
+                  confidence_key:genero + confidence_key:AQ, family=binomial(link="logit"), 
                 data = df_total.solo.FyM)
 summary(fit.4.1)
 display(fit.4.1)
 
-fit.4.2 <- glm (discrimination_is_correct ~ confidence_key:AQ:genero, family=binomial(link="logit"),
+fit.4.2 <- glm (discrimination_is_correct ~confidence_key + AQ + genero +
+                  confidence_key:genero + confidence_key:AQ+ confidence_key:AQ:genero, family=binomial(link="logit"),
                 data = df_total.solo.FyM)
 display(fit.4.2)
 

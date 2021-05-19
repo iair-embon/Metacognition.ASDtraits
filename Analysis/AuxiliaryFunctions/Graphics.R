@@ -53,7 +53,7 @@ for (i in 1:length(unique(df_total$sujetos))) { # ACA ESTA EL ERROR EN GENERO, s
   
   auc2[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"auc2"])
   PC[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"PC"])
-  genero[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"genero"])
+  genero[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"genero"]) # 1 femenino, 2 # masculino
   AQ[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"AQ"])
   horasSueno[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"horasSueno"])
   edad[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"edad"])
@@ -104,9 +104,9 @@ d.mc.filter$m_c <- (d.mc.filter$m_c - mean(d.mc.filter$m_c)) / sd(d.mc.filter$m_
 d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter$sd_c)
 
 
-d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
+d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "2" | d.sin.normalizar$Im == "1",]
 d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
-d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
+d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == '2' | d.mc.filter$Im == '1',]
 
 
 ################
@@ -385,7 +385,7 @@ p+geom_vline(data=mu, aes(xintercept=grp.mean, color=sex),
 
 library(arm)
 
-a=lm(mc ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM) # sin normalizar no da interaccion con sexo
+a=lm(mc ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
 summary(a)
 display(a)
 
