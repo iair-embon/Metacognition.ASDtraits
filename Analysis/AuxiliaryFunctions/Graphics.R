@@ -49,7 +49,7 @@ sd_confidence <- rep(NaN, length(unique(df_total$sujetos)))
 # sujetos que quedaron
 ExistingSubjects <- unique(df_total$sujetos)
 
-for (i in 1:length(unique(df_total$sujetos))) {
+for (i in 1:length(unique(df_total$sujetos))) { # ACA ESTA EL ERROR EN GENERO 
   
   auc2[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"auc2"])
   PC[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"PC"])
@@ -104,7 +104,7 @@ d.mc.filter$m_c <- (d.mc.filter$m_c - mean(d.mc.filter$m_c)) / sd(d.mc.filter$m_
 d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter$sd_c)
 
 
-d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" |d.sin.normalizar$Im == "Femenino",]
+d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
 d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
 d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
 
@@ -361,13 +361,13 @@ ggplot(solo.f, aes(x = mc, y = aq.quartile, fill = aq.quartile)) +
 
 # metacognition with M
 
-ggplot(solo.m, aes(x = mc, y = aq.quartile, fill = aq.quartile)) +
+ggplot(d.sin.normalizar.solo.FyM, aes(x = mc, y = aq.quartile, fill = aq.quartile)) +
   geom_density_ridges() +
   theme_ridges() + 
   theme(legend.position = "none")
 
-# aq by sex HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-ggplot(df, aes(x=weight, fill=sex)) +
+# aq by sex HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+ggplot(d.sin.normalizar.solo.FyM, aes(x=aq, fill=sexo)) +
   geom_density()
 # Use semi-transparent fill
 p<-ggplot(df, aes(x=weight, fill=sex)) +
