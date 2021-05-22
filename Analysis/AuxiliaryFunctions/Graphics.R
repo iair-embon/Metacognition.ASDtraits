@@ -64,6 +64,15 @@ for (i in 1:length(unique(df_total$sujetos))) { # ACA ESTA EL ERROR EN GENERO, s
   sd_confidence[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"sd_confidence"])
 }
 
+for (i in 1:length(genero)) {
+  if(genero[i] == 1){
+    genero[i] = "F"
+  } 
+  else if(genero[i] == 2){
+    genero[i] = "M"
+  }
+}
+  
 
 d.sin.normalizar = data.frame(mc  = auc2,
                               Im = genero, 
@@ -104,19 +113,34 @@ d.mc.filter$m_c <- (d.mc.filter$m_c - mean(d.mc.filter$m_c)) / sd(d.mc.filter$m_
 d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter$sd_c)
 
 
-d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "2" | d.sin.normalizar$Im == "1",]
+d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "M" | d.sin.normalizar$Im == "F",]
 d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
-d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == '2' | d.mc.filter$Im == '1',]
+d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'M' | d.mc.filter$Im == 'F',]
 
+
+###############
+### library ###
+###############
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(forcats)
+library(hrbrthemes)
+library(viridis)
+library(ggridges)
+library(plyr)
+library(arm)
+library(jtools)
+library(ggstance)
+library(broom.mixed)
+library(dotwhisker)
+library(sjPlot)
+library(sjmisc)
+library(ggeffects)
 
 ################
 ### Graphics ###
 ################
-
-# jugando con graficos del libro https://r4ds.had.co.nz/data-visualisation.html 
-# y los datos del exp de metacog
-
-library(tidyverse)
 
 ####### geom_point
 ggplot(data = d) + 
@@ -126,11 +150,11 @@ ggplot(data = d) +
   ggtitle("AQ and Metacognition")+
   theme(plot.title = element_text(hjust = 0.5)) 
   
-# segun genero
+# by sex
 ggplot(data = d) + 
   geom_point(mapping = aes(x = mc, y = aq, color = Im))
 
-# segun estudio
+# by study level
 ggplot(data = df_DatosUnicos_mod2) + 
   geom_point(mapping = aes(x = auc2, y = AQ, color = estudio))
 
@@ -144,12 +168,12 @@ ggplot(data = df_DatosUnicos_mod7) +
 ggplot(data = df_DatosUnicos_mod7) + 
   geom_point(mapping = aes(x = auc2, y = AQ, shape = estudio))
 
-# facet estudios
+# facet study level
 ggplot(data = d) + 
   geom_point(mapping = aes(x = mc, y = aq)) + 
   facet_wrap(~ Im, nrow = 2)
 
-# facet genero
+# facet by sex
 ggplot(data = df_DatosUnicos_mod2) + 
   geom_point(mapping = aes(x = AQ, y = media_tr_discri)) + 
   facet_wrap(~ genero, nrow = 2)
@@ -160,7 +184,7 @@ ggplot(data = df_DatosUnicos_mod2) +
 ggplot(data = df_DatosUnicos_mod7) + 
   geom_smooth(mapping = aes(x = auc2, y = AQ))
 
-####### histogramas
+####### histograms
 
 ggplot(data = d.sin.normalizar) + 
   geom_bar(mapping = aes(x = aq))
@@ -230,12 +254,12 @@ ggplot(data = df_DatosUnicos_mod2) +
 
 ####### boxplot 
 
-# estudio
+# study level
 
 ggplot(data = solo.FyM, mapping = aes(x = Im, y = aq)) + 
   geom_boxplot()+
   
-# genero
+# sex
 
 ggplot(data = d.sin.normalizar, mapping = aes(x = Im, y = m_c)) + 
   geom_boxplot()
@@ -286,15 +310,6 @@ ggplot(mc.sorted, aes(s)) +
         axis.title.y = element_text(size = 25),
         axis.title.x = element_text(size = 25)) 
   
-
-  # theme(axis.text.x = element_text(size = 14), axis.title.x = element_text(size = 16),
-  #       axis.text.y = element_text(size = 14), axis.title.y = element_text(size = 16),
-  #       plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
-  #       panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-  #       panel.background = element_blank(), axis.line = element_line(colour = "black"))
-
-      
-
 ####### violin plots r
 
 # to know the aq quantiles
@@ -320,11 +335,6 @@ table(aq.quartile) # aca se ve el error
 d.sin.normalizar$aq.quartile <- as.factor(aq.quartile)
 
 # plot violin grouped
-library(ggplot2)
-library(dplyr)
-library(forcats)
-library(hrbrthemes)
-library(viridis)
 
 d.sin.normalizar %>%
   mutate(aq.quartile = fct_reorder(aq.quartile, m_c)) %>%
@@ -339,9 +349,6 @@ d.sin.normalizar %>%
 
 
 ####### density plots
-
-library(ggridges)
-library(ggplot2)
 
 # Metacognition with F and M
 ggplot(solo.FyM, aes(x = mc, y = aq.quartile, fill = Im, colour = Im, alpha=0.5)) +
@@ -366,24 +373,31 @@ ggplot(d.sin.normalizar.solo.FyM, aes(x = mc, y = aq.quartile, fill = aq.quartil
   theme_ridges() + 
   theme(legend.position = "none")
 
-# aq by sex HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-ggplot(d.sin.normalizar.solo.FyM, aes(x=aq, fill=sexo)) +
+# aq by sex 
+
+ggplot(d.sin.normalizar.solo.FyM, aes(x=aq, fill=Im)) +
   geom_density()
 # Use semi-transparent fill
-p<-ggplot(df, aes(x=weight, fill=sex)) +
+p<-ggplot(d.sin.normalizar.solo.FyM, aes(x=aq, fill=Im)) +
   geom_density(alpha=0.4)
 p
-# Add mean lines
-p+geom_vline(data=mu, aes(xintercept=grp.mean, color=sex),
-             linetype="dashed")
+p+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25),
+        axis.title.x = element_text(size = 25)) 
+
 
 ################
 ### Analysis ###
 ################
 
 ### lineas para hacer regresion 
-
-library(arm)
 
 a=lm(mc ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
 summary(a)
@@ -468,3 +482,58 @@ summary(a)
 a=lm(mc ~ aq+ aq:Im, data = d.solo.FyM.mc.filter)
 summary(a)
 
+
+# ploteo los coeficientes con plot_summs
+
+a.1=lm(mc ~ aq+aq:Im, data = d.solo.FyM.mc.filter)
+display(a.1)
+plot_summs(a.1, plot.distributions = TRUE)+
+  ylab("confidence") +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25),
+        axis.title.x = element_text(size = 25))
+
+a.2=lm(mc ~ aq+ aq:Im, data = d.sin.normalizar.solo.FyM.mc.filter)
+display(a.2)
+plot_summs(a.1, a.2, plot.distributions = TRUE)
+
+
+# ploteo los coeficientes con dotwhisker
+a.1=lm(mc ~ aq+ aq:Im, data = d.solo.FyM.mc.filter)
+display(a.1)
+
+dwplot((a.1),       
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>% # plot line at zero _behind_ coefs
+  relabel_predictors(c(aq = "AQ",                       
+                       Im = "Sex:")) +
+  theme_bw() + xlab("Coefficient Estimate") + ylab("") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25),
+        axis.title.x = element_text(size = 25))
+
+# ploteo con plot model
+
+df <- d.solo.FyM.mc.filter
+data(df)
+theme_set(theme_sjplot())
+
+# make categorical
+df$Im <- to_factor(df$Im)
+
+# fit model with interaction
+fit <- lm(mc ~ aq + aq * Im, data = df)
+
+plot_model(fit, type = "pred", terms = c("aq", "Im"))

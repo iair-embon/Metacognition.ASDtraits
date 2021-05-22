@@ -194,10 +194,12 @@ ggplot(df.tiempos, aes(x=tiempo.ensayo.discriminacion))+
   ylab("count")+
   xlab("RT in discrimination task (ms)")
 
+
 ggplot(df.tiempos, aes(x=tiempo.ensayo.confianza))+
   geom_histogram(color="darkblue", fill="lightblue", bins = 100)+
   ylab("count")+
   xlab("RT in confidence task (ms)")
+
 
 ## Filter reaction times greater than 5000ms and less than 200ms in the discrimination task
 df_exp_mod <- df_exp
@@ -207,12 +209,21 @@ tiempo.ensayo.discriminacion <- df_exp_mod$t_ensayo_discriminacion
 df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_discriminacion <= 5000 & 
                      df_exp_mod$t_ensayo_discriminacion >= 200,]
 
+n.trials <- nrow(df_exp)
+n.trias.filter.disc.task <- nrow(df_exp_mod)
+
 ## Filter reaction times greater than 5000ms and less than 200ms in the confidence task
 t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -df_exp_mod$confidence_t_onset
 df_exp_mod$t_ensayo_confianza <- t_ensayo_confianza 
 tiempo.ensayo.confianza <- df_exp_mod$t_ensayo_confianza
 df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_confianza <= 5000 &
                      df_exp_mod$t_ensayo_confianza >= 200,]
+
+n.trias.filter.conf.task <- nrow(df_exp_mod)
+
+# see how much trials were discarded in percentage
+trials.disc.task.discarted <- ((n.trials - n.trias.filter.disc.task) * 100)/ n.trials
+trials.conf.task.discarted <- ((n.trias.filter.disc.task - n.trias.filter.conf.task) * 100)/ n.trials
 
 ## Histograms of reaction times 
 
@@ -495,12 +506,12 @@ df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discriminati
 ## save the df_total
 
 # RESULTS_EXP1
-#filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
-#save(df_total,file = filepath)
+filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
+save(df_total,file = filepath)
 
 # RESULTS_EXP2(REPLICA)
-filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
-save(df_total,file = filepath)
+#filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
+#save(df_total,file = filepath)
 
 # save the df in .txt format, it is saved in the mail folder
 write.table(df_total, file= 'df_total.txt')
