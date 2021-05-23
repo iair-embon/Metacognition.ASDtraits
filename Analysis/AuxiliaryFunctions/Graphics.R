@@ -113,9 +113,9 @@ d.mc.filter$m_c <- (d.mc.filter$m_c - mean(d.mc.filter$m_c)) / sd(d.mc.filter$m_
 d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter$sd_c)
 
 
-d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "M" | d.sin.normalizar$Im == "F",]
+d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == 'Femenino' | d.sin.normalizar$Im == 'Masculino',]
 d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
-d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'M' | d.mc.filter$Im == 'F',]
+d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
 
 
 ###############
