@@ -451,7 +451,7 @@ curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
 
 # pruebo hacer algunas regresiones luego de sacar los que tienen metacog menor a 0.5
 
-a=lm(mc ~  aq + aq:Im, data = d.solo.FyM.mc.filter) ## DA SIGNIFICATIVO AQ, Y LA INTERACCION
+a=lm(mc ~  aq + Im + aq:Im, data = d.sin.normalizar.solo.FyM.mc.filter) ## DA SIGNIFICATIVO AQ, Y LA INTERACCION
 summary(a)
 display(a)
 
