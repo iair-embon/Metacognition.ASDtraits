@@ -113,16 +113,15 @@ d.mc.filter$m_c <- (d.mc.filter$m_c - mean(d.mc.filter$m_c)) / sd(d.mc.filter$m_
 d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter$sd_c)
 
 
-d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "M" | d.sin.normalizar$Im == "F",]
+d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
 d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
-d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'M' | d.mc.filter$Im == 'F',]
+d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
 
 
 ###############
 ### library ###
 ###############
 library(tidyverse)
-library(ggplot2)
 library(dplyr)
 library(forcats)
 library(hrbrthemes)
@@ -351,7 +350,7 @@ d.sin.normalizar %>%
 ####### density plots
 
 # Metacognition with F and M
-ggplot(solo.FyM, aes(x = mc, y = aq.quartile, fill = Im, colour = Im, alpha=0.5)) +
+ggplot(d.sin.normalizar.solo.FyM, aes(x = mc, y = aq.quartile, fill = Im, colour = Im, alpha=0.5)) +
   geom_density_ridges() +
   theme_ridges() + 
   theme(legend.title = element_text(colour="blue", size=10, 
@@ -377,20 +376,33 @@ ggplot(d.sin.normalizar.solo.FyM, aes(x = mc, y = aq.quartile, fill = aq.quartil
 
 ggplot(d.sin.normalizar.solo.FyM, aes(x=aq, fill=Im)) +
   geom_density()
+
+
+l <- d.sin.normalizar.solo.FyM
+for (i in 1:nrow(l)) {
+  if(l$Im[i] == 'Femenino'){l$Im[i]= 'Female'}
+  if(l$Im[i] == 'Masculino'){l$Im[i]= 'Male'}
+}
+
+l$Gender <-l$Im 
+
 # Use semi-transparent fill
-p<-ggplot(d.sin.normalizar.solo.FyM, aes(x=aq, fill=Im)) +
+p<-ggplot(l, aes(x=aq, fill=Gender))+ xlab("AQ") +
   geom_density(alpha=0.4)
 p
 p+  theme_bw() +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 25),
         axis.text.y = element_text(size = 25),
-        axis.title.y = element_text(size = 25),
-        axis.title.x = element_text(size = 25)) 
+        axis.title.y = element_text(size = 30),
+        legend.title = element_text(size=25),
+        legend.text = element_text(size=22),
+        axis.title.x = element_text(size = 30)) 
 
 
 ################
@@ -408,10 +420,44 @@ plot(fitted(a), res)
 abline(0,0)
 hist(res)
 
-a=lm(sd_c ~ aq  , data = d)
+a=lm(mc ~ aq  , data = d.mc.filter)
 summary(a)
 display(a)
 
+# plot metacog AQ regresion
+par(mar = c(5, 5, 5, 5))
+plot(d.mc.filter$aq, d.mc.filter$mc, pch = 16, cex = 1, col = "blue",
+     xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8)
+abline(lm(d.mc.filter$mc ~ d.mc.filter$aq),col="red", lwd=3)
+
+
+# plot metacog AQ regresion for males
+
+l <- d.mc.filter[d.mc.filter$Im=='Masculino',]
+# regresion only for males
+a=lm(mc ~ aq  , data = l)
+summary(a)
+display(a)
+
+par(mar = c(5, 5, 5, 5))
+plot(l$aq, l$mc, pch = 16, cex = 1, col = "blue", main = "Males",
+     xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
+abline(lm(l$mc ~ l$aq),col="red", lwd=3)
+
+# plot metacog AQ regresion for females
+
+l <- d.mc.filter[d.mc.filter$Im=='Femenino',]
+# regresion only for females
+a=lm(mc ~ aq  , data = l)
+summary(a)
+display(a)
+
+par(mar = c(5, 5, 5, 5))
+plot(l$aq, l$mc, pch = 16, cex = 1, col = "blue", main = "Females",
+     xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
+abline(lm(l$mc ~ l$aq),col="red", lwd=3)
+
+# Trying other models
 a=lm(tr_c ~ aq  , data = d)
 summary(a)
 display(a)
