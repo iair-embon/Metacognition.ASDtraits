@@ -113,6 +113,7 @@ d.mc.filter$m_c <- (d.mc.filter$m_c - mean(d.mc.filter$m_c)) / sd(d.mc.filter$m_
 d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter$sd_c)
 
 
+
 d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
 d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
 d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
@@ -497,7 +498,7 @@ curve (coef(a)[1] + coef(a)[2]*x, add=TRUE)
 
 # pruebo hacer algunas regresiones luego de sacar los que tienen metacog menor a 0.5
 
-a=lm(mc ~  aq + aq:Im, data = d.solo.FyM.mc.filter) ## DA SIGNIFICATIVO AQ, Y LA INTERACCION
+a=lm(mc ~  aq + Im + aq:Im, data = d.sin.normalizar.solo.FyM.mc.filter) ## DA SIGNIFICATIVO AQ, Y LA INTERACCION
 summary(a)
 display(a)
 
