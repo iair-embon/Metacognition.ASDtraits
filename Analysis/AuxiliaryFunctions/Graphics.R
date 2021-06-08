@@ -530,12 +530,18 @@ a=lm(mc ~ aq+ aq:Im, data = d.solo.FyM.mc.filter)
 summary(a)
 
 
-# ploteo los coeficientes con plot_summs
+# ploteo los coeficientes con plot_summs ----------------------------ESTE VA HASTA AHORA
+df.plot <- d.solo.FyM.mc.filter
+df.plot$AQ <- df.plot$aq
+df.plot$Gender <- df.plot$Im
+df.plot$Gender[df.plot$Gender == "Masculino"] <- "Male"
+df.plot$Gender[df.plot$Gender == "Femenino"] <- "Female"
 
-a.1=lm(mc ~ aq+aq:Im, data = d.solo.FyM.mc.filter)
+a.1=lm(mc ~ AQ+AQ:Gender, data = df.plot)
 display(a.1)
-plot_summs(a.1, plot.distributions = TRUE)+
-  ylab("confidence") +
+plot_summs(a.1, plot.distributions = FALSE)+
+  #ylab("Model") +
+  ylab("") +
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -546,6 +552,8 @@ plot_summs(a.1, plot.distributions = TRUE)+
         axis.text.y = element_text(size = 25),
         axis.title.y = element_text(size = 25),
         axis.title.x = element_text(size = 25))
+
+
 
 a.2=lm(mc ~ aq+ aq:Im, data = d.sin.normalizar.solo.FyM.mc.filter)
 display(a.2)
