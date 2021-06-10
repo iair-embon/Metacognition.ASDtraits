@@ -18,11 +18,11 @@ basename(getwd())
 # load(file= filepath)
 
 ## ambos df_total:
-filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
+filepath <- (root$find_file("Data/Results_Exp1/df_total.filtro.0.Rda"))
 load(file= filepath)
 a <- df_total
 
-filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
+filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.filtro.0.Rda"))
 load(file= filepath)
 b <- df_total
 # sumo 100 a la columna sujetos, para que no se pisen los nros y este nro sea unico
@@ -421,7 +421,7 @@ plot(fitted(a), res)
 abline(0,0)
 hist(res)
 
-a=lm(mc ~ aq  , data = d.mc.filter)
+a=lm(mc ~ aq +Im + aq:Im  , data = d.solo.FyM.mc.filter)
 summary(a)
 display(a)
 
@@ -537,7 +537,7 @@ df.plot$Gender <- df.plot$Im
 df.plot$Gender[df.plot$Gender == "Masculino"] <- "Male"
 df.plot$Gender[df.plot$Gender == "Femenino"] <- "Female"
 
-a.1=lm(mc ~ AQ+AQ:Gender, data = df.plot)
+a.1=lm(mc ~ AQ+ Gender +AQ:Gender, data = df.plot)
 display(a.1)
 plot_summs(a.1, plot.distributions = FALSE)+
   #ylab("Model") +
