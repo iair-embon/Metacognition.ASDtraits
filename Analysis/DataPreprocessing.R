@@ -16,8 +16,8 @@ root <- rprojroot::is_rstudio_project
 basename(getwd())
 # REEMPLAZAR:
 #read each line and convert
-#content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
-content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
+content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
+#content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
 res<-lapply(content,fromJSON)
 
 # each subject has 6 lists in order of arrival and by subjects.

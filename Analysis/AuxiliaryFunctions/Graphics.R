@@ -18,11 +18,11 @@ basename(getwd())
 # load(file= filepath)
 
 ## ambos df_total:
-filepath <- (root$find_file("Data/Results_Exp1/df_total.filtro.0.Rda"))
+filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
 load(file= filepath)
 a <- df_total
 
-filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.filtro.0.Rda"))
+filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
 load(file= filepath)
 b <- df_total
 # sumo 100 a la columna sujetos, para que no se pisen los nros y este nro sea unico
@@ -199,7 +199,7 @@ ggplot(d.sin.normalizar,aes(x=aq)) +
   ggtitle("AQ by Sex")+
   theme(plot.title = element_text(hjust = 0.5)) 
 
-ggplot(solo.FyM, aes(x=aq, fill = Im)) + 
+ggplot(d.sin.normalizar.solo.FyM.mc.filter, aes(x=aq, fill = Im)) + 
   geom_bar(alpha = 0.5) + 
   scale_fill_manual(name="Sex",values=c("red","blue"),labels=c("F","M"))+
   ggtitle("AQ by Sex")+
@@ -256,9 +256,9 @@ ggplot(data = df_DatosUnicos_mod2) +
 
 # study level
 
-ggplot(data = solo.FyM, mapping = aes(x = Im, y = aq)) + 
-  geom_boxplot()+
-  
+ggplot(data = d.sin.normalizar.solo.FyM.mc.filter, mapping = aes(x = Im, y = aq)) + 
+  geom_boxplot()
+
 # sex
 
 ggplot(data = d.sin.normalizar, mapping = aes(x = Im, y = m_c)) + 
@@ -275,7 +275,7 @@ ggplot(solo.FyM, aes(x=aq.quartile, y=mc, fill=Im)) +
 
 ####### metacognition and performance plot
 
-mc.sorted <-  d.sin.normalizar[order(mc),]
+mc.sorted <-  d.sin.normalizar.solo.FyM.mc.filter[order(d.sin.normalizar.solo.FyM.mc.filter$mc),]
 subjects <- 1:nrow(mc.sorted)
 mc.sorted$s <- subjects
 
@@ -403,7 +403,8 @@ p+  theme_bw() +
         axis.title.y = element_text(size = 30),
         legend.title = element_text(size=25),
         legend.text = element_text(size=22),
-        axis.title.x = element_text(size = 30)) 
+        axis.title.x = element_text(size = 30))+
+  scale_fill_grey()
 
 
 ################
@@ -415,6 +416,16 @@ p+  theme_bw() +
 a=lm(mc ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
 summary(a)
 display(a)
+
+
+a=lm(sd_c ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
+summary(a)
+display(a)
+
+a=lm(m_c ~aq +  aq: Im , data = d.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
+summary(a)
+display(a)
+
 
 res <- resid(a)
 plot(fitted(a), res)
@@ -539,6 +550,7 @@ df.plot$Gender[df.plot$Gender == "Femenino"] <- "Female"
 
 a.1=lm(mc ~ AQ+ Gender +AQ:Gender, data = df.plot)
 display(a.1)
+summary(a.1)
 plot_summs(a.1, plot.distributions = FALSE)+
   #ylab("Model") +
   ylab("") +
