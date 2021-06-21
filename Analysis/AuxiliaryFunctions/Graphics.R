@@ -218,6 +218,7 @@ ggplot(df_total, aes(x=t_ensayo_discriminacion))+
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
         panel.border = element_blank(),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 25),
@@ -234,6 +235,7 @@ ggplot(df_total, aes(x=t_ensayo_confianza))+
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
         panel.border = element_blank(),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 25),
@@ -295,15 +297,16 @@ subjects <- 1:nrow(mc.sorted)
 mc.sorted$s <- subjects
 
 ggplot(mc.sorted, aes(s)) +                   
-  geom_point(aes(y=mc), colour="red") +  
-  geom_point(aes(y=pc), colour="green") +  
-# labs(title="Metacognition and performance", x="Subjects", y="Performance (green) - Metacognition (red) ", color = "Leyenda\n") +
-  labs(x="Subjects", y="Metacog(red) - Perf (green)", color = "Leyenda\n") +
+  geom_point(aes(y=mc), colour="red", show.legend = TRUE) +  
+  geom_point(aes(y=pc), colour="green", show.legend = TRUE) +  
+# labs(title="Metacognition and performance", x="Subjects", y="Performance (green)/Metacognition (red) ", color = "Leyenda\n") +
+  labs(x="Subjects", y="Metacognition/Performance", color = "Leyend\n") +
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 25),
         axis.text.y = element_text(size = 25),
@@ -398,12 +401,12 @@ p+  theme_bw() +
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank(),
-        axis.text.x = element_text(size = 25),
-        axis.text.y = element_text(size = 25),
-        axis.title.y = element_text(size = 30),
-        legend.title = element_text(size=25),
-        legend.text = element_text(size=22),
-        axis.title.x = element_text(size = 30))+
+        axis.text.x = element_text(size = 26),
+        axis.text.y = element_text(size = 26),
+        axis.title.y = element_text(size = 31),
+        legend.title = element_text(size=31),
+        legend.text = element_text(size=26),
+        axis.title.x = element_text(size = 31))+
   scale_fill_grey()
 
 
@@ -559,6 +562,7 @@ plot_summs(a.1, plot.distributions = FALSE)+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 25),
         axis.text.y = element_text(size = 25),
