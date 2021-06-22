@@ -117,8 +117,18 @@ d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter
 d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
 d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
 d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
+df_total.sin.normalizar.solo.FyM.mc.filter <-  df_total[df_total$genero == 'Femenino' | df_total$genero == 'Masculino',]
+df_total.sin.normalizar.solo.FyM.mc.filter <- 
+  df_total.sin.normalizar.solo.FyM.mc.filter[
+    df_total.sin.normalizar.solo.FyM.mc.filter$auc2 >= 0.5,]
 
+l <- df_total.sin.normalizar.solo.FyM.mc.filter
 
+l$norm_confidence_key <-(l$confidence_key - mean(l$confidence_key)) / sd(l$confidence_key)
+
+df_total.normalizado.solo.FyM.mc.filter <- l
+
+  
 ###############
 ### library ###
 ###############
@@ -137,6 +147,8 @@ library(dotwhisker)
 library(sjPlot)
 library(sjmisc)
 library(ggeffects)
+library(scales)
+
 
 ################
 ### Graphics ###
@@ -258,8 +270,8 @@ ggplot(data = df_DatosUnicos_mod2) +
 
 # study level
 
-ggplot(data = d.sin.normalizar.solo.FyM.mc.filter, mapping = aes(x = Im, y = aq)) + 
-  geom_boxplot()
+ggplot(data = d.sin.normalizar.solo.FyM.mc.filter, mapping = 
+         aes(x = Im, y = aq)) + geom_boxplot()
 
 # sex
 
@@ -313,6 +325,30 @@ ggplot(mc.sorted, aes(s)) +
         axis.title.y = element_text(size = 25),
         axis.title.x = element_text(size = 25)) 
   
+# probando legends en el grafico anterior
+ggplot(mc.sorted, aes(s)) +                   
+  geom_point(aes(x = s, y=mc , colour="Metacognition")) +  
+  geom_point(aes(x = s, y=pc , colour="Performance"), shape = 17) +  
+  labs(x="Subjects", y="Metacognition/Performance", color = "Leyend") +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 15),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25),
+        axis.title.x = element_text(size = 25)) 
+
+
+
+
+
+
 ####### violin plots r
 
 # to know the aq quantiles
@@ -409,7 +445,25 @@ p+  theme_bw() +
         axis.title.x = element_text(size = 31))+
   scale_fill_grey()
 
+# distribucion de confianza para trials correctas e incorrectas 
 
+p<-ggplot(df_total, aes(x=aq, fill=Gender))+ xlab("AQ") +
+  geom_density(alpha=0.4)
+p
+p+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 26),
+        axis.text.y = element_text(size = 26),
+        axis.title.y = element_text(size = 31),
+        legend.title = element_text(size=31),
+        legend.text = element_text(size=26),
+        axis.title.x = element_text(size = 31))+
+  scale_fill_grey()
 ################
 ### Analysis ###
 ################
@@ -425,7 +479,7 @@ a=lm(sd_c ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin norm
 summary(a)
 display(a)
 
-a=lm(m_c ~aq +  aq: Im , data = d.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
+a=lm(m_c ~aq +  aq: Im , data = d.solo.FyM.mc.filter)
 summary(a)
 display(a)
 
@@ -441,9 +495,9 @@ display(a)
 
 # plot metacog AQ regresion
 par(mar = c(5, 5, 5, 5))
-plot(d.mc.filter$aq, d.mc.filter$mc, pch = 16, cex = 1, col = "blue",
+plot(d.mc.filter$aq, d.mc.filter$mc, pch = 16, cex = 1, col = "black",
      xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8)
-abline(lm(d.mc.filter$mc ~ d.mc.filter$aq),col="red", lwd=3)
+abline(lm(d.mc.filter$mc ~ d.mc.filter$aq),col="black", lwd=3)
 
 
 # plot metacog AQ regresion for males
@@ -455,9 +509,9 @@ summary(a)
 display(a)
 
 par(mar = c(5, 5, 5, 5))
-plot(l$aq, l$mc, pch = 16, cex = 1, col = "blue", main = "Males",
+plot(l$aq, l$mc, pch = 16, cex = 1, col = "grey", main = "Males",
      xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
-abline(lm(l$mc ~ l$aq),col="red", lwd=3)
+abline(lm(l$mc ~ l$aq),col="grey", lwd=3)
 
 # plot metacog AQ regresion for females
 
@@ -468,9 +522,9 @@ summary(a)
 display(a)
 
 par(mar = c(5, 5, 5, 5))
-plot(l$aq, l$mc, pch = 16, cex = 1, col = "blue", main = "Females",
+plot(l$aq, l$mc, pch = 16, cex = 1, col = "grey53", main = "Females",
      xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
-abline(lm(l$mc ~ l$aq),col="red", lwd=3)
+abline(lm(l$mc ~ l$aq),col="grey53", lwd=3)
 
 # Trying other models
 a=lm(tr_c ~ aq  , data = d)
@@ -608,3 +662,60 @@ df$Im <- to_factor(df$Im)
 fit <- lm(mc ~ aq + aq * Im, data = df)
 
 plot_model(fit, type = "pred", terms = c("aq", "Im"))
+
+# ploteo los coeficientes con bar plot
+
+# intento 1
+df.plot <- d.solo.FyM.mc.filter
+df.plot$AQ <- df.plot$aq
+df.plot$Gender <- df.plot$Im
+df.plot$Gender[df.plot$Gender == "Masculino"] <- "Male"
+df.plot$Gender[df.plot$Gender == "Femenino"] <- "Female"
+
+a=lm(mc ~ AQ + Gender + AQ: Gender , data = df.plot)
+summary(a)
+display(a)
+
+coeff <- coefficients(a)
+coeff <- coeff[2:4]
+names.coef <- names(coeff)
+
+
+dtf <- data.frame(Predictor = names.coef,
+                  y = coeff)
+
+ggplot(dtf, aes(Predictor, y)) +    # VA ESTE PARA REGRESION
+  geom_bar(stat = "identity", aes(fill = Predictor))+
+  theme_bw() + xlab("") + ylab("Coefficient Estimate") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 15),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25),
+        axis.title.x = element_text(size = 25))
+
+
+library(plyr)
+library(ggplot2)
+library(scales)
+
+# intento 2
+
+plot_coeffs <- function(mlr_model) {
+  coeffs <- coefficients(mlr_model)
+  mp <- barplot(coeffs, col="#3F97D0", xaxt='n', main="Regression Coefficients")
+  lablist <- names(coeffs)
+  text(mp, par("usr")[3], labels = lablist, srt = 45, 
+       adj = c(1.1,1.1), xpd = TRUE, cex=0.6)
+}
+
+a=lm(mc ~aq + Im + aq: Im , data = d.solo.FyM.mc.filter)
+
+plot_coeffs(a)
+
