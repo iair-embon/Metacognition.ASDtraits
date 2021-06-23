@@ -24,6 +24,7 @@ load(file= filepath)
 fit.4.0 <- glm (discrimination_is_correct ~ confidence_key, 
                 family=binomial(link="logit"), data = df_total.solo.FyM)
 display(fit.4.0)
+summary(fit.4.0)
 
 fit.4.1 <- glm (discrimination_is_correct ~ confidence_key + AQ + genero +
                   confidence_key:genero + confidence_key:AQ, family=binomial(link="logit"), 
@@ -32,9 +33,18 @@ summary(fit.4.1)
 display(fit.4.1)
 
 fit.4.2 <- glm (discrimination_is_correct ~confidence_key + AQ + genero +
-                  confidence_key:genero + confidence_key:AQ+ confidence_key:AQ:genero, family=binomial(link="logit"),
+                  confidence_key:genero + confidence_key:AQ+ confidence_key:AQ:genero, 
+                family=binomial(link="logit"),
                 data = df_total.solo.FyM)
+
+fit.4.2 <- glm (discrimination_is_correct ~confidence_key + AQ  +
+                  confidence_key:AQ, 
+                family=binomial(link="logit"),
+                data = df_total.solo.FyM)
+
+
 display(fit.4.2)
+summary(fit.4.2)
 
 fit.4.4 <- glm (discrimination_is_correct ~ confidence_key + AQ + genero + ### edad?
                    edad, family=binomial(link="logit"), data = df_total.solo.FyM)

@@ -18,11 +18,11 @@ basename(getwd())
 # load(file= filepath)
 
 ## ambos df_total:
-filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
+filepath <- (root$find_file("Data/Results_Exp1/df_total.filtro.0.Rda"))
 load(file= filepath)
 a <- df_total
 
-filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
+filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.filtro.0.Rda"))
 load(file= filepath)
 b <- df_total
 # sumo 100 a la columna sujetos, para que no se pisen los nros y este nro sea unico
@@ -327,22 +327,23 @@ ggplot(mc.sorted, aes(s)) +
   
 # probando legends en el grafico anterior
 ggplot(mc.sorted, aes(s)) +                   
-  geom_point(aes(x = s, y=mc , colour="Metacognition")) +  
+  geom_point(aes(x = s, y=mc , colour="AUROC2")) +  
   geom_point(aes(x = s, y=pc , colour="Performance"), shape = 17) +  
-  labs(x="Subjects", y="Metacognition/Performance", color = "Leyend") +
+  scale_y_continuous(expand = expansion(mult = c(0, .1)))+
+  labs(x="Participants", y="", color = "") +
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         plot.margin = margin(1, 1,1, 1, "cm"),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
+        #legend.title = element_text(size = 20),
+        legend.text = element_text(size = 30),
         panel.background = element_blank(),
-        axis.text.x = element_text(size = 25),
-        axis.text.y = element_text(size = 25),
-        axis.title.y = element_text(size = 25),
-        axis.title.x = element_text(size = 25)) 
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
 
 
 
@@ -428,7 +429,8 @@ l$Gender <-l$Im
 
 # Use semi-transparent fill
 p<-ggplot(l, aes(x=aq, fill=Gender))+ xlab("AQ") +
-  geom_density(alpha=0.4)
+  geom_density(alpha=0.4) +
+  scale_y_continuous(expand = expansion(mult = c(0,0)))
 p
 p+  theme_bw() +
   theme(axis.line = element_line(colour = "black"),
@@ -437,12 +439,13 @@ p+  theme_bw() +
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank(),
-        axis.text.x = element_text(size = 26),
-        axis.text.y = element_text(size = 26),
-        axis.title.y = element_text(size = 31),
-        legend.title = element_text(size=31),
-        legend.text = element_text(size=26),
-        axis.title.x = element_text(size = 31))+
+        axis.text.x = element_text(size = 30),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=30),
+        axis.title.x = element_text(size = 30))+
   scale_fill_grey()
 
 # distribucion de confianza para trials correctas e incorrectas 
@@ -464,13 +467,55 @@ p+  theme_bw() +
         legend.text = element_text(size=26),
         axis.title.x = element_text(size = 31))+
   scale_fill_grey()
+
+# reaction times with density plots
+
+
+ggplot(df_total, aes(x=t_ensayo_discriminacion)) +
+  geom_density(color="darkred", fill="red")+
+  scale_y_continuous(expand = expansion(mult = c(0, .1)))+
+  ylab("")+
+  xlab("RT in discrimination task (ms)")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.title.x = element_text(size = 30)) 
+
+
+ggplot(df_total, aes(x=t_ensayo_confianza)) +
+  geom_density(color="darkred", fill="red")+
+  scale_y_continuous(expand = expansion(mult = c(0, .1)))+
+  ylab("")+
+  xlab("RT in confidence task (ms)")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.title.x = element_text(size = 30)) 
+
+
 ################
 ### Analysis ###
 ################
 
 ### lineas para hacer regresion 
 
-a=lm(mc ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
+a=lm(mc ~aq + Im + aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
 summary(a)
 display(a)
 
@@ -479,7 +524,7 @@ a=lm(sd_c ~aq +  aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin norm
 summary(a)
 display(a)
 
-a=lm(m_c ~aq +  aq: Im , data = d.solo.FyM.mc.filter)
+a=lm(mc ~aq + Im  + aq: Im , data = d.solo.FyM.mc.filter)
 summary(a)
 display(a)
 
@@ -496,7 +541,7 @@ display(a)
 # plot metacog AQ regresion
 par(mar = c(5, 5, 5, 5))
 plot(d.mc.filter$aq, d.mc.filter$mc, pch = 16, cex = 1, col = "black",
-     xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8)
+     xlab = "AQ", ylab = "AUROC2", cex.axis = 1.7, cex.lab = 1.8)
 abline(lm(d.mc.filter$mc ~ d.mc.filter$aq),col="black", lwd=3)
 
 
@@ -510,7 +555,7 @@ display(a)
 
 par(mar = c(5, 5, 5, 5))
 plot(l$aq, l$mc, pch = 16, cex = 1, col = "grey", main = "Males",
-     xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
+     xlab = "AQ", ylab = "AUROC2", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
 abline(lm(l$mc ~ l$aq),col="grey", lwd=3)
 
 # plot metacog AQ regresion for females
@@ -523,7 +568,7 @@ display(a)
 
 par(mar = c(5, 5, 5, 5))
 plot(l$aq, l$mc, pch = 16, cex = 1, col = "grey53", main = "Females",
-     xlab = "AQ", ylab = "Metacognition", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
+     xlab = "AQ", ylab = "AUROC2", cex.axis = 1.7, cex.lab = 1.8, cex.main = 1.8)
 abline(lm(l$mc ~ l$aq),col="grey53", lwd=3)
 
 # Trying other models
@@ -686,19 +731,20 @@ dtf <- data.frame(Predictor = names.coef,
 
 ggplot(dtf, aes(Predictor, y)) +    # VA ESTE PARA REGRESION
   geom_bar(stat = "identity", aes(fill = Predictor))+
-  theme_bw() + xlab("") + ylab("Coefficient Estimate") +
+  theme_bw() + xlab("") + ylab("Regression coefficient") +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
-        axis.text.x = element_text(size = 25),
-        axis.text.y = element_text(size = 25),
-        axis.title.y = element_text(size = 25),
-        axis.title.x = element_text(size = 25))
+        legend.title = element_blank(),
+        legend.text =element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30))
 
 
 library(plyr)
@@ -715,7 +761,12 @@ plot_coeffs <- function(mlr_model) {
        adj = c(1.1,1.1), xpd = TRUE, cex=0.6)
 }
 
-a=lm(mc ~aq + Im + aq: Im , data = d.solo.FyM.mc.filter)
+a=lm(mc ~aq + edad + es + Im + aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter)
+summary(a)
+
+a=lm(mc ~aq + Im + aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter)
+summary(a)
+
 
 plot_coeffs(a)
 
