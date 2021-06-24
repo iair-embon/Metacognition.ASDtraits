@@ -46,7 +46,7 @@ fit.4.2 <- glm (discrimination_is_correct ~confidence_key + AQ  +
 display(fit.4.2)
 summary(fit.4.2)
 
-fit.4.4 <- glm (discrimination_is_correct ~ confidence_key + AQ + genero + ### edad?
+fit.4.4 <- glm (discrimination_is_correct ~ confidence_key + AQ + genero + 
                    edad, family=binomial(link="logit"), data = df_total.solo.FyM)
 display(fit.4.4)
 
@@ -65,11 +65,48 @@ for (i in 1:length(unique(df_total.solo.FyM$sujetos))) {
   reg.coef.conf[i] <- b[2]
 }
 
-# agrego los coeficientes de la regresion al d.sin.normalizar.solo.FyM
+## agrego los coeficientes de la regresion al d.sin.normalizar.solo.FyM
+
+# antes de agregar la los coeficientes rellenar con NAN los lugares que falten
+
+
 
 d.sin.normalizar.solo.FyM$reg.coef.conf <- reg.coef.conf
 
+
+
 plot(d.sin.normalizar.solo.FyM$mc, d.sin.normalizar.solo.FyM$reg.coef.conf, ylim = c(-3,3), xlim = c(-2.5,3.5))
+
+# preparo el density plot
+
+l <- d.sin.normalizar.solo.FyM
+for (i in 1:nrow(l)) {
+  if(l$Im[i] == 'Femenino'){l$Im[i]= 'Female'}
+  if(l$Im[i] == 'Masculino'){l$Im[i]= 'Male'}
+}
+
+l$Gender <-l$Im 
+
+p<-ggplot(l, aes(x=aq, fill=Gender))+ xlab("AQ") +
+  geom_density(alpha=0.4) +
+  scale_y_continuous(expand = expansion(mult = c(0,0)))
+p
+p+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=30),
+        axis.title.x = element_text(size = 30))+
+  scale_fill_grey()
+
 
 # pruebo normalizar ambas medidas de metacognicion
 
