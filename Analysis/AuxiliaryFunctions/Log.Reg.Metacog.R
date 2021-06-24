@@ -67,19 +67,16 @@ for (i in 1:length(unique(df_total.solo.FyM$sujetos))) {
 
 ## agrego los coeficientes de la regresion al d.sin.normalizar.solo.FyM
 
-# antes de agregar la los coeficientes rellenar con NAN los lugares que falten
-
-
-
 d.sin.normalizar.solo.FyM$reg.coef.conf <- reg.coef.conf
 
+d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
 
-
-plot(d.sin.normalizar.solo.FyM$mc, d.sin.normalizar.solo.FyM$reg.coef.conf, ylim = c(-3,3), xlim = c(-2.5,3.5))
+a = lm(reg.coef.conf ~  aq + aq:Im ,data = d.sin.normalizar.solo.FyM.mc.filter)
+summary(a)
 
 # preparo el density plot
 
-l <- d.sin.normalizar.solo.FyM
+l <- d.sin.normalizar.solo.FyM.mc.filter
 for (i in 1:nrow(l)) {
   if(l$Im[i] == 'Femenino'){l$Im[i]= 'Female'}
   if(l$Im[i] == 'Masculino'){l$Im[i]= 'Male'}
@@ -87,8 +84,9 @@ for (i in 1:nrow(l)) {
 
 l$Gender <-l$Im 
 
-p<-ggplot(l, aes(x=aq, fill=Gender))+ xlab("AQ") +
+p<-ggplot(l, aes(x=reg.coef.conf, fill=Gender))+ xlab("Regression Coefficient") +
   geom_density(alpha=0.4) +
+  xlim(-4, 4)+
   scale_y_continuous(expand = expansion(mult = c(0,0)))
 p
 p+  theme_bw() +
