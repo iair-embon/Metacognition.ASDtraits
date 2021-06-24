@@ -18,11 +18,11 @@ basename(getwd())
 # load(file= filepath)
 
 ## ambos df_total:
-filepath <- (root$find_file("Data/Results_Exp1/df_total.filtro.0.Rda"))
+filepath <- (root$find_file("Data/Results_Exp1/df_total.filtro.200.Rda"))
 load(file= filepath)
 a <- df_total
 
-filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.filtro.0.Rda"))
+filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.filtro.200.Rda"))
 load(file= filepath)
 b <- df_total
 # sumo 100 a la columna sujetos, para que no se pisen los nros y este nro sea unico

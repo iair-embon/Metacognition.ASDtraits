@@ -16,8 +16,8 @@ root <- rprojroot::is_rstudio_project
 basename(getwd())
 # REEMPLAZAR:
 #read each line and convert
-content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
-#content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
+#content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
+content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
 res<-lapply(content,fromJSON)
 
 # each subject has 6 lists in order of arrival and by subjects.
@@ -209,7 +209,7 @@ tiempo.ensayo.discriminacion <- df_exp_mod$t_ensayo_discriminacion
 
 # # filter by time greater than 5000ms and less than 200ms in the discrimination task
 df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_discriminacion <= 5000 &
-                     df_exp_mod$t_ensayo_discriminacion >= 0,]
+                     df_exp_mod$t_ensayo_discriminacion >= 100,]
 
 ## Filter reaction times by standar deviation, 3 sd biger than the mean, or lesser than 200ms.
 # sd.t_ensayo_discriminacion <- sd(df_exp_mod$t_ensayo_discriminacion)
@@ -229,7 +229,7 @@ tiempo.ensayo.confianza <- df_exp_mod$t_ensayo_confianza
 
 # # filter by time greater than 5000ms and less than 200ms in the discrimination task
 df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_confianza <= 5000 &
-                     df_exp_mod$t_ensayo_confianza >= 0,]
+                     df_exp_mod$t_ensayo_confianza >= 100,]
 
 ## Filter reaction times by standar deviation, 3 sd biger than the mean, or lesser than 200ms.
 # sd.t_ensayo_confidence <- sd(df_exp_mod$t_ensayo_confianza)
@@ -526,11 +526,11 @@ df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discriminati
 ## save the df_total
 
 # # RESULTS_EXP1
-# filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
-# save(df_total,file = filepath)
+#filepath <- root$find_file("Data/Results_Exp1/df_total.filtro.100.Rda")
+#save(df_total,file = filepath)
 
 # RESULTS_EXP2(REPLICA)
-filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
+filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.filtro.100.Rda")
 save(df_total,file = filepath)
 
 # save the df in .txt format, it is saved in the mail folder
