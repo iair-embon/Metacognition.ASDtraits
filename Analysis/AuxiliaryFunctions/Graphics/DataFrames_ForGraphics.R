@@ -1,26 +1,33 @@
-DataFrame_ForGraphics <- function(experimento, filtro){ 
+DataFrame_ForGraphics <- function(experimento, 
+                                  filtroRT_Disc_Sup,
+                                  filtroRT_Disc_Inf,
+                                  filtroRT_Conf_Sup,
+                                  filtroRT_Conf_Inf,
+                                  filtroTrial = 0){ 
   
   # experimento = 1,2,ambos
-  # filtro = 0,100,200
+  # Superior and inferior filtro Reaction Time Discrimination task 
+  # Superior and inferior filtro Reaction Time Confidence task 
   
+
   # voy a la carpeta del proyecto
   root <- rprojroot::is_rstudio_project
   basename(getwd())
   
   # elijo que exp voy a utilizar, 1, 2 (replica), o ambos
   if (experimento == 1){
-    filepath <- (root$find_file(paste("Data/Results_Exp1/df_total.filtro.",filtro,".Rda", sep = "")))
+    filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
     df_total <- load(file= filepath)} 
   if (experimento == 2){
-    filepath <- (root$find_file(paste("Data/Results_Exp2(replica)/df_total.filtro.",filtro,".Rda", sep = "")))
+    filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
     df_total <- load(file= filepath)}
   if (experimento == 'ambos'){
     ## ambos df_total:
-    filepath <- (root$find_file(paste("Data/Results_Exp1/df_total.filtro.",filtro,".Rda", sep = "")))
+    filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
     load(file= filepath)
     a <- df_total
     
-    filepath <- (root$find_file(paste("Data/Results_Exp2(replica)/df_total.filtro.",filtro,".Rda", sep = "")))
+    filepath <- (root$find_file("Data/Results_Exp2(replica)/df_total.Rda"))
     load(file= filepath)
     b <- df_total
     # sumo 100 a la columna sujetos, para que no se pisen los nros y este nro sea unico
@@ -30,6 +37,18 @@ DataFrame_ForGraphics <- function(experimento, filtro){
     # uno los df
     df_total <- rbind(a,b)
     }
+  
+  ## Filter by reaction times 
+  
+  # In the discrimination task
+  df_total <- df_total[df_total$t_ensayo_discriminacion <= filtroRT_Disc_Sup &
+                         df_total$t_ensayo_discriminacion >= filtroRT_Disc_Inf,]
+  # In the confidence task
+    df_total <- df_total[df_total$t_ensayo_confianza <= filtroRT_Conf_Sup &
+                         df_total$t_ensayo_confianza >= filtroRT_Conf_Inf,]
+  
+  # Filter by trails
+  df_total <- df_total[df_total$trials > filtroTrial,]
   
   # tomo las variables de interes
   auc2 <- rep(NaN, length(unique(df_total$sujetos)))

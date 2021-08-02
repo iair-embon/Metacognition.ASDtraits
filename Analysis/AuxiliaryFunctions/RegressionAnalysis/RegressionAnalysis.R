@@ -12,7 +12,12 @@ source(root$find_file("Analysis/AuxiliaryFunctions/Graphics/DataFrames_ForGraphi
 # get the df list
 # experimento = 1,2,ambos
 # filtro = 0,100,200
-DF_list <- DataFrame_ForGraphics(experimento = "ambos", filtro = 100)
+DF_list <- DataFrame_ForGraphics(experimento = "ambos", 
+                                 filtroRT_Disc_Sup = 5000,
+                                 filtroRT_Disc_Inf = 0,
+                                 filtroRT_Conf_Sup = 5000,
+                                 filtroRT_Conf_Inf = 0,
+                                 filtroTrial = 0)
 
 # DF_list:
 # a df_total
@@ -25,10 +30,8 @@ DF_list <- DataFrame_ForGraphics(experimento = "ambos", filtro = 100)
 # h d.solo.FyM.mc.filter
 # i df_total.sin.normalizar.solo.FyM.mc.filter
 
-
-d.mc.filter <- DF_list$e
 d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
-d.solo.FyM.mc.filter <- DF_list$h
+
 
 ###############
 ### library ###
@@ -59,7 +62,31 @@ library(sjPlot)
 
 ### lineas para hacer regresion 
 
-a=lm(mc ~aq + Im + aq: Im , data = d.sin.normalizar.solo.FyM.mc.filter) # sin normalizar no da interaccion con sexo
+d.sin.normalizar.solo.FyM.mc.filter$aq.norm <- (d.sin.normalizar.solo.FyM.mc.filter$aq 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$aq)
+                                                ) / sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
+
+
+d1 = d.sin.normalizar.solo.FyM.mc.filter
+d1[d1 == "Masculino"] <- "1"
+d1[d1 == "Femenino"] <- "0"
+d1$Im <- as.integer(d1$Im)
+
+a=lm(mc ~aq.norm +
+       Im +
+       edad +
+       es +
+       aq.norm: Im ,
+     data = d1) # sin normalizar no da interaccion con sexo
+summary(a)
+display(a)
+
+a=lm(mc ~aq +
+       Im +
+       #edad +
+       #es +
+       aq: Im ,
+     data = d1) # sin normalizar no da interaccion con sexo
 summary(a)
 display(a)
 

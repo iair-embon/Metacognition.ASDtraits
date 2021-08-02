@@ -177,89 +177,13 @@ puntaje_AQ_sujetos <- puntaje_AQ(cant_sujetos,cant_componentes_por_sujetos,ubica
 # add to df_DatosUnicos
 df_DatosUnicos$AQ <- puntaje_AQ_sujetos 
 
-
-#### Explore the reaction times
-
-## Histograms of reaction times 
-
-library(ggplot2)
-library(dplyr)
-
-df.tiempos <- data_frame(tiempo.ensayo.discriminacion = df_exp$discrimination_t_keydown - df_exp$discrimination_t_onset,
-                         tiempo.ensayo.confianza = df_exp$confidence_t_keydown -df_exp$confidence_t_onset)
-
-# plot
-ggplot(df.tiempos, aes(x=tiempo.ensayo.discriminacion))+
-  geom_histogram(color="darkblue", fill="lightblue", bins = 100)+
-  ylab("count")+
-  xlab("RT in discrimination task (ms)")
-
-
-ggplot(df.tiempos, aes(x=tiempo.ensayo.confianza))+
-  geom_histogram(color="darkblue", fill="lightblue", bins = 100)+
-  ylab("count")+
-  xlab("RT in confidence task (ms)")
-
-
-## Filter reaction times 
+######### Adding columns of reaction times
 df_exp_mod <- df_exp
-t_ensayo_discriminacion <- df_exp_mod$discrimination_t_keydown - df_exp_mod$discrimination_t_onset
-df_exp_mod$t_ensayo_discriminacion <- t_ensayo_discriminacion 
-tiempo.ensayo.discriminacion <- df_exp_mod$t_ensayo_discriminacion
 
-# # filter by time greater than 5000ms and less than 200ms in the discrimination task
-df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_discriminacion <= 5000 &
-                     df_exp_mod$t_ensayo_discriminacion >= 100,]
-
-## Filter reaction times by standar deviation, 3 sd biger than the mean, or lesser than 200ms.
-# sd.t_ensayo_discriminacion <- sd(df_exp_mod$t_ensayo_discriminacion)
-# mean.t_ensayo_discriminacion <- mean(df_exp_mod$t_ensayo_discriminacion)
-# df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_discriminacion <= mean.t_ensayo_discriminacion + sd.t_ensayo_discriminacion*4 & 
-#                            df_exp_mod$t_ensayo_discriminacion >= 0,]
-
-hist(df_exp_mod$t_ensayo_discriminacion, breaks = 500, xlim = c(0, 10000))
-
-n.trials <- nrow(df_exp)
-n.trias.filter.disc.task <- nrow(df_exp_mod)
-
-## Filter reaction times greater than 5000ms and less than 200ms in the confidence task
-t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -df_exp_mod$confidence_t_onset
-df_exp_mod$t_ensayo_confianza <- t_ensayo_confianza 
-tiempo.ensayo.confianza <- df_exp_mod$t_ensayo_confianza
-
-# # filter by time greater than 5000ms and less than 200ms in the discrimination task
-df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_confianza <= 5000 &
-                     df_exp_mod$t_ensayo_confianza >= 100,]
-
-## Filter reaction times by standar deviation, 3 sd biger than the mean, or lesser than 200ms.
-# sd.t_ensayo_confidence <- sd(df_exp_mod$t_ensayo_confianza)
-# mean.t_ensayo_confidence <- mean(df_exp_mod$t_ensayo_confianza)
-# df_exp_mod <- df_exp_mod[df_exp_mod$t_ensayo_confianza <= mean.t_ensayo_confidence + sd.t_ensayo_confidence*4 & 
-#                            df_exp_mod$t_ensayo_confianza >= 0,]
-
-hist(df_exp_mod$t_ensayo_confianza, breaks = 500 , xlim = c(200, 5000))
-
-n.trias.filter.conf.task <- nrow(df_exp_mod)
-
-# see how much trials were discarded in percentage
-trials.disc.task.discarted <- ((n.trials - n.trias.filter.disc.task) * 100)/ n.trials
-trials.conf.task.discarted <- ((n.trias.filter.disc.task - n.trias.filter.conf.task) * 100)/ n.trials
-
-## Histograms of reaction times 
-
-# after filter by reaction time
-# plot
-ggplot(df_exp_mod, aes(x=t_ensayo_discriminacion))+
-  geom_histogram(color="darkred", fill="red", bins = 100)+
-  ylab("count")+
-  xlab("RT in discrimination task (ms)")
-
-ggplot(df_exp_mod, aes(x=t_ensayo_confianza))+
-  geom_histogram(color="darkred", fill="red", bins = 100)+
-  ylab("count")+
-  xlab("RT in confidence task (ms)")
-
-
+df_exp_mod$t_ensayo_discriminacion <- df_exp_mod$discrimination_t_keydown - 
+  df_exp_mod$discrimination_t_onset
+df_exp_mod$t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -
+  df_exp_mod$confidence_t_onset
 
 ####### metacognitive sensivity 
 
@@ -495,12 +419,12 @@ df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discriminati
 ## save the df_total
 
 # # RESULTS_EXP1
-#filepath <- root$find_file("Data/Results_Exp1/df_total.filtro.100.Rda")
+#filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
 #save(df_total,file = filepath)
 
 # RESULTS_EXP2(REPLICA)
-filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.filtro.100.Rda")
+filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
 save(df_total,file = filepath)
 
 # save the df in .txt format, it is saved in the mail folder
-write.table(df_total, file= 'df_total.txt')
+#write.table(df_total, file= 'df_total.txt')
