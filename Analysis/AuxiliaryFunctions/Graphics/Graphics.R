@@ -71,7 +71,7 @@ ggplot(d.sin.normalizar.solo.FyM.mc.filter,aes(x=aq)) +
         axis.text.x = element_text(size = 30),
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30),
-        strip.text.y = element_text(size = 20),
+        strip.text = element_text(size = 20),
         axis.title.x = element_text(size = 30))
 
 # a2
@@ -95,14 +95,25 @@ ggplot(d.sin.normalizar.solo.FyM.mc.filter,aes(x=aq)) +
         axis.text.x = element_text(size = 30),
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30),
-        strip.text.y = element_text(size = 20),
+        strip.text = element_text(size = 20),
         axis.title.x = element_text(size = 30))
         
 
 ## Histograms of reaction times 
+RT_disk_task = df_total$t_ensayo_discriminacion
+RT_conf_task = df_total$t_ensayo_confianza
+RT_disk_task_label <- rep('RT_disk_task',length(RT_disk_task))
+RT_conf_task_label <- rep('RT_conf_task', length(RT_conf_task))
 
-# after filter by reaction time
-# plot
+RT_task <- c(RT_disk_task,RT_conf_task)
+RT_task_labels <- c(RT_disk_task_label,RT_conf_task_label)
+
+d <- data.frame(RT_task = RT_task,
+                RT_task_labels = RT_task_labels)
+
+
+# a1
+# disc task
 ggplot(df_total, aes(x=t_ensayo_discriminacion))+
   geom_histogram(color="darkred", fill="red", bins = 100)+
   ylab("count")+
@@ -119,6 +130,7 @@ ggplot(df_total, aes(x=t_ensayo_discriminacion))+
         axis.title.y = element_text(size = 25),
         axis.title.x = element_text(size = 25)) 
 
+# conf task
 ggplot(df_total, aes(x=t_ensayo_confianza))+
   geom_histogram(color="darkred", fill="red", bins = 100)+
   ylab("count")+
@@ -134,6 +146,51 @@ ggplot(df_total, aes(x=t_ensayo_confianza))+
         axis.text.y = element_text(size = 25),
         axis.title.y = element_text(size = 25),
         axis.title.x = element_text(size = 25)) 
+
+# b1
+ggplot(d,aes(x=RT_task)) + 
+  geom_histogram(data=subset(d,RT_task_labels == 'RT_disk_task'),
+           fill = "red", alpha = 0.2) +
+  geom_histogram(data=subset(d,RT_task_labels == 'RT_conf_task'),
+           fill = "blue", alpha = 0.2) +
+  facet_grid(cols = vars(RT_task_labels))+
+  xlab("RT_task") +
+  ylab("Trials")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        strip.text = element_text(size = 20),
+        axis.title.x = element_text(size = 30))
+
+# b2
+ggplot(d,aes(x=RT_task)) + 
+  geom_histogram(data=subset(d,RT_task_labels == 'RT_disk_task'),
+                 fill = "red", alpha = 0.2) +
+  geom_histogram(data=subset(d,RT_task_labels == 'RT_conf_task'),
+                 fill = "blue", alpha = 0.2) +
+  facet_grid(rows = vars(RT_task_labels))+
+  xlab("RT_task") +
+  ylab("Trials")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        strip.text = element_text(size = 20),
+        axis.title.x = element_text(size = 30))
+
 
 ####### metacognition and performance plot
 
@@ -349,3 +406,45 @@ abline(lm(d.sin.normalizar$mc ~ d.sin.normalizar$Cant_trial_disc),
        col="grey", lwd=3)
 
 
+####### plotting the performance by trial
+library(matrixStats)
+
+d1 <- df_total.sin.normalizar.solo.FyM.mc.filter 
+d1$discrimination_is_correct[d1$discrimination_is_correct=='TRUE'] <- "1"
+d1$discrimination_is_correct[d1$discrimination_is_correct=='FALSE'] <- "0"
+
+total_trials <- max(d1$trials)-min(d1$trials)
+
+MeanPerformanceByTrial <- rep(NA,total_trials)
+#sd <- rep(NA,total_trials)
+  
+for (i in 1:total_trials){
+  trial_colum <- d1[d1$trials == i,]  # getting data by trial
+  MeanPerformanceByTrial[i] <- mean(as.integer(trial_colum$discrimination_is_correct))
+  #sd[i] <- sd(as.integer(trial_colum$discrimination_is_correct))
+}
+
+plot(MeanPerformanceByTrial, type='l', col="green", lwd=5, 
+     xlab="Trial", ylab="Mean Peroformance", xlim=c(0,135), ylim=c(0.50,1))
+
+df2 <- data.frame(TrialNumber = 1:length(MeanPerformanceByTrial),
+                  MeanPerformanceByTrial = MeanPerformanceByTrial)
+
+ggplot(data=df2, aes(x=TrialNumber, y=MeanPerformanceByTrial)) +
+  geom_line( color="blue", size=1.2)+
+  geom_point(color="red", size=3) +
+  #geom_errorbar(aes(ymin=MeanPerformanceByTrial-sd,
+  #                  ymax=MeanPerformanceByTrial+sd), 
+  #              width=.2,
+  #              position=position_dodge(0.05))
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
