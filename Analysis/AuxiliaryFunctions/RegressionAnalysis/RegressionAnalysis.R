@@ -14,10 +14,10 @@ source(root$find_file("Analysis/AuxiliaryFunctions/Graphics/DataFrames_ForGraphi
 # filtro = 0,100,200
 DF_list <- DataFrame_ForGraphics(experimento = "ambos", 
                                  filtroRT_Disc_Sup = 5000,
-                                 filtroRT_Disc_Inf = 0,
+                                 filtroRT_Disc_Inf = 150,
                                  filtroRT_Conf_Sup = 5000,
                                  filtroRT_Conf_Inf = 0,
-                                 filtroTrial = 0)
+                                 filtroTrial = 20)
 
 # DF_list:
 # a df_total
@@ -28,11 +28,12 @@ DF_list <- DataFrame_ForGraphics(experimento = "ambos",
 # f d.sin.normalizar.solo.FyM
 # g d.sin.normalizar.solo.FyM.mc.filter
 # h d.solo.FyM.mc.filter
-# i df_total.sin.normalizar.solo.FyM.mc.filter
+# i df_total.solo.FyM.mc.filter
 
 d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
-
-
+df_total <- DF_list$a
+d.sin.normalizar <- DF_list$b
+d <- DF_list$d
 ###############
 ### library ###
 ###############
@@ -66,27 +67,39 @@ d.sin.normalizar.solo.FyM.mc.filter$aq.norm <- (d.sin.normalizar.solo.FyM.mc.fil
                                                 - mean(d.sin.normalizar.solo.FyM.mc.filter$aq)
                                                 ) / sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
 
+d.sin.normalizar.solo.FyM.mc.filter$mc.norm <- (d.sin.normalizar.solo.FyM.mc.filter$mc 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$mc)) / sd(d.sin.normalizar.solo.FyM.mc.filter$mc)
+
+d.sin.normalizar.solo.FyM.mc.filter$edad.norm <- (d.sin.normalizar.solo.FyM.mc.filter$edad 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$edad)) / sd(d.sin.normalizar.solo.FyM.mc.filter$edad)
+
 
 d1 = d.sin.normalizar.solo.FyM.mc.filter
 d1[d1 == "Masculino"] <- "1"
 d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
 
+d2 <- d1[!(d1$es == "Secundaria incompleta" |d1$es == "Secundaria completa"),]
+
+d3 <- d1[!(d1$es == "Secundaria incompleta"),]
+
+
 a=lm(mc ~aq.norm +
        Im +
-       edad +
-       es +
+       #edad+
+       #es +
        aq.norm: Im ,
      data = d1) 
 summary(a)
 display(a)
 
+
 a=lm(mc ~aq +
        Im +
-       #edad +
-       #es +
+       edad +
+       es +
        aq: Im ,
-     data = d1) 
+     data = d) 
 summary(a)
 display(a)
 

@@ -32,6 +32,8 @@ DF_list <- DataFrame_ForGraphics(experimento = "ambos",
 d.sin.normalizar <- DF_list$b
 df_total <- DF_list$a
 d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
+df_total.solo.FyM.mc.filter <- DF_list$i
+
 ###############
 ### library ###
 ###############
@@ -445,6 +447,115 @@ ggplot(data=df2, aes(x=TrialNumber, y=MeanPerformanceByTrial)) +
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
+
+
+####### plotting the metacognition by trial (for different discarding rt)
+
+d1 <- df_total.solo.FyM.mc.filter 
+
+Nsuj <- length(unique(d1$sujetos))
+
+# saving metacog = mc for each RT discarded
+mc_Rt_Discarded_0 <- rep(NA, Nsuj)
+mc_Rt_Discarded_50 <- rep(NA, Nsuj)
+mc_Rt_Discarded_100 <- rep(NA, Nsuj)
+mc_Rt_Discarded_150 <- rep(NA, Nsuj)
+mc_Rt_Discarded_200 <- rep(NA, Nsuj)
+mc_Rt_Discarded_250 <- rep(NA, Nsuj)
+
+# load the type 2 ROC analysis function
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+
+## get metacognitive sensivity
+library(dplyr)
+
+ExistingSubjects <- unique(d1$sujetos)
+
+for (i in 1:Nsuj){
+  mc_Rt_Discarded_0[i] <- type2roc(correct = d1$discrimination_is_correct[d1$sujetos==ExistingSubjects[i]], 
+                      conf = d1$confidence_key[d1$sujetos==ExistingSubjects[i]], Nratings = 4 )
+  
+  d2 <- d1[d1$t_ensayo_discriminacion >= 50 & d1$t_ensayo_confianza >=50,]
+  mc_Rt_Discarded_50[i] <- type2roc(correct = d2$discrimination_is_correct[d2$sujetos==ExistingSubjects[i]], 
+                                    conf = d2$confidence_key[d2$sujetos==ExistingSubjects[i]], Nratings = 4 )
+  
+  d3 <- d1[d1$t_ensayo_discriminacion >= 100 & d1$t_ensayo_confianza >= 100,]
+  mc_Rt_Discarded_100[i] <- type2roc(correct = d3$discrimination_is_correct[d3$sujetos==ExistingSubjects[i]], 
+                                     conf = d3$confidence_key[d3$sujetos==ExistingSubjects[i]], Nratings = 4 )
+  
+  d4 <- d1[d1$t_ensayo_discriminacion >= 150 & d1$t_ensayo_confianza >=150,]
+  mc_Rt_Discarded_150[i] <- type2roc(correct = d4$discrimination_is_correct[d4$sujetos==ExistingSubjects[i]], 
+                                     conf = d4$confidence_key[d4$sujetos==ExistingSubjects[i]], Nratings = 4 )
+  
+  d5 <- d1[d1$t_ensayo_discriminacion >= 200 & d1$t_ensayo_confianza >=200,]
+  mc_Rt_Discarded_200[i] <- type2roc(correct = d5$discrimination_is_correct[d5$sujetos==ExistingSubjects[i]], 
+                                     conf = d5$confidence_key[d5$sujetos==ExistingSubjects[i]], Nratings = 4 )
+  
+  d6 <- d1[d1$t_ensayo_discriminacion >= 250 & d1$t_ensayo_confianza >=250,]
+  mc_Rt_Discarded_250[i] <- type2roc(correct = d6$discrimination_is_correct[d6$sujetos==ExistingSubjects[i]], 
+                                     conf = d6$confidence_key[d6$sujetos==ExistingSubjects[i]], Nratings = 4 )
+  
+}
+
+
+
+plot(mc_Rt_Discarded_200, type='l', col="green", lwd=5, 
+     xlab="Trial", ylab="Mean Peroformance", xlim=c(0,135), ylim=c(0.50,1))
+
+df2 <- data.frame(subjects = 1:Nsuj,
+                  mc_Rt_Discarded_0 = mc_Rt_Discarded_0,
+                  mc_Rt_Discarded_50 = mc_Rt_Discarded_50,
+                  mc_Rt_Discarded_100 = mc_Rt_Discarded_100,
+                  mc_Rt_Discarded_150 = mc_Rt_Discarded_150,
+                  mc_Rt_Discarded_200 = mc_Rt_Discarded_200,
+                  mc_Rt_Discarded_250 = mc_Rt_Discarded_250)
+                  
+ggplot(df2, aes(x=subjects)) + 
+  geom_line(aes(y = mc_Rt_Discarded_0), color = "darkred",size=0.8) + 
+  geom_line(aes(y = mc_Rt_Discarded_250), color="steelblue", linetype="twodash",size=0.8) +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        #axis.text.y = element_text(size = 30),
+        #axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
+
+AUROC2 <- c(mc_Rt_Discarded_0,mc_Rt_Discarded_50,mc_Rt_Discarded_100,
+            mc_Rt_Discarded_150,mc_Rt_Discarded_200,
+            mc_Rt_Discarded_250)
+
+a <- rep("0RT",Nsuj)
+b <- rep("50RT",Nsuj)
+c <- rep("100RT",Nsuj)
+d <- rep("150RT",Nsuj)
+e <- rep("200RT",Nsuj)
+f <- rep("250RT",Nsuj)
+
+AUROC2_Labels <- c(a,b,c,d,e,f)
+
+df3 <- data.frame(AUROC2 = AUROC2,
+                  AUROC2_Labels = AUROC2_Labels)
+
+ggplot(df3, aes(x=AUROC2_Labels, y=AUROC2,fill=AUROC2_Labels)) +
+  geom_boxplot()+
+  labs(x = "Limite inferior de TR")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_blank(),
+        legend.title = element_blank(),
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30),
         axis.title.x = element_text(size = 30)) 

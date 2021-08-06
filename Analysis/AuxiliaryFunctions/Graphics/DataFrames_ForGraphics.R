@@ -66,7 +66,7 @@ DataFrame_ForGraphics <- function(experimento,
   # sujetos que quedaron
   ExistingSubjects <- unique(df_total$sujetos)
   
-  for (i in 1:length(unique(df_total$sujetos))) { # ACA ESTA EL ERROR EN GENERO, solucion: https://swcarpentry.github.io/r-novice-inflammation/12-supp-factors/
+  for (i in 1:length(unique(df_total$sujetos))) { 
     
     auc2[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"auc2"])
     PC[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"PC"])
@@ -132,20 +132,12 @@ DataFrame_ForGraphics <- function(experimento,
   d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
   d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.5,]
   d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
-  df_total.sin.normalizar.solo.FyM.mc.filter <-  df_total[df_total$genero == 'Femenino' | df_total$genero == 'Masculino',]
-  # df_total.sin.normalizar.solo.FyM.mc.filter <- 
-  #   df_total.sin.normalizar.solo.FyM.mc.filter[
-  #     df_total.sin.normalizar.solo.FyM.mc.filter$auc2 >= 0.5,]
-  
-  #l <- df_total.sin.normalizar.solo.FyM.mc.filter
-  
-  #l$norm_confidence_key <-(l$confidence_key - mean(l$confidence_key)) / sd(l$confidence_key)
-  
-  #df_total.normalizado.solo.FyM.mc.filter <- l
-  
+  df_total.solo.FyM <-  df_total[df_total$genero == 'Femenino' | df_total$genero == 'Masculino',]
+  df_total.solo.FyM.mc.filter <-df_total.solo.FyM[df_total.solo.FyM$auc2 >= 0.5,]
+
   DF_list <- list(a = df_total, b = d.sin.normalizar, c = d.sin.normalizar.mc.filter, d = d,
                   e = d.mc.filter, f = d.sin.normalizar.solo.FyM, g = d.sin.normalizar.solo.FyM.mc.filter,
-                  h = d.solo.FyM.mc.filter, i = df_total.sin.normalizar.solo.FyM.mc.filter)
+                  h = d.solo.FyM.mc.filter, i = df_total.solo.FyM.mc.filter)
   
   
   return(DF_list)
