@@ -7,16 +7,16 @@ root <- rprojroot::is_rstudio_project
 basename(getwd())
 
 # load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/Graphics/DataFrames_ForGraphics.R"))
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
 
 # get the df list
 # experimento = 1,2,ambos
-DF_list <- DataFrame_ForGraphics(experimento = "ambos", 
-                                  filtroRT_Disc_Sup = 5000,
-                                  filtroRT_Disc_Inf = 0,
-                                  filtroRT_Conf_Sup = 5000,
-                                  filtroRT_Conf_Inf = 0,
-                                  filtroTrial = 0)
+DF_list <- DataFrame_Filtered(experimento = "ambos",
+                              filtroRT_Disc_Sup = 5000,
+                              filtroRT_Disc_Inf = 0,
+                              filtroRT_Conf_Sup = 5000,
+                              filtroRT_Conf_Inf = 200,
+                              filtroTrial = 0)
 
 # DF_list:
 # a df_total
@@ -27,12 +27,10 @@ DF_list <- DataFrame_ForGraphics(experimento = "ambos",
 # f d.sin.normalizar.solo.FyM
 # g d.sin.normalizar.solo.FyM.mc.filter
 # h d.solo.FyM.mc.filter
-# i df_total.sin.normalizar.solo.FyM.mc.filter
 
 d.sin.normalizar <- DF_list$b
-df_total <- DF_list$a
+df_total_200 <- DF_list$a
 d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
-df_total.solo.FyM.mc.filter <- DF_list$i
 
 ###############
 ### library ###
@@ -559,3 +557,11 @@ ggplot(df3, aes(x=AUROC2_Labels, y=AUROC2,fill=AUROC2_Labels)) +
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30),
         axis.title.x = element_text(size = 30)) 
+
+
+### escolaridad segun edad
+
+p<-ggplot(d1, aes(x=edad))+
+  geom_histogram(color="black", fill="white")+
+  facet_grid(. ~ es)
+p

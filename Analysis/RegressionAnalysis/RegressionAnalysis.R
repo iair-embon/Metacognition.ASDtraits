@@ -7,14 +7,13 @@ root <- rprojroot::is_rstudio_project
 basename(getwd())
 
 # load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/Graphics/DataFrames_ForGraphics.R"))
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
 
 # get the df list
 # experimento = 1,2,ambos
-# filtro = 0,100,200
-DF_list <- DataFrame_ForGraphics(experimento = "ambos", 
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
                                  filtroRT_Disc_Sup = 5000,
-                                 filtroRT_Disc_Inf = 150,
+                                 filtroRT_Disc_Inf = 200,
                                  filtroRT_Conf_Sup = 5000,
                                  filtroRT_Conf_Inf = 0,
                                  filtroTrial = 20)
@@ -28,7 +27,6 @@ DF_list <- DataFrame_ForGraphics(experimento = "ambos",
 # f d.sin.normalizar.solo.FyM
 # g d.sin.normalizar.solo.FyM.mc.filter
 # h d.solo.FyM.mc.filter
-# i df_total.solo.FyM.mc.filter
 
 d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
 df_total <- DF_list$a
@@ -84,15 +82,18 @@ d2 <- d1[!(d1$es == "Secundaria incompleta" |d1$es == "Secundaria completa"),]
 d3 <- d1[!(d1$es == "Secundaria incompleta"),]
 
 
-a=lm(mc ~aq.norm +
+a=lm(mc ~ aq.norm +
        Im +
-       #edad+
-       #es +
-       aq.norm: Im ,
+       edad.norm+
+       es +
+       aq.norm: Im,
+       #aq.norm:edad.norm,
+       #es:aq.norm,
      data = d1) 
 summary(a)
 display(a)
 
+tab_model(a)
 
 a=lm(mc ~aq +
        Im +

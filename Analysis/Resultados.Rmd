@@ -1,0 +1,148 @@
+---
+title: "Regression Analysis"
+author: "Embon,Barttfeld & Solovey"
+date: "8/9/2021"
+output: html_document
+---
+
+## Levantar datos
+
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
+                                 filtroRT_Disc_Sup = 5000,
+                                 filtroRT_Disc_Inf = 200,
+                                 filtroRT_Conf_Sup = 5000,
+                                 filtroRT_Conf_Inf = 100,
+                                 filtroTrial = 20)
+                                 
+```{r levantar datos, echo=FALSE}
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+# load the function to get the df list
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+
+# get the df list
+# experimento = 1,2,ambos
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
+                                 filtroRT_Disc_Sup = 5000,
+                                 filtroRT_Disc_Inf = 200,
+                                 filtroRT_Conf_Sup = 5000,
+                                 filtroRT_Conf_Inf = 100,
+                                 filtroTrial = 20)
+
+# DF_list:
+# a df_total
+# b d.sin.normalizar
+# c d.sin.normalizar.mc.filter
+# d d
+# e d.mc.filter
+# f d.sin.normalizar.solo.FyM
+# g d.sin.normalizar.solo.FyM.mc.filter
+# h d.solo.FyM.mc.filter
+
+d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
+df_total <- DF_list$a
+d.sin.normalizar <- DF_list$b
+d <- DF_list$d
+###############
+### library ###
+###############
+library(arm)
+library(jtools)
+library(broom.mixed)
+library(TMB)
+library(sjPlot)
+library(dotwhisker)
+library(tidyverse)
+library(dplyr)
+
+###########################
+### Regression Analysis ###
+###########################
+
+### lineas para hacer regresion 
+
+d.sin.normalizar.solo.FyM.mc.filter$aq.norm <- (d.sin.normalizar.solo.FyM.mc.filter$aq 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$aq)
+                                                ) / sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
+
+d.sin.normalizar.solo.FyM.mc.filter$mc.norm <- (d.sin.normalizar.solo.FyM.mc.filter$mc 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$mc)) / sd(d.sin.normalizar.solo.FyM.mc.filter$mc)
+
+d.sin.normalizar.solo.FyM.mc.filter$edad.norm <- (d.sin.normalizar.solo.FyM.mc.filter$edad 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$edad)) / sd(d.sin.normalizar.solo.FyM.mc.filter$edad)
+
+d1 = d.sin.normalizar.solo.FyM.mc.filter
+d1[d1 == "Masculino"] <- "1"
+d1[d1 == "Femenino"] <- "0"
+d1$Im <- as.integer(d1$Im)
+
+d2 <- d1[!(d1$es == "Secundaria incompleta" |d1$es == "Secundaria completa"),]
+
+d3 <- d1[!(d1$es == "Secundaria incompleta"),]
+```
+
+##### Empiezo a correr modelos de regresiones
+
+## Modelo 1
+```{r modelo 1, echo=FALSE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       es +
+       aq.norm: Im,
+     data = d1) 
+summary(a)
+
+```
+## Modelo 2
+
+```{r Modelo 2, echo=FALSE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       #edad.norm+
+       #es +
+       aq.norm: Im,
+       #aq.norm:edad.norm,
+       #es:aq.norm,
+     data = d1) 
+summary(a)
+
+```
+## Modelo 3
+
+```{r Modelo 3, echo=FALSE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       #es +
+       aq.norm: Im+
+       aq.norm:edad.norm+
+       Im:edad.norm,
+       #es:aq.norm,
+     data = d1) 
+summary(a)
+
+```
+
+## Modelo 4
+
+```{r Modelo 4, echo=FALSE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       es +
+       aq.norm: Im+
+       aq.norm:edad.norm+
+       Im:edad.norm+
+       es:aq.norm,
+     data = d1) 
+summary(a)
+
+```

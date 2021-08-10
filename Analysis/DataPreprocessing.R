@@ -14,10 +14,15 @@ library(jsonlite)
 # Read the .txt result
 root <- rprojroot::is_rstudio_project
 basename(getwd())
-# REEMPLAZAR:
+
 #read each line and convert
+
+# exp 1.1
 #content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
+
+# exp 1.2
 content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
+
 res<-lapply(content,fromJSON)
 
 # each subject has 6 lists in order of arrival and by subjects.
@@ -188,23 +193,23 @@ df_exp_mod$t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -
 ####### metacognitive sensivity 
 
 # load the type 2 ROC analysis function
-source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+#source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
 
 ## get metacognitive sensivity
-library(dplyr)
+#library(dplyr)
 
 Pc   <- rep(NA, max(df_exp_mod$sujetos)) # Percentage of correct answers
-auc2 <- rep(NA, max(df_exp_mod$sujetos)) # Metacognitive sensivity
+#auc2 <- rep(NA, max(df_exp_mod$sujetos)) # Metacognitive sensivity
 
 for (s in 1:max(df_exp_mod$sujetos)){
   Pc[s]   <- mean(df_exp_mod$discrimination_is_correct[df_exp_mod$sujetos==s])
-  auc2[s] <- type2roc(correct = df_exp_mod$discrimination_is_correct[df_exp_mod$sujetos==s], 
-                      conf = df_exp_mod$confidence_key[df_exp_mod$sujetos==s], Nratings = 4 )
+#  auc2[s] <- type2roc(correct = df_exp_mod$discrimination_is_correct[df_exp_mod$sujetos==s], 
+#                      conf = df_exp_mod$confidence_key[df_exp_mod$sujetos==s], Nratings = 4 )
 }
 
 # add to df_DatosUnicos
 df_DatosUnicos$PC <- Pc
-df_DatosUnicos$auc2 <- auc2
+#df_DatosUnicos$auc2 <- auc2
 
 # add difference in dots in every trial to df_exp
 df_exp_mod$diferencia_puntitos <- abs(df_exp_mod$dots_num_left- df_exp_mod$dots_num_right)
@@ -365,14 +370,14 @@ df_DatosUnicos_mod2 <- df_DatosUnicos_mod[df_DatosUnicos_mod$affeccionPsico ==
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$medicacion ==
                                                'No',]
 ## Filter by sincericide, leaving only those who tell us that we can count on their answers.
-# library (stringr)
-# library (tidyverse)
-# df_DatosUnicos_mod2 <- df_DatosUnicos_mod2 %>% 
-#   filter(str_detect(df_DatosUnicos_mod2$sincericidio, "Pueden")) # if start with "Pueden"
+#library (stringr)
+#library (tidyverse)
+#df_DatosUnicos_mod2 <- df_DatosUnicos_mod2 %>% 
+#  filter(str_detect(df_DatosUnicos_mod2$sincericidio, "Pueden")) # if start with "Pueden"
 #                                                                  # it stays
 
 ## Filter by TeEscuchamos leaving only those who didnt interrup the task drastically (= ok)
-# df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$TeEscuchamos ==
+#df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$TeEscuchamos ==
 #                                              'ok',] 
 
 ## Filter by performance, leaving only those who have PC > 60 
@@ -419,8 +424,8 @@ df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discriminati
 ## save the df_total
 
 # # RESULTS_EXP1
-#filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
-#save(df_total,file = filepath)
+filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
+save(df_total,file = filepath)
 
 # RESULTS_EXP2(REPLICA)
 filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
