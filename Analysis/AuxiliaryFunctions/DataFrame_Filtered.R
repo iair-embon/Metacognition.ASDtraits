@@ -100,7 +100,7 @@ DataFrame_Filtered <- function(experimento,
                                 sd_c = sd_confidence)
   
   # filtro para los que tienen metacog menores a 0.5
-  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.5,]
+  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0,]
   
   d <- d.sin.normalizar
   d.mc.filter <- d.sin.normalizar.mc.filter

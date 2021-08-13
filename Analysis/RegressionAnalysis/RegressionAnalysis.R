@@ -61,6 +61,9 @@ library(dplyr)
 
 ### lineas para hacer regresion 
 
+d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar[d.sin.normalizar$Im == "Femenino" |
+                                                          d.sin.normalizar$Im == "Masculino",]
+
 d.sin.normalizar.solo.FyM.mc.filter$aq.norm <- (d.sin.normalizar.solo.FyM.mc.filter$aq 
                                                 - mean(d.sin.normalizar.solo.FyM.mc.filter$aq)
                                                 ) / sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
@@ -85,11 +88,12 @@ d3 <- d1[!(d1$es == "Secundaria incompleta"),]
 a=lm(mc ~ aq.norm +
        Im +
        edad.norm+
-       es +
+       #es +
        aq.norm: Im,
-       #aq.norm:edad.norm,
+       #aq.norm:edad.norm+
+       #edad.norm:Im,
        #es:aq.norm,
-     data = d1) 
+     data = d4) 
 summary(a)
 display(a)
 
