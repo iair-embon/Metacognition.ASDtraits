@@ -1,0 +1,85 @@
+---
+title: "Simulacion de Metacog si la confianza es al azar"
+author: "Embon_Barttfeld_Solovey"
+date: "8/17/2021"
+output: html_document
+---
+
+Tratando de simular la probabilidad de cierto puntaje de mc si esta al nivel de chance
+
+```
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+
+# load the function to get the df list
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+
+# get the df list
+# experimento = 1,2,ambos
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
+                              filtroRT_Disc_Sup = 5000,
+                              filtroRT_Disc_Inf = 200,
+                              filtroRT_Conf_Sup = 5000,
+                              filtroRT_Conf_Inf = 0,
+                              filtroTrial = 20)
+
+df_total <- DF_list$a
+d.sin.normalizar <- DF_list$b
+
+# cantidad de trials luego del descarte de los primeros X trials
+cant_trials <- 110
+
+# simulo el estimulo izq=0 der=1
+stim <- sample(c(0,1), cant_trials, replace = TRUE) # 110 porque los primeros 20 se descartan
+
+# saco el 75 % de la cantidad de trials
+cant_trials_correctos <- round((75* cant_trials)/100)
+
+# que el sujeto responda correctamente al 75 % de trials
+resp <- c(stim[1:cant_trials_correctos] , rep(3, cant_trials- cant_trials_correctos))
+
+# respuestas correctas
+is_correct <-as.numeric(stim == resp)
+
+
+## preparo para sacar la metacog por sujeto
+
+# load the type 2 ROC analysis function
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+
+## get metacognitive sensivity
+library(dplyr)
+
+# nro de repeticiones que quiero simular
+n_rep <- 10000
+
+mc <- rep(NaN, n_rep)
+
+for (i in 1:length(mc)){
+  # selecciono las respuestas de confianza al azar
+  conf <- sample(c(1,2,3,4), cant_trials, replace = TRUE)
+  # saco metacog y guardo
+  mc[i] <- type2roc(correct = is_correct, 
+                    conf = conf, 
+                    Nratings = 4)}
+
+# corroboro que el histograma este bien
+hist(mc)
+
+# saco la probabilidad de que el participante obtenga cierto puntaje de metacog
+# dado a que esta respondiendo con las teclas de confianza al azar
+
+prob_metacog_AlAzar <- rep(NaN,nrow(d.sin.normalizar))
+
+for (i in 1:length(prob_metacog_AlAzar)) {
+  p <- mc[mc < d.sin.normalizar$mc[i]]
+  prob_metacog_AlAzar[i] <- length(p)/n_rep
+}
+
+df_metacog <- data.frame(prob_metacog_AlAzar = prob_metacog_AlAzar,
+                         mc = d.sin.normalizar$mc)
+
+df_metacog_sorted <- df_metacog[order(df_metacog$mc),]
+```

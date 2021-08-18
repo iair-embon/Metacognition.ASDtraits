@@ -1,16 +1,55 @@
+###############
+### library ###
+###############
+library(dplyr)
 library(ggplot2)
 
+#################
+### DataFrame ###
+#################
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+# load the function to get the df list
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+
+# get the df list
+# experimento = 1,2,ambos
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
+                              filtroRT_Disc_Sup = 5000,
+                              filtroRT_Disc_Inf = 200,
+                              filtroRT_Conf_Sup = 5000,
+                              filtroRT_Conf_Inf = 0,
+                              filtroTrial = 20)
+
+# DF_list:
+# a df_total
+# b d.sin.normalizar
+# c d.sin.normalizar.mc.filter
+# d d
+# e d.mc.filter
+# f d.sin.normalizar.solo.FyM
+# g d.sin.normalizar.solo.FyM.mc.filter
+# h d.solo.FyM.mc.filter
+
+df_total <- DF_list$a
+d.sin.normalizar <- DF_list$b
+
+ 
 # sub auroc2 small than 0.5 
-indices <- c(16  ,23 ,
-             35  ,42  ,48 , 
-             54 , 60  ,63 , 
-             83 , 84  ,95 ,
-             138, 146 ,147, 
-             159, 165, 177, 
-             194, 228, 251,
-             261, 270, 281,
-             305, 334, 343, 
-             348, 351, 379)
+indices <- which(d.sin.normalizar$mc < 0.5)
+
+# recreating the dfs, we need the first 10 trials and not any time limit
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
+                              filtroRT_Disc_Sup = 20000,
+                              filtroRT_Disc_Inf = 0,
+                              filtroRT_Conf_Sup = 20000,
+                              filtroRT_Conf_Inf = 0,
+                              filtroTrial = 0)
+
+df_total <- DF_list$a
 
 # df_total sin ningun filtro
 existing_subject <- unique(df_total$sujetos)
@@ -31,7 +70,7 @@ for (i in 1:length(id_subj_smallAuroc)) {
                                discrimination_is_correct == 'TRUE'),aes(fill=discrimination_is_correct), alpha = 0.2) +
     geom_histogram(data=subset(df_lessTrials,
                                discrimination_is_correct == 'FALSE'),aes(fill=discrimination_is_correct), alpha = 0.2)+
-    scale_fill_manual(name="is correct", values=c("red","blue"),labels=c("FALSE","TRUE")) +
+    scale_fill_manual(name="is correct", values=c("red","blue"),labels=c("TRUE","FALSE")) +
     labs(title= paste("Participant",as.character(id_subj_smallAuroc[i]), sep = " "),x="confidence", y="trials", color = "")+
   theme_bw() +
     theme(axis.line = element_line(colour = "black"),
@@ -53,3 +92,130 @@ for (i in 1:length(id_subj_smallAuroc)) {
   dev.off()
 }
 
+
+df <- df_total [df_total$sujetos == 182,] # 2 es un buen sujeto
+
+# nos qedamos con los trials a plotear
+df_lessTrials<- df[df$trials < 11,]
+
+
+myplot<- ggplot(df_lessTrials,aes(x= confidence_key , fill = discrimination_is_correct)) + 
+  geom_histogram(data=subset(df_lessTrials,
+                             discrimination_is_correct == 'TRUE'),aes(fill=discrimination_is_correct), alpha = 0.2) +
+  scale_fill_manual(name="is correct", values=c("blue","red")) +
+  labs(title= paste("Participant",as.character(2), sep = " "),x="confidence", y="trials")+ 
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_text(size = 30),
+        legend.text = element_text(size = 20),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
+
+if (nrow(df_lessTrials[df_lessTrials$discrimination_is_correct == "FALSE",]) >0){
+  myplot +geom_histogram(data=subset(df_lessTrials,
+                                     discrimination_is_correct == 'FALSE'),
+                         aes(fill=discrimination_is_correct), alpha = 0.2)}
+
+png(paste("ELIMINAME", as.character(id_subj_smallAuroc[i]) , ".png", sep = ""))
+print(myplot)
+dev.off()
+
+#### explorando la cantidad de trials de cada sujeto despues del filtrado 
+cant_trials_por_sujeto <- rep(NaN, length(unique(df_total$sujetos)))
+existing_subject <- unique(df_total$sujetos)
+
+for (i in 1:length(cant_trials_por_sujeto)) {
+  cant_trials_por_sujeto[i] <- nrow(df_total[df_total$sujetos == existing_subject[i],])
+}
+
+# veo si algun sujeto quedo sin trials
+hist(cant_trials_por_sujeto)
+min(cant_trials_por_sujeto)
+
+# cuantos tienen menos de 90 trials
+sum(cant_trials_por_sujeto < 90) # 25 tienen menor a 90 trials con los filtros que usamos
+
+
+######## tratando de simular la probabilidad de cierto puntaje de mc si esta al nivel de chance
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+
+# load the function to get the df list
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+
+# get the df list
+# experimento = 1,2,ambos
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
+                              filtroRT_Disc_Sup = 5000,
+                              filtroRT_Disc_Inf = 200,
+                              filtroRT_Conf_Sup = 5000,
+                              filtroRT_Conf_Inf = 0,
+                              filtroTrial = 20)
+
+df_total <- DF_list$a
+d.sin.normalizar <- DF_list$b
+
+# cantidad de trials luego del descarte de los primeros X trials
+cant_trials <- 110
+
+# simulo el estimulo izq=0 der=1
+stim <- sample(c(0,1), cant_trials, replace = TRUE) # 110 porque los primeros 20 se descartan
+
+# saco el 75 % de la cantidad de trials
+cant_trials_correctos <- round((75* cant_trials)/100)
+
+# que el sujeto responda correctamente al 75 % de trials
+resp <- c(stim[1:cant_trials_correctos] , rep(3, cant_trials- cant_trials_correctos))
+
+# respuestas correctas
+is_correct <-as.numeric(stim == resp)
+
+
+## preparo para sacar la metacog por sujeto
+
+# load the type 2 ROC analysis function
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+
+## get metacognitive sensivity
+library(dplyr)
+
+# nro de repeticiones que quiero simular
+n_rep <- 10000
+
+mc <- rep(NaN, n_rep)
+
+for (i in 1:length(mc)){
+  # selecciono las respuestas de confianza al azar
+  conf <- sample(c(1,2,3,4), cant_trials, replace = TRUE)
+  # saco metacog y guardo
+  mc[i] <- type2roc(correct = is_correct, 
+                    conf = conf, 
+                    Nratings = 4)}
+
+# corroboro que el histograma este bien
+hist(mc)
+
+# saco la probabilidad de que el participante obtenga cierto puntaje de metacog
+# dado a que esta respondiendo con las teclas de confianza al azar
+
+prob_metacog_AlAzar <- rep(NaN,nrow(d.sin.normalizar))
+
+for (i in 1:length(prob_metacog_AlAzar)) {
+  p <- mc[mc < d.sin.normalizar$mc[i]]
+  prob_metacog_AlAzar[i] <- length(p)/n_rep
+}
+
+df_metacog <- data.frame(prob_metacog_AlAzar = prob_metacog_AlAzar,
+                         mc = d.sin.normalizar$mc)
+
+df_metacog_sorted <- df_metacog[order(df_metacog$mc),]
