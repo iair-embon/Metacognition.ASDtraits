@@ -1,0 +1,158 @@
+---
+title: "Regression Analysis"
+author: "Embon,Barttfeld & Solovey"
+date: "8/9/2021"
+output: html_document
+---
+
+## Levantar datos
+                                 
+```{r levantar datos, echo=TRUE}
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+# load the function to get the df list
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+
+# get the df list
+# experimento = 1,2,ambos
+DF_list <- DataFrame_Filtered(experimento = "ambos", 
+                                 filtroRT_Disc_Sup = 5000,
+                                 filtroRT_Disc_Inf = 200,
+                                 filtroRT_Conf_Sup = 5000,
+                                 filtroRT_Conf_Inf = 100,
+                                 filtroTrial = 20)
+
+# DF_list:
+# a df_total
+# b d.sin.normalizar
+# c d.sin.normalizar.mc.filter
+# d d
+# e d.mc.filter
+# f d.sin.normalizar.solo.FyM
+# g d.sin.normalizar.solo.FyM.mc.filter
+# h d.solo.FyM.mc.filter
+
+df_total <- DF_list$a
+d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g # 
+###############
+### library ###
+###############
+library(arm)
+library(dplyr)
+
+###########################
+### Regression Analysis ###
+###########################
+
+### lineas para hacer regresion 
+
+d.sin.normalizar.solo.FyM.mc.filter$aq.norm <- (d.sin.normalizar.solo.FyM.mc.filter$aq - mean(d.sin.normalizar.solo.FyM.mc.filter$aq))/
+        sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
+
+d.sin.normalizar.solo.FyM.mc.filter$mc.norm <- (d.sin.normalizar.solo.FyM.mc.filter$mc 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$mc))/ sd(d.sin.normalizar.solo.FyM.mc.filter$mc)
+
+d.sin.normalizar.solo.FyM.mc.filter$edad.norm <- (d.sin.normalizar.solo.FyM.mc.filter$edad 
+                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$edad))/ sd(d.sin.normalizar.solo.FyM.mc.filter$edad)
+
+d1 = d.sin.normalizar.solo.FyM.mc.filter
+d1[d1 == "Masculino"] <- "1"
+d1[d1 == "Femenino"] <- "0"
+d1$Im <- as.integer(d1$Im)
+
+# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
+d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
+         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121 
+         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
+         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
+         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ] 
+
+# sujetos que tienen menos de 90% de trials
+d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
+                 d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
+                 d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
+                 d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
+                 d2$sujetos != 1010 & d2$sujetos != 1046 &
+                 d2$sujetos != 1069 & d2$sujetos != 1112 & 
+                 d2$sujetos != 1127 & d2$sujetos != 1135 &
+                 d2$sujetos != 1154 & d2$sujetos != 1171 &
+                 d2$sujetos != 1191 & d2$sujetos != 1239 & 
+                 d2$sujetos != 1250 & d2$sujetos != 1251 & 
+                 d2$sujetos != 1260,]
+
+
+```
+
+##### Empiezo a correr modelos de regresiones
+
+## Modelo 1
+```{r modelo 1, echo=TRUE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       es +
+       aq.norm: Im,
+     data = d1) 
+summary(a)
+
+```
+## Modelo 2
+
+```{r Modelo 2, echo=TRUE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       aq.norm: Im,
+     data = d1) 
+summary(a)
+
+```
+## Modelo 3 (este es el modelo final que usariamos)
+
+```{r Modelo 3, echo=TRUE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       aq.norm: Im+
+       aq.norm:edad.norm+
+       Im:edad.norm,
+     data = d3) 
+summary(a)
+
+```
+
+## Modelo 4
+
+```{r Modelo 4, echo=TRUE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       es +
+       aq.norm: Im+
+       aq.norm:edad.norm+
+       Im:edad.norm+
+       es:aq.norm,
+     data = d1) 
+summary(a)
+
+```
+## Modelo 5 
+
+```{r Modelo 5, echo=TRUE}
+
+a=lm(mc.norm ~ aq.norm +
+       Im +
+       edad.norm+
+       aq.norm: Im,
+       #aq.norm:edad.norm+
+       #Im:edad.norm,
+     data = d3) 
+summary(a)
+
+```

@@ -1,0 +1,112 @@
+---
+title: "Simulo AUROC2 segun cantidad de trials"
+author: "Embon_Barttfeld_Solovey"
+date: "8/19/2021"
+output: html_document
+---
+
+Tratando de simular la metacog en base a cuantos trials se considera para sacarla
+
+```{r preparacion, echo=TRUE}
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+### preparo para sacar la metacog por sujeto
+
+# load the type 2 ROC analysis function
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+## get metacognitive sensivity
+library(dplyr)
+
+# creo un vector que tenga los posibles trials totales con los cuales sacare
+# el puntaje de metacog
+cant_trials_totales <- 4:130
+
+# cantidad de sujetos que quiero simular. Todos con 75% de aciertos y 
+# metacog de 0.5 (las respuestas de confianza al azar)
+Nsim <- 32
+
+# creo un df en donde va a guardar las columnas de la cant de trials totales y 
+# las simulasiones de metacog
+df_metacog_by_trials <- data_frame(cant_trials_totales = cant_trials_totales)
+
+
+for (j in 1:Nsim) {
+  # creo el vector que va a guardar el score de metacog para cada cantidad de trials
+  mc <- rep(NaN, length(cant_trials_totales))
+  
+  for (i in 1:length(cant_trials_totales)) {
+    
+    ### repuestas correctas en un 75% de acierto
+    # saco el 75 % de la cantidad de trials
+    cant_trials_correctos <- round((75* cant_trials_totales[i])/100)
+    
+    # creo un vector con respuestas correctas
+    is_correct <- c(rep(1,cant_trials_correctos), rep(0,cant_trials_totales[i]-cant_trials_correctos))
+    
+    # mezclo las respuestas correctas e incorrectas
+    correct <- sample(is_correct)
+    # selecciono las respuestas de confianza al azar
+    conf <- sample(c(1,2,3,4), cant_trials_totales[i], replace = TRUE)
+    # saco metacog y guardo
+    mc[i] <- type2roc(correct = is_correct, 
+                      conf = conf, 
+                      Nratings = 4)}
+  
+  ### guardo la metacog en el dataframe
+  # la cargo al df
+  df_metacog_by_trials[ , ncol(df_metacog_by_trials) + 1] <- mc
+  # la renombro
+  colnames(df_metacog_by_trials)[ncol(df_metacog_by_trials)] <- paste0("mc", j) 
+}
+
+# saco la desviacion estandar de cada fila(trial)
+library(dplyr)
+library(matrixStats)
+a <-df_metacog_by_trials%>%mutate(STDEV=rowSds(as.matrix(.[c("mc1","mc2","mc3","mc4",
+                                                         "mc5","mc6","mc7","mc8",
+                                                         "mc9","mc10","mc11","mc12",
+                                                         "mc13","mc14","mc15","mc16",
+                                                         "mc17","mc18","mc19","mc20",
+                                                         "mc21","mc22","mc23","mc24",
+                                                         "mc25","mc26","mc27","mc28",
+                                                         "mc29","mc30","mc31","mc32")])))
+```
+
+Ploteo la metacog de un sujeto simulado segun la cant de trials con la que fue sacado.
+Se deberia notar una menor varianza a medida que se agarran mas trials para sacar la AUROC2
+```{r plot 1, echo=TRUE}
+plot(a$cant_trials_totales,a$mc1)
+```
+
+Ploteo la metacog de otro sujeto simulado segun la cant de trials con la que fue sacado
+```{r plot 2, echo=TRUE}
+# ploteo la metacog de un sujeto simulado segun la cant de trials con la que fue sacado
+plot(a$cant_trials_totales,a$mc2)
+```
+
+
+Ploteo la cantidad de trials y la desviacion estandar de la AUROC2 para cada trial con la que fue sacada
+```{r plot 3, echo=TRUE}
+library(ggplot2)
+
+ggplot(data = a) + 
+  geom_point(mapping = aes(x = cant_trials_totales, y = STDEV))+
+  xlab("Cantidad de trials para calcular la mc") +
+  ylab("STD de metacog calculada (32 sujetos simulados)")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 20),
+        axis.title.x = element_text(size = 15))
+```
+
+Efectivamente, se ve una menor sd a medida que se agarra una mayor cantidad de trials.

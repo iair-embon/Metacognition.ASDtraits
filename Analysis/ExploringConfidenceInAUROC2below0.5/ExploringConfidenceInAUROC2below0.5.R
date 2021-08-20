@@ -131,6 +131,7 @@ dev.off()
 cant_trials_por_sujeto <- rep(NaN, length(unique(df_total$sujetos)))
 existing_subject <- unique(df_total$sujetos)
 
+
 for (i in 1:length(cant_trials_por_sujeto)) {
   cant_trials_por_sujeto[i] <- nrow(df_total[df_total$sujetos == existing_subject[i],])
 }
@@ -141,6 +142,48 @@ min(cant_trials_por_sujeto)
 
 # cuantos tienen menos de 90 trials
 sum(cant_trials_por_sujeto < 90) # 25 tienen menor a 90 trials con los filtros que usamos
+sum(cant_trials_por_sujeto < 70)
+
+# veo quienes son
+indices_cant_trials <- which(cant_trials_por_sujeto < 50)
+subj_pocos_trials<- existing_subject[indices_cant_trials]
+
+#### explorando si algun sujeto respondio la confianza siempre con la misma tecla
+Conf1 <- rep(NaN, length(unique(df_total$sujetos)))
+Conf2 <- rep(NaN, length(unique(df_total$sujetos)))
+Conf3 <- rep(NaN, length(unique(df_total$sujetos)))
+Conf4 <- rep(NaN, length(unique(df_total$sujetos)))
+existing_subject <- unique(df_total$sujetos)
+
+for (i in 1:length(existing_subject)) {
+  Conf1[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_1'])
+  Conf2[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_2'])
+  Conf3[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_3'])
+  Conf4[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_4'])
+}
+
+# veo si algun sujeto quedo sin trials
+hist(Conf1)
+hist(Conf2)
+hist(Conf3)
+hist(Conf4)
+
+min(Conf1)
+min(Conf2)
+min(Conf3)
+min(Conf4)
+
+max(Conf1)
+max(Conf2)
+max(Conf3)
+max(Conf4)
+
+df_conf <- data_frame(Participantes = existing_subject,
+                      Conf1 = Conf1,
+                      Conf2 = Conf2,
+                      Conf3 = Conf3,
+                      Conf4 = Conf4,
+                      mc = d.sin.normalizar$mc)
 
 
 ######## tratando de simular la probabilidad de cierto puntaje de mc si esta al nivel de chance
@@ -219,3 +262,99 @@ df_metacog <- data.frame(prob_metacog_AlAzar = prob_metacog_AlAzar,
                          mc = d.sin.normalizar$mc)
 
 df_metacog_sorted <- df_metacog[order(df_metacog$mc),]
+
+
+
+######## tratando de simular la mc en base a cuantos trials se considera para sacarla
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+### preparo para sacar la metacog por sujeto
+
+# load the type 2 ROC analysis function
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+## get metacognitive sensivity
+library(dplyr)
+
+# creo un vector que tenga los posibles trials totales con los cuales sacare
+# el puntaje de metacog
+cant_trials_totales <- 4:130
+
+# cantidad de sujetos que quiero simular. Todos con 75% de aciertos y 
+# metacog de 0.5 (las respuestas de confianza al azar)
+Nsim <- 32
+
+# creo un df en donde va a guardar las columnas de la cant de trials totales y 
+# las simulasiones de metacog
+df_metacog_by_trials <- data_frame(cant_trials_totales = cant_trials_totales)
+
+
+for (j in 1:Nsim) {
+  # creo el vector que va a guardar el score de metacog para cada cantidad de trials
+  mc <- rep(NaN, length(cant_trials_totales))
+  
+  for (i in 1:length(cant_trials_totales)) {
+    
+    ### repuestas correctas en un 75% de acierto
+    # saco el 75 % de la cantidad de trials
+    cant_trials_correctos <- round((75* cant_trials_totales[i])/100)
+    
+    # creo un vector con respuestas correctas
+    is_correct <- c(rep(1,cant_trials_correctos), rep(0,cant_trials_totales[i]-cant_trials_correctos))
+    
+    # mezclo las respuestas correctas e incorrectas
+    correct <- sample(is_correct)
+    # selecciono las respuestas de confianza al azar
+    conf <- sample(c(1,2,3,4), cant_trials_totales[i], replace = TRUE)
+    # saco metacog y guardo
+    mc[i] <- type2roc(correct = is_correct, 
+                      conf = conf, 
+                      Nratings = 4)}
+  
+  ### guardo la metacog en el dataframe
+  # la cargo al df
+  df_metacog_by_trials[ , ncol(df_metacog_by_trials) + 1] <- mc
+  # la renombro
+  colnames(df_metacog_by_trials)[ncol(df_metacog_by_trials)] <- paste0("mc", j) 
+}
+
+# saco la desviacion estandar de cada fila(trial)
+library(dplyr)
+library(matrixStats)
+a <-df_metacog_by_trials%>%mutate(STDEV=rowSds(as.matrix(.[c("mc1","mc2","mc3","mc4",
+                                                         "mc5","mc6","mc7","mc8",
+                                                         "mc9","mc10","mc11","mc12",
+                                                         "mc13","mc14","mc15","mc16",
+                                                         "mc17","mc18","mc19","mc20",
+                                                         "mc21","mc22","mc23","mc24",
+                                                         "mc25","mc26","mc27","mc28",
+                                                         "mc29","mc30","mc31","mc32")])))
+
+
+
+# ploteo metacog segun la cant de trials con la que fue sacado
+plot(cant_trials_totales,a$STDEV)
+
+ggplot(data = a) + 
+  geom_point(mapping = aes(x = cant_trials_totales, y = STDEV))+
+  xlab("Cantidad de trials para calcular la mc") +
+  ylab("STD de metacog calculada (32 sujetos simulados)")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 20),
+        axis.title.x = element_text(size = 15))
+
+
+
+
+

@@ -7,7 +7,7 @@ output: html_document
 
 Tratando de simular la probabilidad de cierto puntaje de mc si esta al nivel de chance
 
-```
+``` {r simulacion, echo=TRUE}
 # voy a la carpeta del proyecto
 root <- rprojroot::is_rstudio_project
 basename(getwd())
@@ -65,12 +65,17 @@ for (i in 1:length(mc)){
                     conf = conf, 
                     Nratings = 4)}
 
-# corroboro que el histograma este bien
+```
+Corroboro que el histograma de algo coherente
+
+``` {r mc, echo=TRUE}
 hist(mc)
+```
 
-# saco la probabilidad de que el participante obtenga cierto puntaje de metacog
-# dado a que esta respondiendo con las teclas de confianza al azar
+saco la probabilidad de que el participante obtenga cierto puntaje de metacog
+dado a que esta respondiendo con las teclas de confianza al azar
 
+``` {r probabilidad, echo=TRUE}
 prob_metacog_AlAzar <- rep(NaN,nrow(d.sin.normalizar))
 
 for (i in 1:length(prob_metacog_AlAzar)) {
@@ -82,4 +87,11 @@ df_metacog <- data.frame(prob_metacog_AlAzar = prob_metacog_AlAzar,
                          mc = d.sin.normalizar$mc)
 
 df_metacog_sorted <- df_metacog[order(df_metacog$mc),]
+```
+Muestro el df con la columna del puntaje obtenido de metacog, y en la otra columna 
+la probabilidad de que ese puntaje haya sido obtenido si las teclas de confianza eran
+apretadas al azar, de acuerdo a la simulacion
+
+```{r comment='', echo=TRUE, results='asis'}
+ knitr::kable(df_metacog_sorted[,], caption = "A Knitr table.", floating.environment="sidewaystable")
 ```

@@ -18,7 +18,7 @@ basename(getwd())
 #read each line and convert
 
 # exp 1.1
-#content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
+content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
 
 # exp 1.2
 content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
@@ -370,15 +370,15 @@ df_DatosUnicos_mod2 <- df_DatosUnicos_mod[df_DatosUnicos_mod$affeccionPsico ==
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$medicacion ==
                                                'No',]
 ## Filter by sincericide, leaving only those who tell us that we can count on their answers.
-#library (stringr)
-#library (tidyverse)
-#df_DatosUnicos_mod2 <- df_DatosUnicos_mod2 %>% 
-#  filter(str_detect(df_DatosUnicos_mod2$sincericidio, "Pueden")) # if start with "Pueden"
+library (stringr)
+library (tidyverse)
+df_DatosUnicos_mod2 <- df_DatosUnicos_mod2 %>% 
+  filter(str_detect(df_DatosUnicos_mod2$sincericidio, "Pueden")) # if start with "Pueden"
 #                                                                  # it stays
 
-## Filter by TeEscuchamos leaving only those who didnt interrup the task drastically (= ok)
-#df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$TeEscuchamos ==
-#                                              'ok',] 
+# Filter by TeEscuchamos leaving only those who didnt interrup the task drastically (= ok)
+df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$TeEscuchamos ==
+                                              'ok',] 
 
 ## Filter by performance, leaving only those who have PC > 60 
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$PC > 0.60,] 

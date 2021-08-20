@@ -172,12 +172,11 @@ pre code {
 
 
 <p>Tratando de simular la probabilidad de cierto puntaje de mc si esta al nivel de chance</p>
-<pre><code># voy a la carpeta del proyecto
+<pre class="r"><code># voy a la carpeta del proyecto
 root &lt;- rprojroot::is_rstudio_project
-basename(getwd())
-
-
-# load the function to get the df list
+basename(getwd())</code></pre>
+<pre><code>## [1] &quot;ExploringConfidenceInAUROC2below0.5&quot;</code></pre>
+<pre class="r"><code># load the function to get the df list
 source(root$find_file(&quot;Analysis/AuxiliaryFunctions/DataFrame_Filtered.R&quot;))
 
 # get the df list
@@ -187,9 +186,16 @@ DF_list &lt;- DataFrame_Filtered(experimento = &quot;ambos&quot;,
                               filtroRT_Disc_Inf = 200,
                               filtroRT_Conf_Sup = 5000,
                               filtroRT_Conf_Inf = 0,
-                              filtroTrial = 20)
-
-df_total &lt;- DF_list$a
+                              filtroTrial = 20)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>df_total &lt;- DF_list$a
 d.sin.normalizar &lt;- DF_list$b
 
 # cantidad de trials luego del descarte de los primeros X trials
@@ -227,15 +233,12 @@ for (i in 1:length(mc)){
   # saco metacog y guardo
   mc[i] &lt;- type2roc(correct = is_correct, 
                     conf = conf, 
-                    Nratings = 4)}
-
-# corroboro que el histograma este bien
-hist(mc)
-
-# saco la probabilidad de que el participante obtenga cierto puntaje de metacog
-# dado a que esta respondiendo con las teclas de confianza al azar
-
-prob_metacog_AlAzar &lt;- rep(NaN,nrow(d.sin.normalizar))
+                    Nratings = 4)}</code></pre>
+<p>Corroboro que el histograma de algo coherente</p>
+<pre class="r"><code>hist(mc)</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<p>saco la probabilidad de que el participante obtenga cierto puntaje de metacog dado a que esta respondiendo con las teclas de confianza al azar</p>
+<pre class="r"><code>prob_metacog_AlAzar &lt;- rep(NaN,nrow(d.sin.normalizar))
 
 for (i in 1:length(prob_metacog_AlAzar)) {
   p &lt;- mc[mc &lt; d.sin.normalizar$mc[i]]
@@ -246,6 +249,1975 @@ df_metacog &lt;- data.frame(prob_metacog_AlAzar = prob_metacog_AlAzar,
                          mc = d.sin.normalizar$mc)
 
 df_metacog_sorted &lt;- df_metacog[order(df_metacog$mc),]</code></pre>
+<p>Muestro el df con la columna del puntaje obtenido de metacog, y en la otra columna la probabilidad de que ese puntaje haya sido obtenido si las teclas de confianza eran apretadas al azar, de acuerdo a la simulacion</p>
+<pre class="r"><code> knitr::kable(df_metacog_sorted[,], caption = &quot;A Knitr table.&quot;, floating.environment=&quot;sidewaystable&quot;)</code></pre>
+<table>
+<caption>A Knitr table.</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">prob_metacog_AlAzar</th>
+<th align="right">mc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">16</td>
+<td align="right">0.0001</td>
+<td align="right">0.2815394</td>
+</tr>
+<tr class="even">
+<td align="left">146</td>
+<td align="right">0.0264</td>
+<td align="right">0.3874498</td>
+</tr>
+<tr class="odd">
+<td align="left">23</td>
+<td align="right">0.0343</td>
+<td align="right">0.3933063</td>
+</tr>
+<tr class="even">
+<td align="left">177</td>
+<td align="right">0.0825</td>
+<td align="right">0.4197531</td>
+</tr>
+<tr class="odd">
+<td align="left">228</td>
+<td align="right">0.1844</td>
+<td align="right">0.4479638</td>
+</tr>
+<tr class="even">
+<td align="left">334</td>
+<td align="right">0.1991</td>
+<td align="right">0.4510281</td>
+</tr>
+<tr class="odd">
+<td align="left">251</td>
+<td align="right">0.2162</td>
+<td align="right">0.4545278</td>
+</tr>
+<tr class="even">
+<td align="left">270</td>
+<td align="right">0.2297</td>
+<td align="right">0.4577189</td>
+</tr>
+<tr class="odd">
+<td align="left">348</td>
+<td align="right">0.2689</td>
+<td align="right">0.4644608</td>
+</tr>
+<tr class="even">
+<td align="left">351</td>
+<td align="right">0.3048</td>
+<td align="right">0.4704225</td>
+</tr>
+<tr class="odd">
+<td align="left">60</td>
+<td align="right">0.3258</td>
+<td align="right">0.4738948</td>
+</tr>
+<tr class="even">
+<td align="left">63</td>
+<td align="right">0.3302</td>
+<td align="right">0.4747387</td>
+</tr>
+<tr class="odd">
+<td align="left">42</td>
+<td align="right">0.3532</td>
+<td align="right">0.4781454</td>
+</tr>
+<tr class="even">
+<td align="left">95</td>
+<td align="right">0.3661</td>
+<td align="right">0.4803122</td>
+</tr>
+<tr class="odd">
+<td align="left">83</td>
+<td align="right">0.3866</td>
+<td align="right">0.4831250</td>
+</tr>
+<tr class="even">
+<td align="left">84</td>
+<td align="right">0.4032</td>
+<td align="right">0.4857088</td>
+</tr>
+<tr class="odd">
+<td align="left">305</td>
+<td align="right">0.4043</td>
+<td align="right">0.4859127</td>
+</tr>
+<tr class="even">
+<td align="left">261</td>
+<td align="right">0.4147</td>
+<td align="right">0.4871376</td>
+</tr>
+<tr class="odd">
+<td align="left">379</td>
+<td align="right">0.4147</td>
+<td align="right">0.4872222</td>
+</tr>
+<tr class="even">
+<td align="left">48</td>
+<td align="right">0.4245</td>
+<td align="right">0.4884925</td>
+</tr>
+<tr class="odd">
+<td align="left">147</td>
+<td align="right">0.4319</td>
+<td align="right">0.4895362</td>
+</tr>
+<tr class="even">
+<td align="left">281</td>
+<td align="right">0.4402</td>
+<td align="right">0.4908217</td>
+</tr>
+<tr class="odd">
+<td align="left">138</td>
+<td align="right">0.4623</td>
+<td align="right">0.4941502</td>
+</tr>
+<tr class="even">
+<td align="left">165</td>
+<td align="right">0.4634</td>
+<td align="right">0.4943205</td>
+</tr>
+<tr class="odd">
+<td align="left">194</td>
+<td align="right">0.4853</td>
+<td align="right">0.4976454</td>
+</tr>
+<tr class="even">
+<td align="left">343</td>
+<td align="right">0.4853</td>
+<td align="right">0.4976681</td>
+</tr>
+<tr class="odd">
+<td align="left">54</td>
+<td align="right">0.4869</td>
+<td align="right">0.4979877</td>
+</tr>
+<tr class="even">
+<td align="left">35</td>
+<td align="right">0.4952</td>
+<td align="right">0.4994048</td>
+</tr>
+<tr class="odd">
+<td align="left">159</td>
+<td align="right">0.4984</td>
+<td align="right">0.4998006</td>
+</tr>
+<tr class="even">
+<td align="left">229</td>
+<td align="right">0.5190</td>
+<td align="right">0.5027005</td>
+</tr>
+<tr class="odd">
+<td align="left">59</td>
+<td align="right">0.5254</td>
+<td align="right">0.5035714</td>
+</tr>
+<tr class="even">
+<td align="left">260</td>
+<td align="right">0.5335</td>
+<td align="right">0.5048457</td>
+</tr>
+<tr class="odd">
+<td align="left">299</td>
+<td align="right">0.5415</td>
+<td align="right">0.5063317</td>
+</tr>
+<tr class="even">
+<td align="left">350</td>
+<td align="right">0.5468</td>
+<td align="right">0.5070675</td>
+</tr>
+<tr class="odd">
+<td align="left">269</td>
+<td align="right">0.5545</td>
+<td align="right">0.5083747</td>
+</tr>
+<tr class="even">
+<td align="left">249</td>
+<td align="right">0.5624</td>
+<td align="right">0.5093882</td>
+</tr>
+<tr class="odd">
+<td align="left">200</td>
+<td align="right">0.5748</td>
+<td align="right">0.5111888</td>
+</tr>
+<tr class="even">
+<td align="left">64</td>
+<td align="right">0.5810</td>
+<td align="right">0.5118132</td>
+</tr>
+<tr class="odd">
+<td align="left">62</td>
+<td align="right">0.5881</td>
+<td align="right">0.5128396</td>
+</tr>
+<tr class="even">
+<td align="left">372</td>
+<td align="right">0.5924</td>
+<td align="right">0.5134804</td>
+</tr>
+<tr class="odd">
+<td align="left">226</td>
+<td align="right">0.6083</td>
+<td align="right">0.5156250</td>
+</tr>
+<tr class="even">
+<td align="left">390</td>
+<td align="right">0.6473</td>
+<td align="right">0.5210203</td>
+</tr>
+<tr class="odd">
+<td align="left">332</td>
+<td align="right">0.6505</td>
+<td align="right">0.5212565</td>
+</tr>
+<tr class="even">
+<td align="left">256</td>
+<td align="right">0.6596</td>
+<td align="right">0.5227941</td>
+</tr>
+<tr class="odd">
+<td align="left">314</td>
+<td align="right">0.6634</td>
+<td align="right">0.5233384</td>
+</tr>
+<tr class="even">
+<td align="left">106</td>
+<td align="right">0.6810</td>
+<td align="right">0.5263752</td>
+</tr>
+<tr class="odd">
+<td align="left">282</td>
+<td align="right">0.6826</td>
+<td align="right">0.5265351</td>
+</tr>
+<tr class="even">
+<td align="left">44</td>
+<td align="right">0.6833</td>
+<td align="right">0.5267618</td>
+</tr>
+<tr class="odd">
+<td align="left">324</td>
+<td align="right">0.6875</td>
+<td align="right">0.5274245</td>
+</tr>
+<tr class="even">
+<td align="left">326</td>
+<td align="right">0.7073</td>
+<td align="right">0.5306784</td>
+</tr>
+<tr class="odd">
+<td align="left">220</td>
+<td align="right">0.7138</td>
+<td align="right">0.5317787</td>
+</tr>
+<tr class="even">
+<td align="left">98</td>
+<td align="right">0.7151</td>
+<td align="right">0.5320648</td>
+</tr>
+<tr class="odd">
+<td align="left">218</td>
+<td align="right">0.7159</td>
+<td align="right">0.5322171</td>
+</tr>
+<tr class="even">
+<td align="left">310</td>
+<td align="right">0.7159</td>
+<td align="right">0.5322581</td>
+</tr>
+<tr class="odd">
+<td align="left">376</td>
+<td align="right">0.7175</td>
+<td align="right">0.5326087</td>
+</tr>
+<tr class="even">
+<td align="left">278</td>
+<td align="right">0.7299</td>
+<td align="right">0.5348884</td>
+</tr>
+<tr class="odd">
+<td align="left">388</td>
+<td align="right">0.7342</td>
+<td align="right">0.5356159</td>
+</tr>
+<tr class="even">
+<td align="left">236</td>
+<td align="right">0.7412</td>
+<td align="right">0.5367347</td>
+</tr>
+<tr class="odd">
+<td align="left">58</td>
+<td align="right">0.7424</td>
+<td align="right">0.5370561</td>
+</tr>
+<tr class="even">
+<td align="left">66</td>
+<td align="right">0.7436</td>
+<td align="right">0.5371981</td>
+</tr>
+<tr class="odd">
+<td align="left">381</td>
+<td align="right">0.7498</td>
+<td align="right">0.5384691</td>
+</tr>
+<tr class="even">
+<td align="left">123</td>
+<td align="right">0.7501</td>
+<td align="right">0.5385185</td>
+</tr>
+<tr class="odd">
+<td align="left">120</td>
+<td align="right">0.7501</td>
+<td align="right">0.5386507</td>
+</tr>
+<tr class="even">
+<td align="left">329</td>
+<td align="right">0.7515</td>
+<td align="right">0.5388665</td>
+</tr>
+<tr class="odd">
+<td align="left">179</td>
+<td align="right">0.7521</td>
+<td align="right">0.5390808</td>
+</tr>
+<tr class="even">
+<td align="left">210</td>
+<td align="right">0.7530</td>
+<td align="right">0.5392316</td>
+</tr>
+<tr class="odd">
+<td align="left">255</td>
+<td align="right">0.7601</td>
+<td align="right">0.5404197</td>
+</tr>
+<tr class="even">
+<td align="left">217</td>
+<td align="right">0.7643</td>
+<td align="right">0.5413095</td>
+</tr>
+<tr class="odd">
+<td align="left">70</td>
+<td align="right">0.7659</td>
+<td align="right">0.5416216</td>
+</tr>
+<tr class="even">
+<td align="left">184</td>
+<td align="right">0.7679</td>
+<td align="right">0.5420552</td>
+</tr>
+<tr class="odd">
+<td align="left">247</td>
+<td align="right">0.7749</td>
+<td align="right">0.5433053</td>
+</tr>
+<tr class="even">
+<td align="left">385</td>
+<td align="right">0.7786</td>
+<td align="right">0.5439723</td>
+</tr>
+<tr class="odd">
+<td align="left">27</td>
+<td align="right">0.7829</td>
+<td align="right">0.5447684</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="right">0.7893</td>
+<td align="right">0.5460557</td>
+</tr>
+<tr class="odd">
+<td align="left">304</td>
+<td align="right">0.7914</td>
+<td align="right">0.5464305</td>
+</tr>
+<tr class="even">
+<td align="left">150</td>
+<td align="right">0.7924</td>
+<td align="right">0.5467193</td>
+</tr>
+<tr class="odd">
+<td align="left">164</td>
+<td align="right">0.7968</td>
+<td align="right">0.5478831</td>
+</tr>
+<tr class="even">
+<td align="left">361</td>
+<td align="right">0.8004</td>
+<td align="right">0.5486111</td>
+</tr>
+<tr class="odd">
+<td align="left">382</td>
+<td align="right">0.8062</td>
+<td align="right">0.5494058</td>
+</tr>
+<tr class="even">
+<td align="left">125</td>
+<td align="right">0.8073</td>
+<td align="right">0.5496849</td>
+</tr>
+<tr class="odd">
+<td align="left">102</td>
+<td align="right">0.8073</td>
+<td align="right">0.5496988</td>
+</tr>
+<tr class="even">
+<td align="left">82</td>
+<td align="right">0.8073</td>
+<td align="right">0.5497917</td>
+</tr>
+<tr class="odd">
+<td align="left">277</td>
+<td align="right">0.8083</td>
+<td align="right">0.5499238</td>
+</tr>
+<tr class="even">
+<td align="left">92</td>
+<td align="right">0.8148</td>
+<td align="right">0.5512392</td>
+</tr>
+<tr class="odd">
+<td align="left">68</td>
+<td align="right">0.8214</td>
+<td align="right">0.5529332</td>
+</tr>
+<tr class="even">
+<td align="left">74</td>
+<td align="right">0.8330</td>
+<td align="right">0.5559211</td>
+</tr>
+<tr class="odd">
+<td align="left">26</td>
+<td align="right">0.8330</td>
+<td align="right">0.5559476</td>
+</tr>
+<tr class="even">
+<td align="left">240</td>
+<td align="right">0.8353</td>
+<td align="right">0.5564388</td>
+</tr>
+<tr class="odd">
+<td align="left">170</td>
+<td align="right">0.8405</td>
+<td align="right">0.5575204</td>
+</tr>
+<tr class="even">
+<td align="left">284</td>
+<td align="right">0.8423</td>
+<td align="right">0.5578093</td>
+</tr>
+<tr class="odd">
+<td align="left">176</td>
+<td align="right">0.8445</td>
+<td align="right">0.5583614</td>
+</tr>
+<tr class="even">
+<td align="left">291</td>
+<td align="right">0.8450</td>
+<td align="right">0.5585366</td>
+</tr>
+<tr class="odd">
+<td align="left">315</td>
+<td align="right">0.8463</td>
+<td align="right">0.5591242</td>
+</tr>
+<tr class="even">
+<td align="left">51</td>
+<td align="right">0.8493</td>
+<td align="right">0.5597875</td>
+</tr>
+<tr class="odd">
+<td align="left">297</td>
+<td align="right">0.8514</td>
+<td align="right">0.5602159</td>
+</tr>
+<tr class="even">
+<td align="left">234</td>
+<td align="right">0.8525</td>
+<td align="right">0.5606061</td>
+</tr>
+<tr class="odd">
+<td align="left">192</td>
+<td align="right">0.8538</td>
+<td align="right">0.5610183</td>
+</tr>
+<tr class="even">
+<td align="left">129</td>
+<td align="right">0.8555</td>
+<td align="right">0.5614828</td>
+</tr>
+<tr class="odd">
+<td align="left">203</td>
+<td align="right">0.8560</td>
+<td align="right">0.5617188</td>
+</tr>
+<tr class="even">
+<td align="left">344</td>
+<td align="right">0.8571</td>
+<td align="right">0.5619233</td>
+</tr>
+<tr class="odd">
+<td align="left">172</td>
+<td align="right">0.8609</td>
+<td align="right">0.5628828</td>
+</tr>
+<tr class="even">
+<td align="left">301</td>
+<td align="right">0.8644</td>
+<td align="right">0.5636343</td>
+</tr>
+<tr class="odd">
+<td align="left">94</td>
+<td align="right">0.8652</td>
+<td align="right">0.5637542</td>
+</tr>
+<tr class="even">
+<td align="left">296</td>
+<td align="right">0.8680</td>
+<td align="right">0.5648496</td>
+</tr>
+<tr class="odd">
+<td align="left">206</td>
+<td align="right">0.8724</td>
+<td align="right">0.5657027</td>
+</tr>
+<tr class="even">
+<td align="left">196</td>
+<td align="right">0.8756</td>
+<td align="right">0.5667614</td>
+</tr>
+<tr class="odd">
+<td align="left">227</td>
+<td align="right">0.8773</td>
+<td align="right">0.5671910</td>
+</tr>
+<tr class="even">
+<td align="left">154</td>
+<td align="right">0.8787</td>
+<td align="right">0.5673828</td>
+</tr>
+<tr class="odd">
+<td align="left">121</td>
+<td align="right">0.8799</td>
+<td align="right">0.5676692</td>
+</tr>
+<tr class="even">
+<td align="left">219</td>
+<td align="right">0.8799</td>
+<td align="right">0.5677910</td>
+</tr>
+<tr class="odd">
+<td align="left">156</td>
+<td align="right">0.8799</td>
+<td align="right">0.5679563</td>
+</tr>
+<tr class="even">
+<td align="left">377</td>
+<td align="right">0.8799</td>
+<td align="right">0.5680510</td>
+</tr>
+<tr class="odd">
+<td align="left">273</td>
+<td align="right">0.8828</td>
+<td align="right">0.5689544</td>
+</tr>
+<tr class="even">
+<td align="left">271</td>
+<td align="right">0.8860</td>
+<td align="right">0.5698589</td>
+</tr>
+<tr class="odd">
+<td align="left">235</td>
+<td align="right">0.8863</td>
+<td align="right">0.5702026</td>
+</tr>
+<tr class="even">
+<td align="left">105</td>
+<td align="right">0.8870</td>
+<td align="right">0.5702427</td>
+</tr>
+<tr class="odd">
+<td align="left">214</td>
+<td align="right">0.8890</td>
+<td align="right">0.5712191</td>
+</tr>
+<tr class="even">
+<td align="left">323</td>
+<td align="right">0.8901</td>
+<td align="right">0.5713415</td>
+</tr>
+<tr class="odd">
+<td align="left">331</td>
+<td align="right">0.8937</td>
+<td align="right">0.5723214</td>
+</tr>
+<tr class="even">
+<td align="left">101</td>
+<td align="right">0.8951</td>
+<td align="right">0.5727969</td>
+</tr>
+<tr class="odd">
+<td align="left">124</td>
+<td align="right">0.8977</td>
+<td align="right">0.5735229</td>
+</tr>
+<tr class="even">
+<td align="left">188</td>
+<td align="right">0.8977</td>
+<td align="right">0.5735944</td>
+</tr>
+<tr class="odd">
+<td align="left">22</td>
+<td align="right">0.8981</td>
+<td align="right">0.5737670</td>
+</tr>
+<tr class="even">
+<td align="left">103</td>
+<td align="right">0.8998</td>
+<td align="right">0.5742754</td>
+</tr>
+<tr class="odd">
+<td align="left">295</td>
+<td align="right">0.9049</td>
+<td align="right">0.5757769</td>
+</tr>
+<tr class="even">
+<td align="left">17</td>
+<td align="right">0.9055</td>
+<td align="right">0.5758406</td>
+</tr>
+<tr class="odd">
+<td align="left">181</td>
+<td align="right">0.9061</td>
+<td align="right">0.5760995</td>
+</tr>
+<tr class="even">
+<td align="left">189</td>
+<td align="right">0.9069</td>
+<td align="right">0.5765643</td>
+</tr>
+<tr class="odd">
+<td align="left">49</td>
+<td align="right">0.9104</td>
+<td align="right">0.5774117</td>
+</tr>
+<tr class="even">
+<td align="left">347</td>
+<td align="right">0.9104</td>
+<td align="right">0.5774613</td>
+</tr>
+<tr class="odd">
+<td align="left">110</td>
+<td align="right">0.9114</td>
+<td align="right">0.5776876</td>
+</tr>
+<tr class="even">
+<td align="left">298</td>
+<td align="right">0.9136</td>
+<td align="right">0.5783832</td>
+</tr>
+<tr class="odd">
+<td align="left">290</td>
+<td align="right">0.9165</td>
+<td align="right">0.5795132</td>
+</tr>
+<tr class="even">
+<td align="left">99</td>
+<td align="right">0.9218</td>
+<td align="right">0.5809832</td>
+</tr>
+<tr class="odd">
+<td align="left">107</td>
+<td align="right">0.9222</td>
+<td align="right">0.5811738</td>
+</tr>
+<tr class="even">
+<td align="left">204</td>
+<td align="right">0.9227</td>
+<td align="right">0.5817308</td>
+</tr>
+<tr class="odd">
+<td align="left">24</td>
+<td align="right">0.9267</td>
+<td align="right">0.5831643</td>
+</tr>
+<tr class="even">
+<td align="left">112</td>
+<td align="right">0.9267</td>
+<td align="right">0.5833006</td>
+</tr>
+<tr class="odd">
+<td align="left">339</td>
+<td align="right">0.9273</td>
+<td align="right">0.5835317</td>
+</tr>
+<tr class="even">
+<td align="left">81</td>
+<td align="right">0.9280</td>
+<td align="right">0.5838156</td>
+</tr>
+<tr class="odd">
+<td align="left">302</td>
+<td align="right">0.9287</td>
+<td align="right">0.5839487</td>
+</tr>
+<tr class="even">
+<td align="left">215</td>
+<td align="right">0.9297</td>
+<td align="right">0.5843750</td>
+</tr>
+<tr class="odd">
+<td align="left">370</td>
+<td align="right">0.9325</td>
+<td align="right">0.5857724</td>
+</tr>
+<tr class="even">
+<td align="left">36</td>
+<td align="right">0.9346</td>
+<td align="right">0.5870833</td>
+</tr>
+<tr class="odd">
+<td align="left">185</td>
+<td align="right">0.9355</td>
+<td align="right">0.5871622</td>
+</tr>
+<tr class="even">
+<td align="left">111</td>
+<td align="right">0.9356</td>
+<td align="right">0.5874239</td>
+</tr>
+<tr class="odd">
+<td align="left">327</td>
+<td align="right">0.9375</td>
+<td align="right">0.5880325</td>
+</tr>
+<tr class="even">
+<td align="left">41</td>
+<td align="right">0.9386</td>
+<td align="right">0.5886719</td>
+</tr>
+<tr class="odd">
+<td align="left">276</td>
+<td align="right">0.9393</td>
+<td align="right">0.5888211</td>
+</tr>
+<tr class="even">
+<td align="left">308</td>
+<td align="right">0.9393</td>
+<td align="right">0.5888605</td>
+</tr>
+<tr class="odd">
+<td align="left">114</td>
+<td align="right">0.9400</td>
+<td align="right">0.5891687</td>
+</tr>
+<tr class="even">
+<td align="left">50</td>
+<td align="right">0.9431</td>
+<td align="right">0.5907220</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="right">0.9431</td>
+<td align="right">0.5907392</td>
+</tr>
+<tr class="even">
+<td align="left">317</td>
+<td align="right">0.9434</td>
+<td align="right">0.5910115</td>
+</tr>
+<tr class="odd">
+<td align="left">186</td>
+<td align="right">0.9452</td>
+<td align="right">0.5914929</td>
+</tr>
+<tr class="even">
+<td align="left">365</td>
+<td align="right">0.9456</td>
+<td align="right">0.5917217</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="right">0.9456</td>
+<td align="right">0.5917421</td>
+</tr>
+<tr class="even">
+<td align="left">29</td>
+<td align="right">0.9457</td>
+<td align="right">0.5918651</td>
+</tr>
+<tr class="odd">
+<td align="left">56</td>
+<td align="right">0.9472</td>
+<td align="right">0.5928571</td>
+</tr>
+<tr class="even">
+<td align="left">232</td>
+<td align="right">0.9491</td>
+<td align="right">0.5939583</td>
+</tr>
+<tr class="odd">
+<td align="left">292</td>
+<td align="right">0.9495</td>
+<td align="right">0.5940890</td>
+</tr>
+<tr class="even">
+<td align="left">116</td>
+<td align="right">0.9504</td>
+<td align="right">0.5948933</td>
+</tr>
+<tr class="odd">
+<td align="left">354</td>
+<td align="right">0.9510</td>
+<td align="right">0.5957039</td>
+</tr>
+<tr class="even">
+<td align="left">171</td>
+<td align="right">0.9519</td>
+<td align="right">0.5963855</td>
+</tr>
+<tr class="odd">
+<td align="left">254</td>
+<td align="right">0.9529</td>
+<td align="right">0.5968949</td>
+</tr>
+<tr class="even">
+<td align="left">371</td>
+<td align="right">0.9536</td>
+<td align="right">0.5972165</td>
+</tr>
+<tr class="odd">
+<td align="left">212</td>
+<td align="right">0.9564</td>
+<td align="right">0.5984628</td>
+</tr>
+<tr class="even">
+<td align="left">357</td>
+<td align="right">0.9572</td>
+<td align="right">0.5987216</td>
+</tr>
+<tr class="odd">
+<td align="left">242</td>
+<td align="right">0.9573</td>
+<td align="right">0.5991061</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="right">0.9573</td>
+<td align="right">0.5993371</td>
+</tr>
+<tr class="odd">
+<td align="left">285</td>
+<td align="right">0.9585</td>
+<td align="right">0.6001838</td>
+</tr>
+<tr class="even">
+<td align="left">131</td>
+<td align="right">0.9586</td>
+<td align="right">0.6003968</td>
+</tr>
+<tr class="odd">
+<td align="left">208</td>
+<td align="right">0.9598</td>
+<td align="right">0.6013842</td>
+</tr>
+<tr class="even">
+<td align="left">213</td>
+<td align="right">0.9608</td>
+<td align="right">0.6019866</td>
+</tr>
+<tr class="odd">
+<td align="left">345</td>
+<td align="right">0.9610</td>
+<td align="right">0.6023185</td>
+</tr>
+<tr class="even">
+<td align="left">248</td>
+<td align="right">0.9613</td>
+<td align="right">0.6023860</td>
+</tr>
+<tr class="odd">
+<td align="left">198</td>
+<td align="right">0.9617</td>
+<td align="right">0.6029762</td>
+</tr>
+<tr class="even">
+<td align="left">325</td>
+<td align="right">0.9617</td>
+<td align="right">0.6031124</td>
+</tr>
+<tr class="odd">
+<td align="left">128</td>
+<td align="right">0.9619</td>
+<td align="right">0.6031869</td>
+</tr>
+<tr class="even">
+<td align="left">205</td>
+<td align="right">0.9627</td>
+<td align="right">0.6038510</td>
+</tr>
+<tr class="odd">
+<td align="left">69</td>
+<td align="right">0.9627</td>
+<td align="right">0.6040702</td>
+</tr>
+<tr class="even">
+<td align="left">72</td>
+<td align="right">0.9632</td>
+<td align="right">0.6043447</td>
+</tr>
+<tr class="odd">
+<td align="left">263</td>
+<td align="right">0.9638</td>
+<td align="right">0.6047415</td>
+</tr>
+<tr class="even">
+<td align="left">364</td>
+<td align="right">0.9654</td>
+<td align="right">0.6057692</td>
+</tr>
+<tr class="odd">
+<td align="left">259</td>
+<td align="right">0.9664</td>
+<td align="right">0.6069434</td>
+</tr>
+<tr class="even">
+<td align="left">18</td>
+<td align="right">0.9664</td>
+<td align="right">0.6069444</td>
+</tr>
+<tr class="odd">
+<td align="left">97</td>
+<td align="right">0.9673</td>
+<td align="right">0.6074571</td>
+</tr>
+<tr class="even">
+<td align="left">321</td>
+<td align="right">0.9673</td>
+<td align="right">0.6074738</td>
+</tr>
+<tr class="odd">
+<td align="left">80</td>
+<td align="right">0.9677</td>
+<td align="right">0.6075484</td>
+</tr>
+<tr class="even">
+<td align="left">85</td>
+<td align="right">0.9681</td>
+<td align="right">0.6082899</td>
+</tr>
+<tr class="odd">
+<td align="left">306</td>
+<td align="right">0.9684</td>
+<td align="right">0.6086182</td>
+</tr>
+<tr class="even">
+<td align="left">230</td>
+<td align="right">0.9690</td>
+<td align="right">0.6090295</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="right">0.9692</td>
+<td align="right">0.6093211</td>
+</tr>
+<tr class="even">
+<td align="left">391</td>
+<td align="right">0.9694</td>
+<td align="right">0.6093882</td>
+</tr>
+<tr class="odd">
+<td align="left">342</td>
+<td align="right">0.9694</td>
+<td align="right">0.6094276</td>
+</tr>
+<tr class="even">
+<td align="left">368</td>
+<td align="right">0.9696</td>
+<td align="right">0.6098485</td>
+</tr>
+<tr class="odd">
+<td align="left">283</td>
+<td align="right">0.9704</td>
+<td align="right">0.6107143</td>
+</tr>
+<tr class="even">
+<td align="left">369</td>
+<td align="right">0.9713</td>
+<td align="right">0.6113821</td>
+</tr>
+<tr class="odd">
+<td align="left">320</td>
+<td align="right">0.9713</td>
+<td align="right">0.6115033</td>
+</tr>
+<tr class="even">
+<td align="left">175</td>
+<td align="right">0.9716</td>
+<td align="right">0.6117521</td>
+</tr>
+<tr class="odd">
+<td align="left">362</td>
+<td align="right">0.9732</td>
+<td align="right">0.6127141</td>
+</tr>
+<tr class="even">
+<td align="left">79</td>
+<td align="right">0.9733</td>
+<td align="right">0.6129954</td>
+</tr>
+<tr class="odd">
+<td align="left">96</td>
+<td align="right">0.9733</td>
+<td align="right">0.6130309</td>
+</tr>
+<tr class="even">
+<td align="left">201</td>
+<td align="right">0.9746</td>
+<td align="right">0.6141544</td>
+</tr>
+<tr class="odd">
+<td align="left">19</td>
+<td align="right">0.9754</td>
+<td align="right">0.6151177</td>
+</tr>
+<tr class="even">
+<td align="left">87</td>
+<td align="right">0.9756</td>
+<td align="right">0.6153846</td>
+</tr>
+<tr class="odd">
+<td align="left">363</td>
+<td align="right">0.9768</td>
+<td align="right">0.6172204</td>
+</tr>
+<tr class="even">
+<td align="left">272</td>
+<td align="right">0.9780</td>
+<td align="right">0.6182765</td>
+</tr>
+<tr class="odd">
+<td align="left">246</td>
+<td align="right">0.9783</td>
+<td align="right">0.6185345</td>
+</tr>
+<tr class="even">
+<td align="left">88</td>
+<td align="right">0.9786</td>
+<td align="right">0.6191392</td>
+</tr>
+<tr class="odd">
+<td align="left">221</td>
+<td align="right">0.9792</td>
+<td align="right">0.6197157</td>
+</tr>
+<tr class="even">
+<td align="left">117</td>
+<td align="right">0.9800</td>
+<td align="right">0.6209350</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">0.9800</td>
+<td align="right">0.6209985</td>
+</tr>
+<tr class="even">
+<td align="left">216</td>
+<td align="right">0.9800</td>
+<td align="right">0.6211134</td>
+</tr>
+<tr class="odd">
+<td align="left">15</td>
+<td align="right">0.9800</td>
+<td align="right">0.6211803</td>
+</tr>
+<tr class="even">
+<td align="left">37</td>
+<td align="right">0.9803</td>
+<td align="right">0.6215278</td>
+</tr>
+<tr class="odd">
+<td align="left">45</td>
+<td align="right">0.9804</td>
+<td align="right">0.6219343</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="right">0.9809</td>
+<td align="right">0.6223291</td>
+</tr>
+<tr class="odd">
+<td align="left">134</td>
+<td align="right">0.9810</td>
+<td align="right">0.6225229</td>
+</tr>
+<tr class="even">
+<td align="left">25</td>
+<td align="right">0.9817</td>
+<td align="right">0.6229040</td>
+</tr>
+<tr class="odd">
+<td align="left">187</td>
+<td align="right">0.9817</td>
+<td align="right">0.6229056</td>
+</tr>
+<tr class="even">
+<td align="left">33</td>
+<td align="right">0.9817</td>
+<td align="right">0.6230082</td>
+</tr>
+<tr class="odd">
+<td align="left">238</td>
+<td align="right">0.9817</td>
+<td align="right">0.6230106</td>
+</tr>
+<tr class="even">
+<td align="left">136</td>
+<td align="right">0.9817</td>
+<td align="right">0.6232143</td>
+</tr>
+<tr class="odd">
+<td align="left">40</td>
+<td align="right">0.9821</td>
+<td align="right">0.6232697</td>
+</tr>
+<tr class="even">
+<td align="left">162</td>
+<td align="right">0.9821</td>
+<td align="right">0.6232851</td>
+</tr>
+<tr class="odd">
+<td align="left">190</td>
+<td align="right">0.9821</td>
+<td align="right">0.6234375</td>
+</tr>
+<tr class="even">
+<td align="left">163</td>
+<td align="right">0.9824</td>
+<td align="right">0.6237956</td>
+</tr>
+<tr class="odd">
+<td align="left">132</td>
+<td align="right">0.9839</td>
+<td align="right">0.6262539</td>
+</tr>
+<tr class="even">
+<td align="left">378</td>
+<td align="right">0.9841</td>
+<td align="right">0.6265060</td>
+</tr>
+<tr class="odd">
+<td align="left">100</td>
+<td align="right">0.9845</td>
+<td align="right">0.6266812</td>
+</tr>
+<tr class="even">
+<td align="left">383</td>
+<td align="right">0.9850</td>
+<td align="right">0.6270477</td>
+</tr>
+<tr class="odd">
+<td align="left">115</td>
+<td align="right">0.9851</td>
+<td align="right">0.6272059</td>
+</tr>
+<tr class="even">
+<td align="left">182</td>
+<td align="right">0.9851</td>
+<td align="right">0.6272745</td>
+</tr>
+<tr class="odd">
+<td align="left">174</td>
+<td align="right">0.9852</td>
+<td align="right">0.6277574</td>
+</tr>
+<tr class="even">
+<td align="left">104</td>
+<td align="right">0.9857</td>
+<td align="right">0.6282922</td>
+</tr>
+<tr class="odd">
+<td align="left">34</td>
+<td align="right">0.9862</td>
+<td align="right">0.6289092</td>
+</tr>
+<tr class="even">
+<td align="left">167</td>
+<td align="right">0.9862</td>
+<td align="right">0.6289683</td>
+</tr>
+<tr class="odd">
+<td align="left">78</td>
+<td align="right">0.9868</td>
+<td align="right">0.6292266</td>
+</tr>
+<tr class="even">
+<td align="left">73</td>
+<td align="right">0.9870</td>
+<td align="right">0.6294158</td>
+</tr>
+<tr class="odd">
+<td align="left">265</td>
+<td align="right">0.9870</td>
+<td align="right">0.6294756</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="right">0.9870</td>
+<td align="right">0.6295635</td>
+</tr>
+<tr class="odd">
+<td align="left">293</td>
+<td align="right">0.9874</td>
+<td align="right">0.6301910</td>
+</tr>
+<tr class="even">
+<td align="left">122</td>
+<td align="right">0.9877</td>
+<td align="right">0.6304348</td>
+</tr>
+<tr class="odd">
+<td align="left">319</td>
+<td align="right">0.9877</td>
+<td align="right">0.6305871</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="right">0.9885</td>
+<td align="right">0.6317568</td>
+</tr>
+<tr class="odd">
+<td align="left">61</td>
+<td align="right">0.9891</td>
+<td align="right">0.6326096</td>
+</tr>
+<tr class="even">
+<td align="left">202</td>
+<td align="right">0.9891</td>
+<td align="right">0.6327381</td>
+</tr>
+<tr class="odd">
+<td align="left">250</td>
+<td align="right">0.9895</td>
+<td align="right">0.6328027</td>
+</tr>
+<tr class="even">
+<td align="left">266</td>
+<td align="right">0.9896</td>
+<td align="right">0.6331936</td>
+</tr>
+<tr class="odd">
+<td align="left">152</td>
+<td align="right">0.9897</td>
+<td align="right">0.6339286</td>
+</tr>
+<tr class="even">
+<td align="left">155</td>
+<td align="right">0.9897</td>
+<td align="right">0.6339319</td>
+</tr>
+<tr class="odd">
+<td align="left">55</td>
+<td align="right">0.9897</td>
+<td align="right">0.6339431</td>
+</tr>
+<tr class="even">
+<td align="left">20</td>
+<td align="right">0.9897</td>
+<td align="right">0.6339558</td>
+</tr>
+<tr class="odd">
+<td align="left">279</td>
+<td align="right">0.9901</td>
+<td align="right">0.6350328</td>
+</tr>
+<tr class="even">
+<td align="left">374</td>
+<td align="right">0.9903</td>
+<td align="right">0.6356209</td>
+</tr>
+<tr class="odd">
+<td align="left">89</td>
+<td align="right">0.9906</td>
+<td align="right">0.6359776</td>
+</tr>
+<tr class="even">
+<td align="left">274</td>
+<td align="right">0.9906</td>
+<td align="right">0.6360514</td>
+</tr>
+<tr class="odd">
+<td align="left">289</td>
+<td align="right">0.9906</td>
+<td align="right">0.6361628</td>
+</tr>
+<tr class="even">
+<td align="left">386</td>
+<td align="right">0.9907</td>
+<td align="right">0.6364583</td>
+</tr>
+<tr class="odd">
+<td align="left">224</td>
+<td align="right">0.9909</td>
+<td align="right">0.6375000</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="right">0.9909</td>
+<td align="right">0.6375718</td>
+</tr>
+<tr class="odd">
+<td align="left">161</td>
+<td align="right">0.9918</td>
+<td align="right">0.6387032</td>
+</tr>
+<tr class="even">
+<td align="left">126</td>
+<td align="right">0.9918</td>
+<td align="right">0.6387311</td>
+</tr>
+<tr class="odd">
+<td align="left">335</td>
+<td align="right">0.9918</td>
+<td align="right">0.6387893</td>
+</tr>
+<tr class="even">
+<td align="left">207</td>
+<td align="right">0.9920</td>
+<td align="right">0.6392570</td>
+</tr>
+<tr class="odd">
+<td align="left">241</td>
+<td align="right">0.9920</td>
+<td align="right">0.6393336</td>
+</tr>
+<tr class="even">
+<td align="left">338</td>
+<td align="right">0.9929</td>
+<td align="right">0.6403219</td>
+</tr>
+<tr class="odd">
+<td align="left">387</td>
+<td align="right">0.9929</td>
+<td align="right">0.6404617</td>
+</tr>
+<tr class="even">
+<td align="left">355</td>
+<td align="right">0.9930</td>
+<td align="right">0.6406918</td>
+</tr>
+<tr class="odd">
+<td align="left">360</td>
+<td align="right">0.9931</td>
+<td align="right">0.6409736</td>
+</tr>
+<tr class="even">
+<td align="left">341</td>
+<td align="right">0.9936</td>
+<td align="right">0.6421875</td>
+</tr>
+<tr class="odd">
+<td align="left">139</td>
+<td align="right">0.9936</td>
+<td align="right">0.6422619</td>
+</tr>
+<tr class="even">
+<td align="left">145</td>
+<td align="right">0.9936</td>
+<td align="right">0.6429924</td>
+</tr>
+<tr class="odd">
+<td align="left">47</td>
+<td align="right">0.9938</td>
+<td align="right">0.6430976</td>
+</tr>
+<tr class="even">
+<td align="left">31</td>
+<td align="right">0.9938</td>
+<td align="right">0.6437613</td>
+</tr>
+<tr class="odd">
+<td align="left">286</td>
+<td align="right">0.9938</td>
+<td align="right">0.6438492</td>
+</tr>
+<tr class="even">
+<td align="left">300</td>
+<td align="right">0.9939</td>
+<td align="right">0.6450368</td>
+</tr>
+<tr class="odd">
+<td align="left">322</td>
+<td align="right">0.9939</td>
+<td align="right">0.6450397</td>
+</tr>
+<tr class="even">
+<td align="left">258</td>
+<td align="right">0.9941</td>
+<td align="right">0.6458333</td>
+</tr>
+<tr class="odd">
+<td align="left">231</td>
+<td align="right">0.9942</td>
+<td align="right">0.6460446</td>
+</tr>
+<tr class="even">
+<td align="left">30</td>
+<td align="right">0.9942</td>
+<td align="right">0.6464844</td>
+</tr>
+<tr class="odd">
+<td align="left">77</td>
+<td align="right">0.9942</td>
+<td align="right">0.6465638</td>
+</tr>
+<tr class="even">
+<td align="left">39</td>
+<td align="right">0.9942</td>
+<td align="right">0.6473380</td>
+</tr>
+<tr class="odd">
+<td align="left">313</td>
+<td align="right">0.9942</td>
+<td align="right">0.6474014</td>
+</tr>
+<tr class="even">
+<td align="left">389</td>
+<td align="right">0.9942</td>
+<td align="right">0.6479490</td>
+</tr>
+<tr class="odd">
+<td align="left">57</td>
+<td align="right">0.9942</td>
+<td align="right">0.6486345</td>
+</tr>
+<tr class="even">
+<td align="left">264</td>
+<td align="right">0.9948</td>
+<td align="right">0.6505399</td>
+</tr>
+<tr class="odd">
+<td align="left">311</td>
+<td align="right">0.9949</td>
+<td align="right">0.6514863</td>
+</tr>
+<tr class="even">
+<td align="left">142</td>
+<td align="right">0.9949</td>
+<td align="right">0.6517324</td>
+</tr>
+<tr class="odd">
+<td align="left">166</td>
+<td align="right">0.9950</td>
+<td align="right">0.6527383</td>
+</tr>
+<tr class="even">
+<td align="left">127</td>
+<td align="right">0.9950</td>
+<td align="right">0.6531286</td>
+</tr>
+<tr class="odd">
+<td align="left">160</td>
+<td align="right">0.9954</td>
+<td align="right">0.6551587</td>
+</tr>
+<tr class="even">
+<td align="left">157</td>
+<td align="right">0.9954</td>
+<td align="right">0.6554370</td>
+</tr>
+<tr class="odd">
+<td align="left">353</td>
+<td align="right">0.9955</td>
+<td align="right">0.6566406</td>
+</tr>
+<tr class="even">
+<td align="left">245</td>
+<td align="right">0.9955</td>
+<td align="right">0.6569277</td>
+</tr>
+<tr class="odd">
+<td align="left">90</td>
+<td align="right">0.9955</td>
+<td align="right">0.6571285</td>
+</tr>
+<tr class="even">
+<td align="left">169</td>
+<td align="right">0.9955</td>
+<td align="right">0.6571573</td>
+</tr>
+<tr class="odd">
+<td align="left">67</td>
+<td align="right">0.9960</td>
+<td align="right">0.6587900</td>
+</tr>
+<tr class="even">
+<td align="left">268</td>
+<td align="right">0.9960</td>
+<td align="right">0.6590264</td>
+</tr>
+<tr class="odd">
+<td align="left">316</td>
+<td align="right">0.9962</td>
+<td align="right">0.6595833</td>
+</tr>
+<tr class="even">
+<td align="left">76</td>
+<td align="right">0.9962</td>
+<td align="right">0.6597112</td>
+</tr>
+<tr class="odd">
+<td align="left">21</td>
+<td align="right">0.9964</td>
+<td align="right">0.6602151</td>
+</tr>
+<tr class="even">
+<td align="left">294</td>
+<td align="right">0.9964</td>
+<td align="right">0.6603187</td>
+</tr>
+<tr class="odd">
+<td align="left">86</td>
+<td align="right">0.9964</td>
+<td align="right">0.6605847</td>
+</tr>
+<tr class="even">
+<td align="left">257</td>
+<td align="right">0.9967</td>
+<td align="right">0.6616801</td>
+</tr>
+<tr class="odd">
+<td align="left">180</td>
+<td align="right">0.9967</td>
+<td align="right">0.6617525</td>
+</tr>
+<tr class="even">
+<td align="left">356</td>
+<td align="right">0.9967</td>
+<td align="right">0.6619817</td>
+</tr>
+<tr class="odd">
+<td align="left">336</td>
+<td align="right">0.9969</td>
+<td align="right">0.6627122</td>
+</tr>
+<tr class="even">
+<td align="left">318</td>
+<td align="right">0.9969</td>
+<td align="right">0.6627665</td>
+</tr>
+<tr class="odd">
+<td align="left">191</td>
+<td align="right">0.9969</td>
+<td align="right">0.6632241</td>
+</tr>
+<tr class="even">
+<td align="left">158</td>
+<td align="right">0.9969</td>
+<td align="right">0.6638289</td>
+</tr>
+<tr class="odd">
+<td align="left">28</td>
+<td align="right">0.9971</td>
+<td align="right">0.6650270</td>
+</tr>
+<tr class="even">
+<td align="left">153</td>
+<td align="right">0.9971</td>
+<td align="right">0.6650748</td>
+</tr>
+<tr class="odd">
+<td align="left">113</td>
+<td align="right">0.9971</td>
+<td align="right">0.6653874</td>
+</tr>
+<tr class="even">
+<td align="left">118</td>
+<td align="right">0.9971</td>
+<td align="right">0.6656746</td>
+</tr>
+<tr class="odd">
+<td align="left">328</td>
+<td align="right">0.9971</td>
+<td align="right">0.6658136</td>
+</tr>
+<tr class="even">
+<td align="left">333</td>
+<td align="right">0.9971</td>
+<td align="right">0.6658427</td>
+</tr>
+<tr class="odd">
+<td align="left">280</td>
+<td align="right">0.9971</td>
+<td align="right">0.6659053</td>
+</tr>
+<tr class="even">
+<td align="left">119</td>
+<td align="right">0.9972</td>
+<td align="right">0.6662109</td>
+</tr>
+<tr class="odd">
+<td align="left">14</td>
+<td align="right">0.9972</td>
+<td align="right">0.6662821</td>
+</tr>
+<tr class="even">
+<td align="left">237</td>
+<td align="right">0.9972</td>
+<td align="right">0.6664749</td>
+</tr>
+<tr class="odd">
+<td align="left">340</td>
+<td align="right">0.9973</td>
+<td align="right">0.6681542</td>
+</tr>
+<tr class="even">
+<td align="left">346</td>
+<td align="right">0.9974</td>
+<td align="right">0.6694224</td>
+</tr>
+<tr class="odd">
+<td align="left">75</td>
+<td align="right">0.9979</td>
+<td align="right">0.6724265</td>
+</tr>
+<tr class="even">
+<td align="left">195</td>
+<td align="right">0.9980</td>
+<td align="right">0.6728277</td>
+</tr>
+<tr class="odd">
+<td align="left">239</td>
+<td align="right">0.9980</td>
+<td align="right">0.6733936</td>
+</tr>
+<tr class="even">
+<td align="left">209</td>
+<td align="right">0.9982</td>
+<td align="right">0.6761039</td>
+</tr>
+<tr class="odd">
+<td align="left">309</td>
+<td align="right">0.9982</td>
+<td align="right">0.6777820</td>
+</tr>
+<tr class="even">
+<td align="left">380</td>
+<td align="right">0.9983</td>
+<td align="right">0.6791075</td>
+</tr>
+<tr class="odd">
+<td align="left">211</td>
+<td align="right">0.9983</td>
+<td align="right">0.6791667</td>
+</tr>
+<tr class="even">
+<td align="left">358</td>
+<td align="right">0.9983</td>
+<td align="right">0.6791667</td>
+</tr>
+<tr class="odd">
+<td align="left">288</td>
+<td align="right">0.9983</td>
+<td align="right">0.6794118</td>
+</tr>
+<tr class="even">
+<td align="left">149</td>
+<td align="right">0.9988</td>
+<td align="right">0.6818490</td>
+</tr>
+<tr class="odd">
+<td align="left">384</td>
+<td align="right">0.9988</td>
+<td align="right">0.6819807</td>
+</tr>
+<tr class="even">
+<td align="left">53</td>
+<td align="right">0.9990</td>
+<td align="right">0.6825547</td>
+</tr>
+<tr class="odd">
+<td align="left">135</td>
+<td align="right">0.9992</td>
+<td align="right">0.6845100</td>
+</tr>
+<tr class="even">
+<td align="left">253</td>
+<td align="right">0.9992</td>
+<td align="right">0.6847426</td>
+</tr>
+<tr class="odd">
+<td align="left">244</td>
+<td align="right">0.9992</td>
+<td align="right">0.6851815</td>
+</tr>
+<tr class="even">
+<td align="left">32</td>
+<td align="right">0.9993</td>
+<td align="right">0.6882353</td>
+</tr>
+<tr class="odd">
+<td align="left">52</td>
+<td align="right">0.9993</td>
+<td align="right">0.6896745</td>
+</tr>
+<tr class="even">
+<td align="left">143</td>
+<td align="right">0.9993</td>
+<td align="right">0.6897297</td>
+</tr>
+<tr class="odd">
+<td align="left">141</td>
+<td align="right">0.9993</td>
+<td align="right">0.6902006</td>
+</tr>
+<tr class="even">
+<td align="left">375</td>
+<td align="right">0.9993</td>
+<td align="right">0.6904223</td>
+</tr>
+<tr class="odd">
+<td align="left">130</td>
+<td align="right">0.9993</td>
+<td align="right">0.6914474</td>
+</tr>
+<tr class="even">
+<td align="left">199</td>
+<td align="right">0.9993</td>
+<td align="right">0.6914835</td>
+</tr>
+<tr class="odd">
+<td align="left">330</td>
+<td align="right">0.9993</td>
+<td align="right">0.6919192</td>
+</tr>
+<tr class="even">
+<td align="left">71</td>
+<td align="right">0.9995</td>
+<td align="right">0.6928571</td>
+</tr>
+<tr class="odd">
+<td align="left">193</td>
+<td align="right">0.9995</td>
+<td align="right">0.6933835</td>
+</tr>
+<tr class="even">
+<td align="left">108</td>
+<td align="right">0.9995</td>
+<td align="right">0.6941445</td>
+</tr>
+<tr class="odd">
+<td align="left">173</td>
+<td align="right">0.9995</td>
+<td align="right">0.6945548</td>
+</tr>
+<tr class="even">
+<td align="left">303</td>
+<td align="right">0.9995</td>
+<td align="right">0.6949314</td>
+</tr>
+<tr class="odd">
+<td align="left">148</td>
+<td align="right">0.9995</td>
+<td align="right">0.6950397</td>
+</tr>
+<tr class="even">
+<td align="left">109</td>
+<td align="right">0.9996</td>
+<td align="right">0.6975610</td>
+</tr>
+<tr class="odd">
+<td align="left">46</td>
+<td align="right">0.9997</td>
+<td align="right">0.6985294</td>
+</tr>
+<tr class="even">
+<td align="left">359</td>
+<td align="right">0.9997</td>
+<td align="right">0.7005238</td>
+</tr>
+<tr class="odd">
+<td align="left">367</td>
+<td align="right">0.9997</td>
+<td align="right">0.7042363</td>
+</tr>
+<tr class="even">
+<td align="left">287</td>
+<td align="right">0.9997</td>
+<td align="right">0.7042400</td>
+</tr>
+<tr class="odd">
+<td align="left">65</td>
+<td align="right">0.9997</td>
+<td align="right">0.7066799</td>
+</tr>
+<tr class="even">
+<td align="left">178</td>
+<td align="right">0.9998</td>
+<td align="right">0.7089001</td>
+</tr>
+<tr class="odd">
+<td align="left">352</td>
+<td align="right">0.9998</td>
+<td align="right">0.7095238</td>
+</tr>
+<tr class="even">
+<td align="left">144</td>
+<td align="right">0.9998</td>
+<td align="right">0.7105477</td>
+</tr>
+<tr class="odd">
+<td align="left">275</td>
+<td align="right">1.0000</td>
+<td align="right">0.7181070</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">1.0000</td>
+<td align="right">0.7187500</td>
+</tr>
+<tr class="odd">
+<td align="left">183</td>
+<td align="right">1.0000</td>
+<td align="right">0.7190341</td>
+</tr>
+<tr class="even">
+<td align="left">349</td>
+<td align="right">1.0000</td>
+<td align="right">0.7192460</td>
+</tr>
+<tr class="odd">
+<td align="left">373</td>
+<td align="right">1.0000</td>
+<td align="right">0.7206897</td>
+</tr>
+<tr class="even">
+<td align="left">223</td>
+<td align="right">1.0000</td>
+<td align="right">0.7208460</td>
+</tr>
+<tr class="odd">
+<td align="left">262</td>
+<td align="right">1.0000</td>
+<td align="right">0.7215909</td>
+</tr>
+<tr class="even">
+<td align="left">225</td>
+<td align="right">1.0000</td>
+<td align="right">0.7220231</td>
+</tr>
+<tr class="odd">
+<td align="left">337</td>
+<td align="right">1.0000</td>
+<td align="right">0.7226838</td>
+</tr>
+<tr class="even">
+<td align="left">267</td>
+<td align="right">1.0000</td>
+<td align="right">0.7240575</td>
+</tr>
+<tr class="odd">
+<td align="left">366</td>
+<td align="right">1.0000</td>
+<td align="right">0.7251953</td>
+</tr>
+<tr class="even">
+<td align="left">137</td>
+<td align="right">1.0000</td>
+<td align="right">0.7256944</td>
+</tr>
+<tr class="odd">
+<td align="left">93</td>
+<td align="right">1.0000</td>
+<td align="right">0.7264646</td>
+</tr>
+<tr class="even">
+<td align="left">133</td>
+<td align="right">1.0000</td>
+<td align="right">0.7272727</td>
+</tr>
+<tr class="odd">
+<td align="left">233</td>
+<td align="right">1.0000</td>
+<td align="right">0.7281297</td>
+</tr>
+<tr class="even">
+<td align="left">252</td>
+<td align="right">1.0000</td>
+<td align="right">0.7297889</td>
+</tr>
+<tr class="odd">
+<td align="left">151</td>
+<td align="right">1.0000</td>
+<td align="right">0.7310532</td>
+</tr>
+<tr class="even">
+<td align="left">9</td>
+<td align="right">1.0000</td>
+<td align="right">0.7316356</td>
+</tr>
+<tr class="odd">
+<td align="left">168</td>
+<td align="right">1.0000</td>
+<td align="right">0.7345238</td>
+</tr>
+<tr class="even">
+<td align="left">197</td>
+<td align="right">1.0000</td>
+<td align="right">0.7409399</td>
+</tr>
+<tr class="odd">
+<td align="left">312</td>
+<td align="right">1.0000</td>
+<td align="right">0.7409722</td>
+</tr>
+<tr class="even">
+<td align="left">38</td>
+<td align="right">1.0000</td>
+<td align="right">0.7412348</td>
+</tr>
+<tr class="odd">
+<td align="left">222</td>
+<td align="right">1.0000</td>
+<td align="right">0.7518293</td>
+</tr>
+<tr class="even">
+<td align="left">243</td>
+<td align="right">1.0000</td>
+<td align="right">0.7567460</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
+<td align="right">1.0000</td>
+<td align="right">0.7627510</td>
+</tr>
+<tr class="even">
+<td align="left">307</td>
+<td align="right">1.0000</td>
+<td align="right">0.7641006</td>
+</tr>
+<tr class="odd">
+<td align="left">91</td>
+<td align="right">1.0000</td>
+<td align="right">0.7665005</td>
+</tr>
+<tr class="even">
+<td align="left">140</td>
+<td align="right">1.0000</td>
+<td align="right">0.7711039</td>
+</tr>
+<tr class="odd">
+<td align="left">43</td>
+<td align="right">1.0000</td>
+<td align="right">0.7801724</td>
+</tr>
+</tbody>
+</table>
 
 
 
