@@ -206,6 +206,7 @@ DF_list &lt;- DataFrame_Filtered(experimento = &quot;ambos&quot;,
 # g d.sin.normalizar.solo.FyM.mc.filter
 # h d.solo.FyM.mc.filter
 
+df_total &lt;- DF_list$a
 d.sin.normalizar.solo.FyM.mc.filter &lt;- DF_list$g # 
 ###############
 ### library ###
@@ -244,23 +245,24 @@ d1[d1 == &quot;Masculino&quot;] &lt;- &quot;1&quot;
 d1[d1 == &quot;Femenino&quot;] &lt;- &quot;0&quot;
 d1$Im &lt;- as.integer(d1$Im)
 
-
+# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
 d2 &lt;- d1[d1$sujetos != 57 &amp; d1$sujetos != 63 &amp; d1$sujetos != 83
-         &amp; d1$sujetos != 109 &amp; d1$sujetos != 1029 &amp; d1$sujetos != 1121 
+         &amp; d1$sujetos != 109 &amp; d1$sujetos != 1029 &amp; d1$sujetos != 1121
          &amp; d1$sujetos != 1159 &amp; d1$sujetos != 1193 &amp; d1$sujetos != 36
          &amp; d1$sujetos != 170 &amp; d1$sujetos != 1081 &amp; d1$sujetos != 1086
-         &amp; d1$sujetos != 1095 &amp; d1$sujetos != 1110 &amp; d1$sujetos != 1172, ] 
+         &amp; d1$sujetos != 1095 &amp; d1$sujetos != 1110 &amp; d1$sujetos != 1172, ]
 
+# sujetos que tienen menos de 90 de trials
 d3 &lt;- d2[d2$sujetos != 55 &amp; d2$sujetos != 57 &amp; d2$sujetos != 83 &amp;
                  d2$sujetos != 122 &amp; d2$sujetos != 131 &amp; d2$sujetos != 141 &amp;
                  d2$sujetos != 172 &amp; d2$sujetos != 173 &amp; d2$sujetos != 179 &amp;
                  d2$sujetos != 189 &amp; d2$sujetos != 193 &amp; d2$sujetos != 195 &amp;
                  d2$sujetos != 1010 &amp; d2$sujetos != 1046 &amp;
-                 d2$sujetos != 1069 &amp; d2$sujetos != 1112 &amp; 
+                 d2$sujetos != 1069 &amp; d2$sujetos != 1112 &amp;
                  d2$sujetos != 1127 &amp; d2$sujetos != 1135 &amp;
                  d2$sujetos != 1154 &amp; d2$sujetos != 1171 &amp;
-                 d2$sujetos != 1191 &amp; d2$sujetos != 1239 &amp; 
-                 d2$sujetos != 1250 &amp; d2$sujetos != 1251 &amp; 
+                 d2$sujetos != 1191 &amp; d2$sujetos != 1239 &amp;
+                 d2$sujetos != 1250 &amp; d2$sujetos != 1251 &amp;
                  d2$sujetos != 1260,]</code></pre>
 <div id="empiezo-a-correr-modelos-de-regresiones" class="section level5">
 <h5>Empiezo a correr modelos de regresiones</h5>
@@ -273,66 +275,66 @@ d3 &lt;- d2[d2$sujetos != 55 &amp; d2$sujetos != 57 &amp; d2$sujetos != 83 &amp;
        edad.norm+
        es +
        aq.norm: Im,
-     data = d1) 
+     data = d3) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = mc ~ aq.norm + Im + edad.norm + es + aq.norm:Im, 
-##     data = d1)
+##     data = d3)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.123999 -0.042463 -0.003187  0.037033  0.138264 
+## -0.129579 -0.036869 -0.004405  0.037764  0.134535 
 ## 
 ## Coefficients:
 ##                            Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)               0.6120037  0.0103726  59.002   &lt;2e-16 ***
-## aq.norm                  -0.0030793  0.0038305  -0.804   0.4220    
-## Im                        0.0038867  0.0069682   0.558   0.5774    
-## edad.norm                -0.0038275  0.0038069  -1.005   0.3154    
-## esPosgrado incompleto     0.0156668  0.0135269   1.158   0.2476    
-## esSecundaria completa     0.0004716  0.0184310   0.026   0.9796    
-## esSecundaria incompleta   0.0183626  0.0598516   0.307   0.7592    
-## esUniversidad completa   -0.0049456  0.0117682  -0.420   0.6746    
-## esUniversidad incompleta  0.0120720  0.0120194   1.004   0.3159    
-## aq.norm:Im                0.0158644  0.0069919   2.269   0.0239 *  
+## (Intercept)               6.136e-01  1.055e-02  58.170   &lt;2e-16 ***
+## aq.norm                  -3.215e-03  3.898e-03  -0.825   0.4101    
+## Im                        6.559e-05  7.148e-03   0.009   0.9927    
+## edad.norm                -2.913e-03  3.883e-03  -0.750   0.4537    
+## esPosgrado incompleto     1.662e-02  1.383e-02   1.202   0.2303    
+## esSecundaria completa     1.188e-02  1.909e-02   0.623   0.5340    
+## esSecundaria incompleta   1.621e-02  5.883e-02   0.275   0.7831    
+## esUniversidad completa   -5.267e-03  1.194e-02  -0.441   0.6595    
+## esUniversidad incompleta  1.640e-02  1.229e-02   1.334   0.1833    
+## aq.norm:Im                1.553e-02  7.057e-03   2.201   0.0285 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.05908 on 339 degrees of freedom
-## Multiple R-squared:  0.04669,    Adjusted R-squared:  0.02138 
-## F-statistic: 1.845 on 9 and 339 DF,  p-value: 0.05945</code></pre>
+## Residual standard error: 0.05802 on 310 degrees of freedom
+## Multiple R-squared:  0.05457,    Adjusted R-squared:  0.02712 
+## F-statistic: 1.988 on 9 and 310 DF,  p-value: 0.04023</code></pre>
 </div>
 <div id="modelo-2" class="section level2">
 <h2>Modelo 2</h2>
 <pre class="r"><code>a=lm(mc ~ aq.norm +
        Im +
        aq.norm: Im,
-     data = d1) 
+     data = d3) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = mc ~ aq.norm + Im + aq.norm:Im, data = d1)
+## lm(formula = mc ~ aq.norm + Im + aq.norm:Im, data = d3)
 ## 
 ## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -0.11795 -0.04420 -0.00228  0.03988  0.14330 
+##       Min        1Q    Median        3Q       Max 
+## -0.122085 -0.040463 -0.003567  0.039222  0.142771 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.618284   0.003806 162.462   &lt;2e-16 ***
-## aq.norm     -0.004666   0.003803  -1.227   0.2207    
-## Im           0.005079   0.006960   0.730   0.4661    
-## aq.norm:Im   0.017957   0.006991   2.569   0.0106 *  
+## (Intercept)  0.622066   0.003922 158.616   &lt;2e-16 ***
+## aq.norm     -0.004989   0.003891  -1.282   0.2007    
+## Im           0.001732   0.007159   0.242   0.8090    
+## aq.norm:Im   0.017751   0.007076   2.509   0.0126 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.05939 on 345 degrees of freedom
-## Multiple R-squared:  0.01977,    Adjusted R-squared:  0.01124 
-## F-statistic: 2.319 on 3 and 345 DF,  p-value: 0.07524</code></pre>
+## Residual standard error: 0.05852 on 316 degrees of freedom
+## Multiple R-squared:  0.01957,    Adjusted R-squared:  0.01027 
+## F-statistic: 2.103 on 3 and 316 DF,  p-value: 0.09976</code></pre>
 </div>
-<div id="modelo-3-este-es-el-modelo-final-que-usariamos" class="section level2">
-<h2>Modelo 3 (este es el modelo final que usariamos)</h2>
+<div id="modelo-3" class="section level2">
+<h2>Modelo 3</h2>
 <pre class="r"><code>a=lm(mc ~ aq.norm +
        Im +
        edad.norm+
@@ -376,42 +378,42 @@ summary(a)</code></pre>
        aq.norm:edad.norm+
        Im:edad.norm+
        es:aq.norm,
-     data = d1) 
+     data = d3) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = mc ~ aq.norm + Im + edad.norm + es + aq.norm:Im + 
-##     aq.norm:edad.norm + Im:edad.norm + es:aq.norm, data = d1)
+##     aq.norm:edad.norm + Im:edad.norm + es:aq.norm, data = d3)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.121000 -0.041800 -0.004254  0.038191  0.140273 
+## -0.126224 -0.039017 -0.005514  0.038239  0.138183 
 ## 
 ## Coefficients: (1 not defined because of singularities)
 ##                                    Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)                       6.125e-01  1.054e-02  58.093   &lt;2e-16 ***
-## aq.norm                           3.423e-05  1.067e-02   0.003   0.9974    
-## Im                                3.592e-03  7.056e-03   0.509   0.6111    
-## edad.norm                        -5.341e-03  4.212e-03  -1.268   0.2057    
-## esPosgrado incompleto             1.531e-02  1.374e-02   1.114   0.2659    
-## esSecundaria completa             6.233e-03  1.889e-02   0.330   0.7416    
-## esSecundaria incompleta           1.879e-02  5.986e-02   0.314   0.7538    
-## esUniversidad completa           -4.067e-03  1.195e-02  -0.340   0.7339    
-## esUniversidad incompleta          1.265e-02  1.221e-02   1.035   0.3012    
-## aq.norm:Im                        1.541e-02  7.095e-03   2.172   0.0305 *  
-## aq.norm:edad.norm                -4.595e-03  3.586e-03  -1.281   0.2010    
-## Im:edad.norm                      7.460e-03  8.139e-03   0.917   0.3600    
-## aq.norm:esPosgrado incompleto    -1.960e-04  1.436e-02  -0.014   0.9891    
-## aq.norm:esSecundaria completa     1.082e-02  1.736e-02   0.623   0.5337    
+## (Intercept)                       0.6148593  0.0107050  57.437   &lt;2e-16 ***
+## aq.norm                          -0.0012472  0.0108052  -0.115   0.9082    
+## Im                               -0.0008155  0.0072320  -0.113   0.9103    
+## edad.norm                        -0.0046175  0.0042966  -1.075   0.2834    
+## esPosgrado incompleto             0.0158760  0.0140050   1.134   0.2579    
+## esSecundaria completa             0.0168692  0.0195999   0.861   0.3901    
+## esSecundaria incompleta           0.0160827  0.0587345   0.274   0.7844    
+## esUniversidad completa           -0.0048476  0.0121045  -0.400   0.6891    
+## esUniversidad incompleta          0.0161523  0.0124660   1.296   0.1961    
+## aq.norm:Im                        0.0156030  0.0071529   2.181   0.0299 *  
+## aq.norm:edad.norm                -0.0037398  0.0036657  -1.020   0.3084    
+## Im:edad.norm                      0.0056165  0.0082123   0.684   0.4945    
+## aq.norm:esPosgrado incompleto     0.0012005  0.0143983   0.083   0.9336    
+## aq.norm:esSecundaria completa     0.0122918  0.0172059   0.714   0.4755    
 ## aq.norm:esSecundaria incompleta          NA         NA      NA       NA    
-## aq.norm:esUniversidad completa   -8.254e-03  1.171e-02  -0.705   0.4815    
-## aq.norm:esUniversidad incompleta -8.000e-04  1.199e-02  -0.067   0.9469    
+## aq.norm:esUniversidad completa   -0.0119648  0.0119088  -1.005   0.3158    
+## aq.norm:esUniversidad incompleta  0.0016587  0.0122544   0.135   0.8924    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.05906 on 333 degrees of freedom
-## Multiple R-squared:  0.06427,    Adjusted R-squared:  0.02212 
-## F-statistic: 1.525 on 15 and 333 DF,  p-value: 0.09419</code></pre>
+## Residual standard error: 0.0579 on 304 degrees of freedom
+## Multiple R-squared:  0.07681,    Adjusted R-squared:  0.03125 
+## F-statistic: 1.686 on 15 and 304 DF,  p-value: 0.05258</code></pre>
 </div>
 <div id="modelo-5" class="section level2">
 <h2>Modelo 5</h2>
@@ -445,6 +447,40 @@ summary(a)</code></pre>
 ## Residual standard error: 0.9751 on 315 degrees of freedom
 ## Multiple R-squared:  0.03203,    Adjusted R-squared:  0.01974 
 ## F-statistic: 2.606 on 4 and 315 DF,  p-value: 0.03587</code></pre>
+</div>
+<div id="modelo-6-este-es-el-modelo-final-que-usariamos" class="section level2">
+<h2>Modelo 6 (este es el modelo final que usariamos)</h2>
+<pre class="r"><code>a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       aq.norm: Im+
+       aq.norm:edad.norm,
+       #Im:edad.norm,
+     data = d3) 
+summary(a)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mc ~ aq.norm + Im + edad.norm + aq.norm:Im + aq.norm:edad.norm, 
+##     data = d3)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.121206 -0.039836 -0.002533  0.034454  0.143553 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        0.6230967  0.0039149 159.161   &lt;2e-16 ***
+## aq.norm           -0.0025935  0.0039927  -0.650   0.5165    
+## Im                 0.0001087  0.0071412   0.015   0.9879    
+## edad.norm         -0.0065041  0.0032870  -1.979   0.0487 *  
+## aq.norm:Im         0.0160125  0.0070628   2.267   0.0241 *  
+## aq.norm:edad.norm -0.0046824  0.0028432  -1.647   0.1006    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.05808 on 314 degrees of freedom
+## Multiple R-squared:  0.04032,    Adjusted R-squared:  0.02504 
+## F-statistic: 2.638 on 5 and 314 DF,  p-value: 0.02354</code></pre>
 </div>
 
 

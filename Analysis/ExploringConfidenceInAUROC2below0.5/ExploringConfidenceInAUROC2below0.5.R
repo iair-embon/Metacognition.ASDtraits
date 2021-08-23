@@ -145,7 +145,7 @@ sum(cant_trials_por_sujeto < 90) # 25 tienen menor a 90 trials con los filtros q
 sum(cant_trials_por_sujeto < 70)
 
 # veo quienes son
-indices_cant_trials <- which(cant_trials_por_sujeto < 50)
+indices_cant_trials <- which(cant_trials_por_sujeto < 90)
 subj_pocos_trials<- existing_subject[indices_cant_trials]
 
 #### explorando si algun sujeto respondio la confianza siempre con la misma tecla

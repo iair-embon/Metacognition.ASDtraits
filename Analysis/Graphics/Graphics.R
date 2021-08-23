@@ -12,10 +12,10 @@ source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
 # get the df list
 # experimento = 1,2,ambos
 DF_list <- DataFrame_Filtered(experimento = "ambos",
-                              filtroRT_Disc_Sup = 5000,
+                              filtroRT_Disc_Sup = 20000,
                               filtroRT_Disc_Inf = 0,
-                              filtroRT_Conf_Sup = 5000,
-                              filtroRT_Conf_Inf = 200,
+                              filtroRT_Conf_Sup = 20000,
+                              filtroRT_Conf_Inf = 0,
                               filtroTrial = 0)
 
 # DF_list:
@@ -29,7 +29,7 @@ DF_list <- DataFrame_Filtered(experimento = "ambos",
 # h d.solo.FyM.mc.filter
 
 d.sin.normalizar <- DF_list$b
-df_total_200 <- DF_list$a
+df_total <- DF_list$a
 d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
 
 ###############
@@ -47,16 +47,62 @@ library(ggridges)
 #### AQ by sex
 
 # a
-d.sin.normalizar.solo.FyM.mc.filter[d.sin.normalizar.solo.FyM.mc.filter=="Masculino"] <- 'Male' 
-d.sin.normalizar.solo.FyM.mc.filter[d.sin.normalizar.solo.FyM.mc.filter=="Femenino"] <- 'Female' 
+d3[d3 == "Masculino"] <- 'Male' 
+d3[d3 == "Femenino"] <- 'Female' 
+
+# ploteo para hombres y mujeres por separado
+
+# mujeres
+ggplot(d3,aes(aq))+
+  geom_bar(data=subset(d3, Im == 'Female'),
+           fill = "grey29", alpha = 0.2)+
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  xlab("Female AQ") +
+  ylab("Participants")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        strip.text = element_text(size = 20),
+        axis.title.x = element_text(size = 30))
+
+# homb4res
+ggplot(d3,aes(aq))+
+  geom_bar(data=subset(d3, Im == 'Male'),
+           fill = "black", alpha = 0.8)+
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  xlab("Male AQ") +
+  ylab("Participants")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        strip.text = element_text(size = 20),
+        axis.title.x = element_text(size = 30))
+
+
+
+
 
 # a1
-ggplot(d.sin.normalizar.solo.FyM.mc.filter,aes(x=aq)) + 
-  geom_bar(data=subset(d.sin.normalizar.solo.FyM.mc.filter,
-                       Im == 'Female'),
+ggplot(d3,aes(x=aq)) + 
+  geom_bar(data=subset(d3, Im == 'Female'),
            fill = "red", alpha = 0.2) +
-  geom_bar(data=subset(d.sin.normalizar.solo.FyM.mc.filter,
-                       Im == 'Male'),
+  geom_bar(data=subset(d3, Im == 'Male'),
            fill = "blue", alpha = 0.2) +
   facet_grid(rows = vars(Im))+
   xlab("AQ") +
@@ -194,14 +240,15 @@ ggplot(d,aes(x=RT_task)) +
 
 ####### metacognition and performance plot
 
-mc.sorted <-  d.sin.normalizar.mc.filter[order(d.sin.normalizar.mc.filter$mc),]
+mc.sorted <-  d3[order(d3$mc),]
 subjects <- 1:nrow(mc.sorted)
 mc.sorted$s <- subjects
 
 ggplot(mc.sorted, aes(s)) +                   
   geom_point(aes(x = s, y=mc , colour="AUROC2")) +  
-  geom_point(aes(x = s, y=pc , colour="Performance"), shape = 17) +  
+  geom_point(aes(x = s, y=pc , colour="Performance")) +  
   scale_y_continuous(expand = expansion(mult = c(0, .1)))+
+  scale_x_continuous(expand = c(.009, 0)) +
   labs(x="Participants", y="", color = "") +
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
@@ -409,17 +456,45 @@ abline(lm(d.sin.normalizar$mc ~ d.sin.normalizar$Cant_trial_disc),
 ####### plotting the performance by trial
 library(matrixStats)
 
-d1 <- df_total.sin.normalizar.solo.FyM.mc.filter 
-d1$discrimination_is_correct[d1$discrimination_is_correct=='TRUE'] <- "1"
-d1$discrimination_is_correct[d1$discrimination_is_correct=='FALSE'] <- "0"
+d1 <- df_total
+d1 <- d1[d1$genero == 'Femenino' | d1$genero == 'Masculino',]
 
-total_trials <- max(d1$trials)-min(d1$trials)
+# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
+d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
+         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
+         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
+         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
+         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
+
+# sujetos que tienen menos de 90 de trials
+d4 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
+           d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
+           d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
+           d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
+           d2$sujetos != 1010 & d2$sujetos != 1046 &
+           d2$sujetos != 1069 & d2$sujetos != 1112 &
+           d2$sujetos != 1127 & d2$sujetos != 1135 &
+           d2$sujetos != 1154 & d2$sujetos != 1171 &
+           d2$sujetos != 1191 & d2$sujetos != 1239 &
+           d2$sujetos != 1250 & d2$sujetos != 1251 &
+           d2$sujetos != 1260,]
+
+# saco a los que tienen metacog menor a 1,5 de desvio de la media para abajo
+d5 <- d4[d4$sujetos %in% d3$sujetos,] # d3 es el df de datos unicos, ya con la 
+                                      # metacog filtrada a 1.5 de desvio
+
+
+
+d5$discrimination_is_correct[d5$discrimination_is_correct=='TRUE'] <- "1"
+d5$discrimination_is_correct[d5$discrimination_is_correct=='FALSE'] <- "0"
+
+total_trials <- max(d5$trials)-min(d5$trials)
 
 MeanPerformanceByTrial <- rep(NA,total_trials)
 #sd <- rep(NA,total_trials)
   
 for (i in 1:total_trials){
-  trial_colum <- d1[d1$trials == i,]  # getting data by trial
+  trial_colum <- d5[d5$trials == i,]  # getting data by trial
   MeanPerformanceByTrial[i] <- mean(as.integer(trial_colum$discrimination_is_correct))
   #sd[i] <- sd(as.integer(trial_colum$discrimination_is_correct))
 }
@@ -433,10 +508,9 @@ df2 <- data.frame(TrialNumber = 1:length(MeanPerformanceByTrial),
 ggplot(data=df2, aes(x=TrialNumber, y=MeanPerformanceByTrial)) +
   geom_line( color="blue", size=1.2)+
   geom_point(color="red", size=3) +
-  #geom_errorbar(aes(ymin=MeanPerformanceByTrial-sd,
-  #                  ymax=MeanPerformanceByTrial+sd), 
-  #              width=.2,
-  #              position=position_dodge(0.05))
+  scale_x_continuous(expand = c(0, 0)) + #scale_y_continuous(expand = c(0, 0))
+  xlab("Trial number") + ylab("Performance mean")+
+  geom_vline(xintercept =20, linetype="dashed", color = "black")+
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),

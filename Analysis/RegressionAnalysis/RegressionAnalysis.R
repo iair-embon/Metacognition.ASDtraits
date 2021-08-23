@@ -15,7 +15,7 @@ DF_list <- DataFrame_Filtered(experimento = "ambos",
                                  filtroRT_Disc_Sup = 5000,
                                  filtroRT_Disc_Inf = 200,
                                  filtroRT_Conf_Sup = 5000,
-                                 filtroRT_Conf_Inf = 0,
+                                 filtroRT_Conf_Inf = 100,
                                  filtroTrial = 20)
 
 # DF_list:
@@ -242,9 +242,15 @@ df.plot$Gender[df.plot$Gender == "Femenino"] <- "Female"
 a.1=lm(mc ~ AQ.norm+ edad + es+ Gender +AQ.norm:Gender, data = df.plot) 
 display(a.1)
 summary(a.1)
-plot_summs(a.1, plot.distributions = FALSE)+
-  #ylab("Model") +
+
+
+
+######### va este para jaiio
+
+plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender-Male'='Im','Age' = 'edad.norm',
+                        'AQ:Gender-Male'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,plot.distributions = FALSE)+
   ylab("") +
+  xlab("Regression coefficient") +
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -289,7 +295,7 @@ plot_summs(a.1, a.2, plot.distributions = TRUE)
 a.1=lm(mc ~ aq+ aq:Im, data = d.solo.FyM.mc.filter)
 display(a.1)
 
-dwplot((a.1),       
+dwplot((a),       
        vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>% # plot line at zero _behind_ coefs
   relabel_predictors(c(aq = "AQ",                       
                        Im = "Sex:")) +
@@ -331,7 +337,7 @@ df$Im <- to_factor(df$Im)
 # fit model with interaction
 fit <- lm(mc ~ aq + aq * Im, data = df)
 
-plot_model(fit, type = "pred", terms = c("aq", "Im"))
+plot_model(a, type = "pred",terms = c("aq", "Im"))
 
 # plot model!!
 
@@ -345,12 +351,13 @@ summary(a)
 
 
 p <- plot_model(a, type = "pred", terms = c("aq.norm", "Im"),
-           axis.labels = c('AUROC2','AQ standarized'),
-           title = 'Predicted AUROC2 for AQ by Sex', 
-           axis.title = c('AUROC2','AQ standarized'),
-           wrap.title = 50,
-           show.data = TRUE,
-           wrap.labels = 50)
+           axis.labels = c('AUROC2','AQ'),
+           legend.title = 'Gender',
+           title = '', 
+           axis.title = c('AUROC2','AQ'),
+           show.data = FALSE)
+p +theme_sjplot(base_size = 25)
+
 #p + theme_sjplot()
 #p + theme_sjplot(base_size = 25, base_family = "")
 #p + theme_sjplot2(base_size = 25, base_family = "")
@@ -440,8 +447,8 @@ ggplot(dtf.plot, aes(Predictor, y)) +                                  # VA ESTE
 
 # intento 2 # no tiene muchos argumentos esta funcion
 
-plot_coeffs <- function(mlr_model) {
-  coeffs <- coefficients(mlr_model)
+plot_coeffs <- function(a) {
+  coeffs <- coefficients(a)
   mp <- barplot(coeffs, col="#3F97D0", xaxt='n', main="Regression Coefficients")
   lablist <- names(coeffs)
   text(mp, par("usr")[3], labels = lablist, srt = 45, 

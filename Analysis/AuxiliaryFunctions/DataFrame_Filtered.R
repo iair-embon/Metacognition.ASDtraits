@@ -101,7 +101,10 @@ DataFrame_Filtered <- function(experimento,
                                 sd_c = sd_confidence)
   
   # filtro para los que tienen metacog menores a 0.5
-  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.4,] # a partir de cuanto quiero dejar de metacog
+  mean_mc <- mean(d.sin.normalizar$mc)
+  sd_mc <-sd(d.sin.normalizar$mc)
+  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= mean_mc - sd_mc* 1.5,]
+#  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.4,] # a partir de cuanto quiero dejar de metacog
   
   d <- d.sin.normalizar
   d.mc.filter <- d.sin.normalizar.mc.filter
@@ -127,7 +130,7 @@ DataFrame_Filtered <- function(experimento,
   d.mc.filter$sd_c <- (d.mc.filter$sd_c - mean(d.mc.filter$sd_c)) / sd(d.mc.filter$sd_c)
   
   d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
-  d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.solo.FyM[d.sin.normalizar.solo.FyM$mc >= 0.4,] # a partir de cuanto quiero dejar de metacog
+  d.sin.normalizar.solo.FyM.mc.filter <- d.sin.normalizar.mc.filter[d.sin.normalizar.mc.filter$Im == "Masculino" | d.sin.normalizar.mc.filter$Im == "Femenino",]
   d.solo.FyM.mc.filter <- d.mc.filter[d.mc.filter$Im == 'Femenino' | d.mc.filter$Im == 'Masculino',]
   df_total.solo.FyM <-  df_total[df_total$genero == 'Femenino' | df_total$genero == 'Masculino',]
 
