@@ -93,8 +93,8 @@ df2 <- data.frame(TrialNumber = 1:length(MeanPerformanceByTrial),
                   MeanPerformanceByTrial = MeanPerformanceByTrial)
 
 ggplot(data=df2, aes(x=TrialNumber, y=MeanPerformanceByTrial)) +
-  geom_line( color="blue", size=1.2)+
-  geom_point(color="red", size=3) +
+  geom_line( color="black", size=1.2)+
+  #geom_point(color="red", size=3) +
   scale_x_continuous(expand = c(0, 0)) + #scale_y_continuous(expand = c(0, 0))
   xlab("Trial number") + ylab("Performance mean")+
   geom_vline(xintercept =20, linetype="dashed", color = "black")+
@@ -165,7 +165,7 @@ d3[d3 == "Femenino"] <- 'Female'
 # mujeres
 ggplot(d3,aes(aq))+
   geom_bar(data=subset(d3, Im == 'Female'),
-           fill = "grey29", alpha = 0.2)+
+           fill = "black", alpha = 0.8)+
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
   xlab("Female AQ") +
@@ -344,7 +344,8 @@ summary(a)
 
 
 plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender-Male'='Im','Age' = 'edad.norm',
-                        'AQ:Gender-Male'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,plot.distributions = FALSE)+
+                        'AQ:Gender-Male'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,
+           plot.distributions = FALSE, colors = "black")+
   ylab("") +
   xlab("Regression coefficient") +
   scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
@@ -361,16 +362,15 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender-Male'='Im','Age' = 'edad.norm',
         axis.title.x = element_text(size = 25))
 
 
-
 ###################
 ### Interaccion ###
 ###################
 
 p <- plot_model(a, type = "pred", terms = c("aq.norm", "Im"),
-                axis.labels = c('AUROC2','AQ'),
+                axis.labels = c('AQ standardized','AUROC2'),
                 legend.title = '',
                 title = '', 
-                axis.title = c('AUROC2','AQ'),
+                axis.title = c('AQ standardized','AUROC2'),
                 show.data = FALSE)
 p +theme_sjplot(base_size = 25)
 
