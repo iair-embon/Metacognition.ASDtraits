@@ -103,7 +103,7 @@ DataFrame_Filtered <- function(experimento,
   # filtro para los que tienen metacog menores a 0.5
   mean_mc <- mean(d.sin.normalizar$mc)
   sd_mc <-sd(d.sin.normalizar$mc)
-  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= mean_mc - sd_mc* 1.5,]
+  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= mean_mc - sd_mc* 2,]
 #  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.4,] # a partir de cuanto quiero dejar de metacog
   
   d <- d.sin.normalizar

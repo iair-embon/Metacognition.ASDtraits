@@ -15,7 +15,7 @@ DF_list <- DataFrame_Filtered(experimento = "ambos",
                                  filtroRT_Disc_Sup = 5000,
                                  filtroRT_Disc_Inf = 200,
                                  filtroRT_Conf_Sup = 5000,
-                                 filtroRT_Conf_Inf = 100,
+                                 filtroRT_Conf_Inf = 200,
                                  filtroTrial = 20)
 
 # DF_list:
