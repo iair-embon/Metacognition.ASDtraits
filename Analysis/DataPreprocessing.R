@@ -23,6 +23,10 @@ content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_2020112913234
 # exp 1.2
 content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
 
+# exp 1.2 + 1.3
+content<-readLines(root$find_file("Data/Exp2+3/jatos_results_20210824144041.txt"))
+
+
 res<-lapply(content,fromJSON)
 
 # each subject has 6 lists in order of arrival and by subjects.
@@ -430,6 +434,11 @@ save(df_total,file = filepath)
 # RESULTS_EXP2(REPLICA)
 filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
 save(df_total,file = filepath)
+
+# # RESULTS_EXP2+3
+filepath <- root$find_file("Data/Exp2+3/df_total.Rda")
+save(df_total,file = filepath)
+
 
 # save the df in .txt format, it is saved in the mail folder
 #write.table(df_total, file= 'df_total.txt')

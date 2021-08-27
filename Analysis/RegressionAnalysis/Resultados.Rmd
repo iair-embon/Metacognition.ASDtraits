@@ -18,12 +18,13 @@ source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
 
 # get the df list
 # experimento = 1,2,ambos
-DF_list <- DataFrame_Filtered(experimento = "ambos", 
+DF_list <- DataFrame_Filtered(experimento = "todos", 
                                  filtroRT_Disc_Sup = 5000,
                                  filtroRT_Disc_Inf = 200,
                                  filtroRT_Conf_Sup = 5000,
-                                 filtroRT_Conf_Inf = 200,
-                                 filtroTrial = 20)
+                                 filtroRT_Conf_Inf = 0,
+                                 filtroTrial = 20,
+                                 cant_trial_filter = 90)
 
 # DF_list:
 # a df_total
@@ -64,27 +65,10 @@ d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
 
 # sujetos que tienen un 85 % de trials en una misma respuesta de confianza
-d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
-         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
-         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
-         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
 
-# sujetos que tienen menos de 90 de trials
-d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
-                 d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
-                 d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
-                 d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
-                 d2$sujetos != 1010 & d2$sujetos != 1046 &
-                 d2$sujetos != 1069 & d2$sujetos != 1112 &
-                 d2$sujetos != 1127 & d2$sujetos != 1135 &
-                 d2$sujetos != 1154 & d2$sujetos != 1171 &
-                 d2$sujetos != 1191 & d2$sujetos != 1239 &
-                 d2$sujetos != 1250 & d2$sujetos != 1251 &
-                 d2$sujetos != 1260,]
-
-
-d3 <- d3[d3$edad < 40,]
+source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence.R"))
+sujetos_a_descartar <- discard_by_x_same_confidence(85)
+d2 <- d1[! d1$sujetos %in% sujetos_a_descartar,]
 
 ```
 
@@ -98,7 +82,7 @@ a=lm(mc ~ aq.norm +
        edad.norm+
        es +
        aq.norm: Im,
-     data = d3) 
+     data = d2) 
 summary(a)
 
 ```
@@ -109,7 +93,7 @@ summary(a)
 a=lm(mc ~ aq.norm +
        Im +
        aq.norm: Im,
-     data = d3) 
+     data = d2) 
 summary(a)
 
 ```
@@ -123,7 +107,7 @@ a=lm(mc ~ aq.norm +
        aq.norm: Im+
        aq.norm:edad.norm+
        Im:edad.norm,
-     data = d3) 
+     data = d2) 
 summary(a)
 
 ```
@@ -140,7 +124,7 @@ a=lm(mc ~ aq.norm +
        aq.norm:edad.norm+
        Im:edad.norm+
        es:aq.norm,
-     data = d3) 
+     data = d2) 
 summary(a)
 
 ```
@@ -154,7 +138,7 @@ a=lm(mc.norm ~ aq.norm +
        aq.norm: Im,
        #aq.norm:edad.norm+
        #Im:edad.norm,
-     data = d3) 
+     data = d2) 
 summary(a)
 
 ```
@@ -168,7 +152,7 @@ a=lm(mc ~ aq.norm +
        aq.norm: Im+
        aq.norm:edad.norm,
        #Im:edad.norm,
-     data = d3) 
+     data = d2) 
 summary(a)
 
 ```

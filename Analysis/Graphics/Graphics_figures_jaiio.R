@@ -127,7 +127,7 @@ DF_list <- DataFrame_Filtered(experimento = "ambos",
                               filtroRT_Disc_Sup = 5000,
                               filtroRT_Disc_Inf = 200,
                               filtroRT_Conf_Sup = 5000,
-                              filtroRT_Conf_Inf = 100,
+                              filtroRT_Conf_Inf = 0,
                               filtroTrial = 20)
 
 
@@ -135,12 +135,13 @@ d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g #
 
 d1 = d.sin.normalizar.solo.FyM.mc.filter
 
-# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
 d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
          & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
          & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
          & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
+         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172
+         & d1$sujetos != 123 & d1$sujetos != 1135 & d1$sujetos != 1154 
+         & d1$sujetos != 1185, ] # los ultimos 4 no estaban antes, contamos mal visualmente
 
 # sujetos que tienen menos de 90 de trials
 d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
@@ -221,7 +222,7 @@ DF_list <- DataFrame_Filtered(experimento = "ambos",
                               filtroRT_Disc_Sup = 5000,
                               filtroRT_Disc_Inf = 200,
                               filtroRT_Conf_Sup = 5000,
-                              filtroRT_Conf_Inf = 100,
+                              filtroRT_Conf_Inf = 0,
                               filtroTrial = 20)
 
 
@@ -234,7 +235,9 @@ d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
          & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
          & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
          & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
+         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172
+         & d1$sujetos != 123 & d1$sujetos != 1135 & d1$sujetos != 1154 # en esta fila agrego 4 que no estaban antes (contamos mal visualmente)
+         & d1$sujetos != 1185, ] 
 
 # sujetos que tienen menos de 90 de trials
 d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
@@ -292,7 +295,7 @@ DF_list <- DataFrame_Filtered(experimento = "ambos",
                               filtroRT_Disc_Sup = 5000,
                               filtroRT_Disc_Inf = 200,
                               filtroRT_Conf_Sup = 5000,
-                              filtroRT_Conf_Inf = 100,
+                              filtroRT_Conf_Inf = 0,
                               filtroTrial = 20)
 
 d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g 
@@ -318,7 +321,9 @@ d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
          & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
          & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
          & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
+         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172
+         & d1$sujetos != 123 & d1$sujetos != 1135 & d1$sujetos != 1154 # en esta fila agrego 4 que no estaban antes (contamos mal visualmente)
+         & d1$sujetos != 1185, ] 
 
 # sujetos que tienen menos de 90 de trials
 d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &

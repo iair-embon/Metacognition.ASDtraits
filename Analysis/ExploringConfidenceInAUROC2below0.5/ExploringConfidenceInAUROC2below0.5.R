@@ -43,9 +43,9 @@ indices <- which(d.sin.normalizar$mc < 0.5)
 
 # recreating the dfs, we need the first 10 trials and not any time limit
 DF_list <- DataFrame_Filtered(experimento = "ambos", 
-                              filtroRT_Disc_Sup = 20000,
+                              filtroRT_Disc_Sup = 5000000,
                               filtroRT_Disc_Inf = 0,
-                              filtroRT_Conf_Sup = 20000,
+                              filtroRT_Conf_Sup = 5000000,
                               filtroRT_Conf_Inf = 0,
                               filtroTrial = 0)
 
@@ -126,65 +126,6 @@ if (nrow(df_lessTrials[df_lessTrials$discrimination_is_correct == "FALSE",]) >0)
 png(paste("ELIMINAME", as.character(id_subj_smallAuroc[i]) , ".png", sep = ""))
 print(myplot)
 dev.off()
-
-#### explorando la cantidad de trials de cada sujeto despues del filtrado 
-cant_trials_por_sujeto <- rep(NaN, length(unique(df_total$sujetos)))
-existing_subject <- unique(df_total$sujetos)
-
-
-for (i in 1:length(cant_trials_por_sujeto)) {
-  cant_trials_por_sujeto[i] <- nrow(df_total[df_total$sujetos == existing_subject[i],])
-}
-
-# veo si algun sujeto quedo sin trials
-hist(cant_trials_por_sujeto)
-min(cant_trials_por_sujeto)
-
-# cuantos tienen menos de 90 trials
-sum(cant_trials_por_sujeto < 90) # 25 tienen menor a 90 trials con los filtros que usamos
-sum(cant_trials_por_sujeto < 70)
-
-# veo quienes son
-indices_cant_trials <- which(cant_trials_por_sujeto < 90)
-subj_pocos_trials<- existing_subject[indices_cant_trials]
-
-#### explorando si algun sujeto respondio la confianza siempre con la misma tecla
-Conf1 <- rep(NaN, length(unique(df_total$sujetos)))
-Conf2 <- rep(NaN, length(unique(df_total$sujetos)))
-Conf3 <- rep(NaN, length(unique(df_total$sujetos)))
-Conf4 <- rep(NaN, length(unique(df_total$sujetos)))
-existing_subject <- unique(df_total$sujetos)
-
-for (i in 1:length(existing_subject)) {
-  Conf1[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_1'])
-  Conf2[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_2'])
-  Conf3[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_3'])
-  Conf4[i] <- unique(df_total[df_total$sujetos == existing_subject[i],'confidence_key_4'])
-}
-
-# veo si algun sujeto quedo sin trials
-hist(Conf1)
-hist(Conf2)
-hist(Conf3)
-hist(Conf4)
-
-min(Conf1)
-min(Conf2)
-min(Conf3)
-min(Conf4)
-
-max(Conf1)
-max(Conf2)
-max(Conf3)
-max(Conf4)
-
-df_conf <- data_frame(Participantes = existing_subject,
-                      Conf1 = Conf1,
-                      Conf2 = Conf2,
-                      Conf3 = Conf3,
-                      Conf4 = Conf4,
-                      mc = d.sin.normalizar$mc)
-
 
 ######## tratando de simular la probabilidad de cierto puntaje de mc si esta al nivel de chance
 

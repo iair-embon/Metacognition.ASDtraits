@@ -3,7 +3,8 @@ DataFrame_Filtered <- function(experimento,
                                   filtroRT_Disc_Inf,
                                   filtroRT_Conf_Sup,
                                   filtroRT_Conf_Inf,
-                                  filtroTrial = 0){ 
+                                  filtroTrial = 0,
+                                  cant_trial_filter){ 
   
   # experimento = 1,2,ambos
   # Superior and inferior filtro Reaction Time Discrimination task 
@@ -36,7 +37,24 @@ DataFrame_Filtered <- function(experimento,
     ### cambio la columna sujetos por una nueva, para que no se pisen los nros y este nro sea unico
     # uno los df
     df_total <- rbind(a,b)
-    }
+  }
+  
+  if (experimento == 'todos'){
+    ## ambos df_total:
+    filepath <- (root$find_file("Data/Results_Exp1/df_total.Rda"))
+    load(file= filepath)
+    a <- df_total
+    
+    filepath <- (root$find_file("Data/Exp2+3/df_total.Rda"))
+    load(file= filepath)
+    b <- df_total
+    # sumo 100 a la columna sujetos, para que no se pisen los nros y este nro sea unico
+    b$sujetos <- b$sujetos + 1000 
+    
+    ### cambio la columna sujetos por una nueva, para que no se pisen los nros y este nro sea unico
+    # uno los df
+    df_total <- rbind(a,b)
+  }
   
   ## Filter by reaction times 
   source(root$find_file("Analysis/AuxiliaryFunctions/auroc2_by_ReactionTimeFilter.R"))
@@ -45,7 +63,8 @@ DataFrame_Filtered <- function(experimento,
                                 filtroRT_Disc_Inf = filtroRT_Disc_Inf,
                                 filtroRT_Conf_Sup = filtroRT_Conf_Sup,
                                 filtroRT_Conf_Inf = filtroRT_Conf_Inf,
-                                filtroTrial = filtroTrial)
+                                filtroTrial = filtroTrial,
+                                cant_trial_filter = cant_trial_filter)
   auc2 <- list_exp$mc_Rt_Discarded
   df_total <- list_exp$df_total
   
@@ -103,7 +122,7 @@ DataFrame_Filtered <- function(experimento,
   # filtro para los que tienen metacog menores a 0.5
   mean_mc <- mean(d.sin.normalizar$mc)
   sd_mc <-sd(d.sin.normalizar$mc)
-  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= mean_mc - sd_mc* 2,]
+  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= mean_mc - sd_mc* 1.5,]
 #  d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.4,] # a partir de cuanto quiero dejar de metacog
   
   d <- d.sin.normalizar
