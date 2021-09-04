@@ -1,6 +1,6 @@
 ---
 title: "Regression Analysis"
-author: "Embon,Barttfeld & Solovey"
+author: "Embon, Barttfeld & Solovey"
 date: "8/9/2021"
 output: html_document
 ---
