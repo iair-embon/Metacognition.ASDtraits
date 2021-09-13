@@ -1,6 +1,9 @@
 ### get the AQ quotient
 
-puntaje_AQ <- function (cant_sujetos,cant_componentes_por_sujetos,ubicacion_comp_AQ){
+puntaje_AQ <- function (cant_sujetos,
+                        cant_componentes_por_sujetos,
+                        ubicacion_comp_AQ,
+                        AQ){
   # cant_sujetos = cantidad de sujetos; cant_componentes_por_sujetos = cantidad de componentes en un sujeto;
   # ubicacion_comp_AQ = la ubicacion del componente AQ en el primer sujeto
   

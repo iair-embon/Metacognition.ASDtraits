@@ -1,10 +1,8 @@
-####################################
-# Metacognition and ASD experiment #
-####################################
+##################################################
+# Metacognition and ASD experiment preprocessing #
+##################################################
 
-####### Data Preprocessing:
-
-# Read the .txt results from JATOS and perform the data preprocessing.
+####### Read the .txt results from JATOS and perform the data preprocessing.
 
 # (To reado the .txt results from JATOS it was necesary to add an "enter" before the curly brackets
 # that open the component "sincericidio").
@@ -20,147 +18,41 @@ basename(getwd())
 # exp 1.1
 content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
 
-# exp 1.2
-content<-readLines(root$find_file("Data/Results_Exp2(replica)/jatos_results_20210519110741.txt"))
+res<-lapply(content,fromJSON)
+
+# load the function to read the .txt results from JATOS and create a dataframe
+source(root$find_file("Analysis/AuxiliaryFunctions/initial_df.R"))
+df_list <- initial_df(res)
+
+# df_DatosUnicos: for data of each subject.
+# df_exp: save each trial of metacognition exp (already created in previous loop)
+df_DatosUnicos <- df_list$a
+df_exp <- df_list$b
+AQ <- df_list$c
 
 # exp 1.2 + 1.3
 content<-readLines(root$find_file("Data/Exp2+3/jatos_results_20210824144041.txt"))
 
-
 res<-lapply(content,fromJSON)
 
-# each subject has 6 lists in order of arrival and by subjects.
-# res[[1]] are the demographic data of subject 1
-# res[[2]] are the data of the practice of the experiment of subject 1
-# res[[3]] are the data from subject 1's experiment
-# res[[4]] are the AQ data of subject 1
-# res[[4]] are the data of the browser of subject 1
-# res[[6]] are the email data of subject 1
-# res[[7]] are the demographic data of subject 2
-# res[[8]] are the data of the practice of the experiment of subject 2
-# ....
+df_list <- initial_df(res)
+df <- df_list$a 
+df$sujetos <- df$sujetos + 1000
+df_DatosUnicos <- rbind(df_DatosUnicos, df) 
+df_exp <- rbind(df_exp, df_list$b)
+AQ <- c(AQ,df_list$c)
 
-iSub      <- 0
-horasSuen <- c()
-fechaNac  <- c()
-pais      <- c()
-genero    <- c()
-estudio   <- c()
-affeccionPsico <- c()
-medicacion <- c()
-AQ      <- c()
-Browser <- c()
-Sinc    <- c()
-TeEscuchamos <- c()
-
-# Experiment data frame
-df_exp <- data.frame(t0 =character(), 
-                 t_offset =character(), 
-                 dots_num_left =character(), 
-                 dots_num_right =character(), 
-                 discrimination_is_correct =character(), 
-                 discrimination_t_onset =character(), 
-                 discrimination_t_keydown =character(), 
-                 confidence_key =character(), 
-                 confidence_t_onset=character(), 
-                 confidence_t_keydown=character(), 
-                 stringsAsFactors=FALSE) 
-
-for (s in 1:(length(res)-4)){
-  
-  ind_suenio <- NaN  
-  ind_fecha <- NaN  
-  ind_pais <- NaN  
-  ind_genero <- NaN  
-  ind_estudio <- NaN  
-  ind_affeccion <- NaN  
-  ind_medicacion <- NaN  
-  
-  for (item in 1:length(res[[s]])){
-    if (is.null(res[[s]][item]$sueno)           ==FALSE){   ind_suenio <- item   }
-    if (is.null(res[[s]][item]$Cumpleanos)      ==FALSE){   ind_fecha  <- item   }
-    if (is.null(res[[s]][item]$Pais)            ==FALSE){   ind_pais   <- item   }
-    if (is.null(res[[s]][item]$Genero)          ==FALSE){   ind_genero <- item   }
-    if (is.null(res[[s]][item]$Estudio)         ==FALSE){   ind_estudio <- item   }
-    if (is.null(res[[s]][item]$AffeccionPsico)  ==FALSE){   ind_affeccion <- item   }
-    if (is.null(res[[s]][item]$medicacion)      ==FALSE){   ind_medicacion <- item   }
-  }
-  
-  # Condition 1 will be TRUE if there is a response to the first component of demographic data
-  condicion1 <-  is.nan(ind_suenio) == FALSE
-  # Condition 2 will be TRUE if there is an answer to the AQ questions (component 4)
-  condicion2 <-  is.null(res[[s+3]][1]$question) ==FALSE
-  
-  if(condicion1 & condicion2 ){ # new participant
-    iSub <- iSub + 1;
-    # I take data from component 1 (demographic)
-    horasSuen <- c(horasSuen,res[[s]][ind_suenio]$sueno)
-    fechaNac  <- c(fechaNac,res[[s]][ind_fecha]$Cumpleanos)
-    pais <- c(pais, res[[s]][ind_pais]$Pais)
-    genero <- c(genero,res[[s]][ind_genero]$Genero)
-    estudio <- c(estudio,res[[s]][ind_estudio]$Estudio)
-    affeccionPsico <- c(affeccionPsico,res[[s]][ind_affeccion]$AffeccionPsico)
-    medicacion <- c(medicacion,res[[s]][ind_medicacion]$medicacion)
-    
-    # Experiment data 
-    df_exp <- rbind(df_exp, res[[s+2]])
-    
-    # AQ data
-    AQ <- c(AQ, res[[s+3]])  
-      
-    if(is.null(res[[s+4]][1]$browser) ==FALSE){
-    Browser <- c(Browser, res[[s+4]][1]$browser)
-    }else{
-      Browser <- c(Browser, NaN)}
-    
-    if(length(res)-s >= 5 ){
-      
-      if(is.null(res[[s+5]][1]$sincericidio) ==FALSE){
-        Sinc <- c(Sinc, res[[s+5]][1]$sincericidio)
-      }else{
-        Sinc <- c(Sinc, NaN)}
-
-      if(is.null(res[[s+5]]$TeEscuchamos) ==FALSE){
-      TeEscuchamos <- c(TeEscuchamos, res[[s+5]]$TeEscuchamos)
-      }else{
-      TeEscuchamos <- c(TeEscuchamos, NaN)}
-    }
-  }
-  }
-####### df 
-
-# df_DatosUnicos: for data of each subject.
-# df_exp: save each trial of metacognition exp (already created in previous loop)
-
-## df_DatosUnicos
-sujetos <-  1:iSub
-df_DatosUnicos <- data.frame(
-  sujetos = sujetos, 
-  horasSueno = horasSuen,
-  fechaNac = fechaNac,
-  pais = pais,
-  genero = genero,
-  estudio = estudio,
-  affeccionPsico = affeccionPsico,
-  medicacion = medicacion,
-  Browser = Browser,
-  sincericidio = Sinc,
-  TeEscuchamos = TeEscuchamos,
-  stringsAsFactors = FALSE
-)
-
-####### add subjects and trials to df_exp
+####### adding subjects and trials columns to df_exp
 
 # get the number of trials per subject
-cant_trials <- length(res[[1+2]]$t0) 
+cant_trials <- nrow(df_exp)/ nrow(df_DatosUnicos)
 
-# prepare subject column
-col_sujetos <- 1:iSub
-sujetos <- rep(col_sujetos, each = cant_trials)
+# prepare subject column to add in df_exp
+sujetos <- rep(df_DatosUnicos$sujetos, each = cant_trials)
 
 # prepare trials column
 col_trials <- 1:cant_trials
-trials <- rep(col_trials, times = iSub)
+trials <- rep(col_trials, times = nrow(df_DatosUnicos))
 
 # add columns to df_exp
 df_exp$sujetos <- sujetos
@@ -172,7 +64,7 @@ df_exp$trials <- trials
 cant_componentes_por_sujetos <- 2
 
 # number of subject 
-cant_sujetos <- iSub
+cant_sujetos <- nrow(df_DatosUnicos)
 
 # location of the sublist where the responses to the AQ of the first subject are
 ubicacion_comp_AQ <- 2
@@ -181,12 +73,17 @@ ubicacion_comp_AQ <- 2
 source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ.R"))
 
 # get the AQ quotient
-puntaje_AQ_sujetos <- puntaje_AQ(cant_sujetos,cant_componentes_por_sujetos,ubicacion_comp_AQ)
+puntaje_AQ_sujetos <- puntaje_AQ(cant_sujetos,
+                                 cant_componentes_por_sujetos,
+                                 ubicacion_comp_AQ,
+                                 AQ)
 
 # add to df_DatosUnicos
 df_DatosUnicos$AQ <- puntaje_AQ_sujetos 
 
-######### Adding columns of reaction times
+######### Adding columns of
+
+## Reaction Times
 df_exp_mod <- df_exp
 
 df_exp_mod$t_ensayo_discriminacion <- df_exp_mod$discrimination_t_keydown - 
@@ -194,26 +91,16 @@ df_exp_mod$t_ensayo_discriminacion <- df_exp_mod$discrimination_t_keydown -
 df_exp_mod$t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -
   df_exp_mod$confidence_t_onset
 
-####### metacognitive sensivity 
+## Percentage of correct answers
 
-# load the type 2 ROC analysis function
-#source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
-
-## get metacognitive sensivity
-#library(dplyr)
-
-Pc   <- rep(NA, max(df_exp_mod$sujetos)) # Percentage of correct answers
-#auc2 <- rep(NA, max(df_exp_mod$sujetos)) # Metacognitive sensivity
-
-for (s in 1:max(df_exp_mod$sujetos)){
-  Pc[s]   <- mean(df_exp_mod$discrimination_is_correct[df_exp_mod$sujetos==s])
-#  auc2[s] <- type2roc(correct = df_exp_mod$discrimination_is_correct[df_exp_mod$sujetos==s], 
-#                      conf = df_exp_mod$confidence_key[df_exp_mod$sujetos==s], Nratings = 4 )
+`Pc   <- rep(NA, nrow(df_DatosUnicos)) 
+existing_subjects <- unique(df_DatosUnicos$sujetos)
+for (s in 1:nrow(df_DatosUnicos)){
+  Pc[s]   <- mean(df_exp_mod$discrimination_is_correct[df_exp_mod$sujetos== existing_subjects[s]])
 }
-
+`
 # add to df_DatosUnicos
 df_DatosUnicos$PC <- Pc
-#df_DatosUnicos$auc2 <- auc2
 
 # add difference in dots in every trial to df_exp
 df_exp_mod$diferencia_puntitos <- abs(df_exp_mod$dots_num_left- df_exp_mod$dots_num_right)
@@ -361,7 +248,7 @@ for(i in 1:nrow(df_DatosUnicos_mod)){
 df_DatosUnicos_mod$media_tr_confi <- media_tr_confi
 df_DatosUnicos_mod$sd_tr_confi <- sd_tr_confi
 
-####### Exclusion criteria, data from future analysis is discarded
+####### Inclusion criteria, data is not included in future analysis
 ## Comment / uncomment or modify filters as required
 
 ## Filter for hours of sleep, leaving me only with > 4
@@ -373,28 +260,126 @@ df_DatosUnicos_mod2 <- df_DatosUnicos_mod[df_DatosUnicos_mod$affeccionPsico ==
 ## Filter by medication, leaving only with those who do not take.
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$medicacion ==
                                                'No',]
-## Filter by sincericide, leaving only those who tell us that we can count on their answers.
-library (stringr)
-library (tidyverse)
-df_DatosUnicos_mod2 <- df_DatosUnicos_mod2 %>% 
-  filter(str_detect(df_DatosUnicos_mod2$sincericidio, "Pueden")) # if start with "Pueden"
-#                                                                  # it stays
-
-# Filter by TeEscuchamos leaving only those who didnt interrup the task drastically (= ok)
-df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$TeEscuchamos ==
-                                              'ok',] 
-
-## Filter by performance, leaving only those who have PC > 60 
-df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$PC > 0.60,] 
 
 ## Filter by age, leaving only those who are age > 17, < 100, and are not NA
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$edad > 17,]
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$edad < 100,]
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[!is.na(df_DatosUnicos_mod2$edad),]
 
-## filter in df_exp those who survived the filters applied to df_DatosUnicos_mod2
+## filter in df_exp those who survived inclusion criteria applied to 
+## df_DatosUnicos_mod2
+library(dplyr)
 df_exp_mod2 <- df_exp_mod %>% 
   filter(df_exp_mod$sujetos %in% df_DatosUnicos_mod2$sujetos)
+
+####### putting it all together 
+
+df_total <- df_DatosUnicos_mod2[0,]
+
+#  sujetos que quedaron
+ExistingSubjects <- unique(df_exp_mod2$sujetos)
+
+# iterar por sujeto existente
+for (i in ExistingSubjects) {
+  # saco la cantidad de trials del sujeto
+  sujeto_df_exp <- df_exp_mod2[df_exp_mod2$sujetos== i,]
+  cant_trials <- nrow(sujeto_df_exp)
+  
+  # repito cada fila del sujeto segun la cantidad de trials que le quedaron
+  sujeto_df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$sujetos== i,]
+  df <- as.data.frame(lapply(sujeto_df_DatosUnicos_mod2, rep, cant_trials))
+  
+  # lo agrago al df_total
+  df_total <- rbind(df_total, df)
+}
+
+# combino las columnas de df_exp_mod2 que me interesan con el df_total
+df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discrimination_is_correct,
+                  confidence_key = df_exp_mod2$confidence_key, 
+                  trials = df_exp_mod2$trials,
+                  diferencia_puntitos = df_exp_mod2$diferencia_puntitos, 
+                  t_ensayo_discriminacion = df_exp_mod2$t_ensayo_discriminacion,
+                  t_ensayo_confianza = df_exp_mod2$t_ensayo_confianza)
+
+## save the df_total
+
+# # RESULTS_EXP1
+filepath <- root$find_file("Data/All_exp_inclusion_criteria/df_total.Rda")
+save(df_total,file = filepath)
+
+
+####### Exclusion criteria, data is excluded of future analysis
+
+## Filter by sincericide, leaving only those who tell us that we can count on their answers.
+library (stringr)
+library (tidyverse)
+df_total <- df_total %>% 
+  filter(str_detect(df_total$sincericidio, "Pueden")) # if start with "Pueden"
+#                                                                  # it stays
+
+# Filter by TeEscuchamos leaving only those who did not interrup the 
+# task drastically (= ok)
+df_total <- df_total[df_total$TeEscuchamos == 'ok',] 
+
+## Filter by performance, leaving only those who have PC > 60 
+df_total <- df_total[df_total$PC > 0.60,]
+
+# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
+source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence_new.R"))
+sujetos_a_descartar <- discard_by_x_same_confidence_new(85,df_total)  ###################### ACA ESTOY TIRA ERROR EN LA FUNCION ESTA
+df_total <- df_total[! df_total$sujetos %in% sujetos_a_descartar,]
+
+## Filter by reaction times
+df_total <- df_total[df_total$t_ensayo_discriminacion >= 5000,]
+df_total <- df_total[df_total$t_ensayo_discriminacion <= 200,]
+df_total <- df_total[df_total$t_ensayo_confianza >=5000,]
+df_total <- df_total[df_total$t_ensayo_confianza <=0,]
+
+# burning the first 20 trials of each subject
+df_total <- df_total[df_total$trials > 20,]
+
+## Filter by trails needed to calculate AUROC2
+## discarding because very few trials
+cant_trials_por_sujeto <- rep(NaN, length(unique(df_total$sujetos)))
+existing_subject <- unique(df_total$sujetos)
+
+for (i in 1:length(cant_trials_por_sujeto)) {
+  cant_trials_por_sujeto[i] <- nrow(df_total[df_total$sujetos == existing_subject[i],])
+}
+
+# veo quienes son
+indices_cant_trials <- which(cant_trials_por_sujeto < cant_trial_filter)
+subj_pocos_trials<- existing_subject[indices_cant_trials]
+
+# los descarto
+df_total <- df_total[! df_total$sujetos %in% subj_pocos_trials,]
+
+########### AUROC2
+## get metacognitive sensivity
+
+# load the type 2 ROC analysis function
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+library(dplyr)
+
+Nsuj <- length(unique(d1$sujetos))
+# saving metacog = mc for each RT discarded
+mc <- rep(NA, Nsuj)
+ExistingSubjects <- unique(df_total$sujetos)
+
+for (i in 1:Nsuj){
+  mc[i] <- type2roc(correct = df_total$discrimination_is_correct[df_total$sujetos==ExistingSubjects[i]],
+                    conf = df_total$confidence_key[df_total$sujetos==ExistingSubjects[i]], 
+                    Nratings = 4)}
+
+######## queda correr todo hasta aca, meter metacog como columna en df total
+######## filtrar por metacog, y seguir revisando el codigo hasta guardarlo.
+
+
+## filter in df_exp those who survived the exclusion criteria applied to 
+## df_DatosUnicos_mod3
+df_exp_mod3 <- df_exp_mod %>% 
+  filter(df_exp_mod$sujetos %in% df_DatosUnicos_mod3$sujetos)
+
 
 ####### Prepare the df for the regression analysis
 
