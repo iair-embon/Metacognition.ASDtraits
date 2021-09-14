@@ -11,20 +11,22 @@ output: html_document
 
 # voy a la carpeta del proyecto
 root <- rprojroot::is_rstudio_project
-basename(getwd())
+basename(getwd())                       ###### ERROR, NO AGARRA EL PROYECTO CORRECTO
+
+####### data frames and filters
 
 # load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+#source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
 
 # get the df list
 # experimento = 1,2,ambos
-DF_list <- DataFrame_Filtered(experimento = "todos", 
-                                 filtroRT_Disc_Sup = 5000,
-                                 filtroRT_Disc_Inf = 200,
-                                 filtroRT_Conf_Sup = 5000,
-                                 filtroRT_Conf_Inf = 0,
-                                 filtroTrial = 20,
-                                 cant_trial_filter = 90)
+#DF_list <- DataFrame_Filtered(experimento = "todos", 
+#                                 filtroRT_Disc_Sup = 5000,
+#                                 filtroRT_Disc_Inf = 200,
+#                                 filtroRT_Conf_Sup = 5000,
+#                                 filtroRT_Conf_Inf = 0,
+#                                 filtroTrial = 20,
+#                                 cant_trial_filter = 90)
 
 # DF_list:
 # a df_total
@@ -35,9 +37,22 @@ DF_list <- DataFrame_Filtered(experimento = "todos",
 # f d.sin.normalizar.solo.FyM
 # g d.sin.normalizar.solo.FyM.mc.filter
 # h d.solo.FyM.mc.filter
+#df_total <- DF_list$a
+#d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g # 
 
-df_total <- DF_list$a
-d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g # 
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+df_total <- load(file= filepath)
+
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+
+# a = df_total.solo.FyM
+# b = d.sin.normalizar
+# c = d.normalizado
+# d = d.sin.normalizar.solo.FyM
+d.sin.normalizar.solo.FyM <- DF_list$d
+
 ###############
 ### library ###
 ###############
@@ -50,25 +65,23 @@ library(dplyr)
 
 ### lineas para hacer regresion 
 
-d.sin.normalizar.solo.FyM.mc.filter$aq.norm <- (d.sin.normalizar.solo.FyM.mc.filter$aq - mean(d.sin.normalizar.solo.FyM.mc.filter$aq))/
-        sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
+d1 = d.sin.normalizar.solo.FyM
 
-d.sin.normalizar.solo.FyM.mc.filter$mc.norm <- (d.sin.normalizar.solo.FyM.mc.filter$mc 
-                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$mc))/ sd(d.sin.normalizar.solo.FyM.mc.filter$mc)
+d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
 
-d.sin.normalizar.solo.FyM.mc.filter$edad.norm <- (d.sin.normalizar.solo.FyM.mc.filter$edad 
-                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$edad))/ sd(d.sin.normalizar.solo.FyM.mc.filter$edad)
+d1$mc.norm <- (d1$mc - mean(d1$mc))/ sd(d1$mc)
 
-d1 = d.sin.normalizar.solo.FyM.mc.filter
+d1$edad.norm <- (d1$edad - mean(d1$edad))/ sd(d1$edad)
+
 d1[d1 == "Masculino"] <- "1"
 d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
 
 # sujetos que tienen un 85 % de trials en una misma respuesta de confianza
 
-source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence.R"))
-sujetos_a_descartar <- discard_by_x_same_confidence(85)
-d2 <- d1[! d1$sujetos %in% sujetos_a_descartar,]
+#source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence.R"))
+#sujetos_a_descartar <- discard_by_x_same_confidence(85)
+#d2 <- d1[! d1$sujetos %in% sujetos_a_descartar,]
 
 ```
 
@@ -82,7 +95,7 @@ a=lm(mc ~ aq.norm +
        edad.norm+
        es +
        aq.norm: Im,
-     data = d2) 
+     data = d1) 
 summary(a)
 
 ```
@@ -93,7 +106,7 @@ summary(a)
 a=lm(mc ~ aq.norm +
        Im +
        aq.norm: Im,
-     data = d2) 
+     data = d1) 
 summary(a)
 
 ```
@@ -107,7 +120,7 @@ a=lm(mc ~ aq.norm +
        aq.norm: Im+
        aq.norm:edad.norm+
        Im:edad.norm,
-     data = d2) 
+     data = d1) 
 summary(a)
 
 ```
@@ -124,7 +137,7 @@ a=lm(mc ~ aq.norm +
        aq.norm:edad.norm+
        Im:edad.norm+
        es:aq.norm,
-     data = d2) 
+     data = d1) 
 summary(a)
 
 ```
@@ -138,7 +151,7 @@ a=lm(mc.norm ~ aq.norm +
        aq.norm: Im,
        #aq.norm:edad.norm+
        #Im:edad.norm,
-     data = d2) 
+     data = d1) 
 summary(a)
 
 ```
@@ -152,7 +165,7 @@ a=lm(mc ~ aq.norm +
        aq.norm: Im+
        aq.norm:edad.norm,
        #Im:edad.norm,
-     data = d2) 
+     data = d1) 
 summary(a)
 
 ```

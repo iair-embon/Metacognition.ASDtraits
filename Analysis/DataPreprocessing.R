@@ -81,7 +81,7 @@ puntaje_AQ_sujetos <- puntaje_AQ(cant_sujetos,
 # add to df_DatosUnicos
 df_DatosUnicos$AQ <- puntaje_AQ_sujetos 
 
-######### Adding columns of
+####### Adding columns of
 
 ## Reaction Times
 df_exp_mod <- df_exp
@@ -93,12 +93,12 @@ df_exp_mod$t_ensayo_confianza <- df_exp_mod$confidence_t_keydown -
 
 ## Percentage of correct answers
 
-`Pc   <- rep(NA, nrow(df_DatosUnicos)) 
+Pc   <- rep(NA, nrow(df_DatosUnicos)) 
 existing_subjects <- unique(df_DatosUnicos$sujetos)
 for (s in 1:nrow(df_DatosUnicos)){
   Pc[s]   <- mean(df_exp_mod$discrimination_is_correct[df_exp_mod$sujetos== existing_subjects[s]])
 }
-`
+
 # add to df_DatosUnicos
 df_DatosUnicos$PC <- Pc
 
@@ -174,7 +174,7 @@ source(root$find_file("Analysis/AuxiliaryFunctions/unifica_col_TeEscuchamos.R"))
 # converts the TeEscuchamos values in Si, No , noSabe
 df_DatosUnicos_mod <- unifica_col_TeEscuchamos(df_DatosUnicos_mod,df_DatosUnicos)
 
-### Add the confidence columns to df_DatosUnicos_mod
+####### Add the confidence columns to df_DatosUnicos_mod
 
 # Confidence columns for all the subjects
 confidence_key_1 <- rep(NA, nrow(df_DatosUnicos_mod))
@@ -224,7 +224,7 @@ for(i in 1:nrow(df_DatosUnicos_mod)){
 df_DatosUnicos_mod$media_confidence <- media_confidence
 df_DatosUnicos_mod$sd_confidence <- sd_confidence
 
-## Get the sd and mean of reaction times by subject in the discrimination task
+####### Get the sd and mean of reaction times by subject in the discrimination task
 media_tr_discri <- rep(NA, nrow(df_DatosUnicos_mod))
 sd_tr_discri <- rep(NA, nrow(df_DatosUnicos_mod))
 
@@ -236,7 +236,7 @@ for(i in 1:nrow(df_DatosUnicos_mod)){
 df_DatosUnicos_mod$media_tr_discri <- media_tr_discri
 df_DatosUnicos_mod$sd_tr_discri <- sd_tr_discri
 
-## get the sd and mean of reaction times by subject in the confidence task
+####### get the sd and mean of reaction times by subject in the confidence task
 media_tr_confi <- rep(NA, nrow(df_DatosUnicos_mod))
 sd_tr_confi <- rep(NA, nrow(df_DatosUnicos_mod))
 
@@ -289,7 +289,7 @@ for (i in ExistingSubjects) {
   sujeto_df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$sujetos== i,]
   df <- as.data.frame(lapply(sujeto_df_DatosUnicos_mod2, rep, cant_trials))
   
-  # lo agrago al df_total
+  # lo agrego al df_total
   df_total <- rbind(df_total, df)
 }
 
@@ -301,7 +301,7 @@ df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discriminati
                   t_ensayo_discriminacion = df_exp_mod2$t_ensayo_discriminacion,
                   t_ensayo_confianza = df_exp_mod2$t_ensayo_confianza)
 
-## save the df_total
+####### save the df_total
 
 # # RESULTS_EXP1
 filepath <- root$find_file("Data/All_exp_inclusion_criteria/df_total.Rda")
@@ -317,25 +317,25 @@ df_total <- df_total %>%
   filter(str_detect(df_total$sincericidio, "Pueden")) # if start with "Pueden"
 #                                                                  # it stays
 
-# Filter by TeEscuchamos leaving only those who did not interrup the 
+## Filter by TeEscuchamos leaving only those who did not interrup the 
 # task drastically (= ok)
 df_total <- df_total[df_total$TeEscuchamos == 'ok',] 
 
 ## Filter by performance, leaving only those who have PC > 60 
 df_total <- df_total[df_total$PC > 0.60,]
 
-# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
+## sujetos que tienen un 85 % de trials en una misma respuesta de confianza
 source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence_new.R"))
-sujetos_a_descartar <- discard_by_x_same_confidence_new(85,df_total)  ###################### ACA ESTOY TIRA ERROR EN LA FUNCION ESTA
+sujetos_a_descartar <- discard_by_x_same_confidence_new(85,df_total)  
 df_total <- df_total[! df_total$sujetos %in% sujetos_a_descartar,]
 
 ## Filter by reaction times
-df_total <- df_total[df_total$t_ensayo_discriminacion >= 5000,]
-df_total <- df_total[df_total$t_ensayo_discriminacion <= 200,]
-df_total <- df_total[df_total$t_ensayo_confianza >=5000,]
-df_total <- df_total[df_total$t_ensayo_confianza <=0,]
+df_total <- df_total[df_total$t_ensayo_discriminacion <= 5000,]
+df_total <- df_total[df_total$t_ensayo_discriminacion >= 200,]
+df_total <- df_total[df_total$t_ensayo_confianza <=5000,]
+df_total <- df_total[df_total$t_ensayo_confianza >=0,]
 
-# burning the first 20 trials of each subject
+## burning the first 20 trials of each subject
 df_total <- df_total[df_total$trials > 20,]
 
 ## Filter by trails needed to calculate AUROC2
@@ -347,21 +347,21 @@ for (i in 1:length(cant_trials_por_sujeto)) {
   cant_trials_por_sujeto[i] <- nrow(df_total[df_total$sujetos == existing_subject[i],])
 }
 
-# veo quienes son
-indices_cant_trials <- which(cant_trials_por_sujeto < cant_trial_filter)
+# veo quienes son los que tienen menos trials que X
+indices_cant_trials <- which(cant_trials_por_sujeto < 90)
 subj_pocos_trials<- existing_subject[indices_cant_trials]
 
 # los descarto
 df_total <- df_total[! df_total$sujetos %in% subj_pocos_trials,]
 
-########### AUROC2
+####### AUROC2
 ## get metacognitive sensivity
 
 # load the type 2 ROC analysis function
 source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
 library(dplyr)
 
-Nsuj <- length(unique(d1$sujetos))
+Nsuj <- length(unique(df_total$sujetos))
 # saving metacog = mc for each RT discarded
 mc <- rep(NA, Nsuj)
 ExistingSubjects <- unique(df_total$sujetos)
@@ -371,59 +371,51 @@ for (i in 1:Nsuj){
                     conf = df_total$confidence_key[df_total$sujetos==ExistingSubjects[i]], 
                     Nratings = 4)}
 
-######## queda correr todo hasta aca, meter metacog como columna en df total
-######## filtrar por metacog, y seguir revisando el codigo hasta guardarlo.
+## adding column mc to df_total
 
-
-## filter in df_exp those who survived the exclusion criteria applied to 
-## df_DatosUnicos_mod3
-df_exp_mod3 <- df_exp_mod %>% 
-  filter(df_exp_mod$sujetos %in% df_DatosUnicos_mod3$sujetos)
-
-
-####### Prepare the df for the regression analysis
-
-df_total <- df_DatosUnicos_mod2[0,]
-
-#  sujetos que quedaron
-ExistingSubjects <- unique(df_exp_mod2$sujetos)
+todos_sujetos_mc <- c()
 
 # iterar por sujeto existente
-for (i in ExistingSubjects) {
+for (i in 1:length(ExistingSubjects)) {
   # saco la cantidad de trials del sujeto
-  sujeto_df_exp <- df_exp_mod2[df_exp_mod2$sujetos== i,]
+  sujeto_df_exp <- df_total[df_total$sujetos == ExistingSubjects[i],]
   cant_trials <- nrow(sujeto_df_exp)
   
-  # repito cada fila del sujeto segun la cantidad de trials que le quedaron
-  sujeto_df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$sujetos== i,]
-  df <- as.data.frame(lapply(sujeto_df_DatosUnicos_mod2, rep, cant_trials))
+  # repito cada valor de mc segun la cantidad de trials que le quedaron al sujeto
+  sujeto_mc <-rep(mc[i],cant_trials)
   
-  # lo agrago al df_total
-  df_total <- rbind(df_total, df)
+  # lo agrego a un vector que tenga los mc de todos los sujetos por cantidad de trials
+  todos_sujetos_mc <- c(todos_sujetos_mc,sujeto_mc)
 }
 
-# combino las columnas de df_exp_mod2 que me interesan con el df_total
-df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discrimination_is_correct,
-                  confidence_key = df_exp_mod2$confidence_key, 
-                  trials = df_exp_mod2$trials,
-                  diferencia_puntitos = df_exp_mod2$diferencia_puntitos, 
-                  t_ensayo_discriminacion = df_exp_mod2$t_ensayo_discriminacion,
-                  t_ensayo_confianza = df_exp_mod2$t_ensayo_confianza)
+# lo agrego al df_total
+df_total$mc <- todos_sujetos_mc
 
-## save the df_total
+####### filter by mc
+# filtro para los que tienen metacog menores a 0.5
+mean_mc <- mean(mc)
+sd_mc <-sd(mc)
+df_total <- df_total[df_total$mc >= mean_mc - sd_mc* 1.5,]
+# a partir de cuanto quiero dejar de metacog (otra forma de filtrar)
+# d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.4,] 
+
+####### save the df_total
+
+# # RESULTS all exp
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+save(df_total,file = filepath)
 
 # # RESULTS_EXP1
-filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
-save(df_total,file = filepath)
+#filepath <- root$find_file("Data/Results_Exp1/df_total.Rda")
+#save(df_total,file = filepath)
 
 # RESULTS_EXP2(REPLICA)
-filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
-save(df_total,file = filepath)
+#filepath <- root$find_file("Data/Results_Exp2(replica)/df_total.Rda")
+#save(df_total,file = filepath)
 
 # # RESULTS_EXP2+3
-filepath <- root$find_file("Data/Exp2+3/df_total.Rda")
-save(df_total,file = filepath)
-
+#filepath <- root$find_file("Data/Exp2+3/df_total.Rda")
+#save(df_total,file = filepath)
 
 # save the df in .txt format, it is saved in the mail folder
 #write.table(df_total, file= 'df_total.txt')
