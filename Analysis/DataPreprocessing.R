@@ -254,18 +254,25 @@ df_DatosUnicos_mod$sd_tr_confi <- sd_tr_confi
 ## Filter for hours of sleep, leaving me only with > 4
 #df_DatosUnicos_mod2 <- df_DatosUnicos_mod[df_DatosUnicos_mod$horasSueno > 4,] 
 
+cat("Cantidad de sujetos antes de todo filtro: ", nrow(df_DatosUnicos_mod))
+
 ## Filter by psychological disorder, staying only with those who do not have.
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod[df_DatosUnicos_mod$affeccionPsico ==
                                                'No',]
+
+cat("Cantidad de sujetos luego de filtrar por trastorno psi: ", nrow(df_DatosUnicos_mod2))
+
 ## Filter by medication, leaving only with those who do not take.
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$medicacion ==
                                                'No',]
+cat("Cantidad de sujetos luego de filtrar por medicacion: ", nrow(df_DatosUnicos_mod2))
 
 ## Filter by age, leaving only those who are age > 17, < 100, and are not NA
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$edad > 17,]
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$edad < 100,]
 df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[!is.na(df_DatosUnicos_mod2$edad),]
 
+cat("Cantidad de sujetos luego de filtrar por edad: ", nrow(df_DatosUnicos_mod2))
 ## filter in df_exp those who survived inclusion criteria applied to 
 ## df_DatosUnicos_mod2
 library(dplyr)
@@ -310,6 +317,8 @@ save(df_total,file = filepath)
 
 ####### Exclusion criteria, data is excluded of future analysis
 
+cat("Cantidad de sujetos antes de filtrar por criterios de exclusion: ", length(unique(df_total$sujetos)))
+
 ## Filter by sincericide, leaving only those who tell us that we can count on their answers.
 library (stringr)
 library (tidyverse)
@@ -317,26 +326,40 @@ df_total <- df_total %>%
   filter(str_detect(df_total$sincericidio, "Pueden")) # if start with "Pueden"
 #                                                                  # it stays
 
+cat("Cantidad de sujetos luego de filtrar por sincericidio: ", length(unique(df_total$sujetos)))
+
 ## Filter by TeEscuchamos leaving only those who did not interrup the 
 # task drastically (= ok)
 df_total <- df_total[df_total$TeEscuchamos == 'ok',] 
 
+cat("Cantidad de sujetos luego de filtrar por te escuchamos: ", length(unique(df_total$sujetos)))
+
 ## Filter by performance, leaving only those who have PC > 60 
 df_total <- df_total[df_total$PC > 0.60,]
+
+cat("Cantidad de sujetos luego de filtrar por desempeno: ", length(unique(df_total$sujetos)))
 
 ## sujetos que tienen un 85 % de trials en una misma respuesta de confianza
 source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence_new.R"))
 sujetos_a_descartar <- discard_by_x_same_confidence_new(85,df_total)  
 df_total <- df_total[! df_total$sujetos %in% sujetos_a_descartar,]
 
+cat("Cantidad de sujetos luego de filtrar por X% de trials con la misma confianza: ", length(unique(df_total$sujetos)))
+
+cat("Cantidad de trials antes de filtrar por RT: ", nrow(df_total))
 ## Filter by reaction times
 df_total <- df_total[df_total$t_ensayo_discriminacion <= 5000,]
+cat("Cantidad de trials luego de filtrar por <5000 en tarea t1: ", nrow(df_total))
 df_total <- df_total[df_total$t_ensayo_discriminacion >= 200,]
+cat("Cantidad de trials luego de filtrar por >200 en tarea t1: ", nrow(df_total))
 df_total <- df_total[df_total$t_ensayo_confianza <=5000,]
+cat("Cantidad de trials luego de filtrar por <5000 en tarea t2: ", nrow(df_total))
 df_total <- df_total[df_total$t_ensayo_confianza >=0,]
+cat("Cantidad de trials luego de filtrar por >0 en tarea t2: ", nrow(df_total))
 
 ## burning the first 20 trials of each subject
 df_total <- df_total[df_total$trials > 20,]
+cat("Cantidad de trials luego de quemar los primeros 20 trials: ", nrow(df_total))
 
 ## Filter by trails needed to calculate AUROC2
 ## discarding because very few trials
@@ -353,6 +376,8 @@ subj_pocos_trials<- existing_subject[indices_cant_trials]
 
 # los descarto
 df_total <- df_total[! df_total$sujetos %in% subj_pocos_trials,]
+
+cat("Cantidad de sujetos luego de filtrar por trials insuficientes para calcular AUROC2: ", length(unique(df_total$sujetos)))
 
 ####### AUROC2
 ## get metacognitive sensivity
@@ -398,6 +423,8 @@ sd_mc <-sd(mc)
 df_total <- df_total[df_total$mc >= mean_mc - sd_mc* 1.5,]
 # a partir de cuanto quiero dejar de metacog (otra forma de filtrar)
 # d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.4,] 
+
+cat("Cantidad de sujetos luego de filtrar por AUROC2: ", length(unique(df_total$sujetos)))
 
 ####### save the df_total
 

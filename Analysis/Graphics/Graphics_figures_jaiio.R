@@ -117,45 +117,20 @@ ggplot(data=df2, aes(x=TrialNumber, y=MeanPerformanceByTrial)) +
 
 # voy a la carpeta del proyecto
 root <- rprojroot::is_rstudio_project
-basename(getwd())
+basename(getwd())               
 
-# load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
 
-#### AQ by sex
-DF_list <- DataFrame_Filtered(experimento = "ambos", 
-                              filtroRT_Disc_Sup = 5000,
-                              filtroRT_Disc_Inf = 200,
-                              filtroRT_Conf_Sup = 5000,
-                              filtroRT_Conf_Inf = 0,
-                              filtroTrial = 20)
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
 
-
-d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g # 
-
-d1 = d.sin.normalizar.solo.FyM.mc.filter
-
-d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
-         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
-         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
-         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172
-         & d1$sujetos != 123 & d1$sujetos != 1135 & d1$sujetos != 1154 
-         & d1$sujetos != 1185, ] # los ultimos 4 no estaban antes, contamos mal visualmente
-
-# sujetos que tienen menos de 90 de trials
-d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
-           d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
-           d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
-           d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
-           d2$sujetos != 1010 & d2$sujetos != 1046 &
-           d2$sujetos != 1069 & d2$sujetos != 1112 &
-           d2$sujetos != 1127 & d2$sujetos != 1135 &
-           d2$sujetos != 1154 & d2$sujetos != 1171 &
-           d2$sujetos != 1191 & d2$sujetos != 1239 &
-           d2$sujetos != 1250 & d2$sujetos != 1251 &
-           d2$sujetos != 1260,]
-
+# a = df_total.solo.FyM
+# b = d.sin.normalizar
+# c = d.normalizado
+# d = d.sin.normalizar.solo.FyM
+d3 <- DF_list$d
 
 # a
 d3[d3 == "Masculino"] <- 'Male' 
@@ -212,53 +187,27 @@ ggplot(d3,aes(aq))+
 
 # voy a la carpeta del proyecto
 root <- rprojroot::is_rstudio_project
-basename(getwd())
+basename(getwd())               
 
-# load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
 
-#### AQ by sex
-DF_list <- DataFrame_Filtered(experimento = "ambos", 
-                              filtroRT_Disc_Sup = 5000,
-                              filtroRT_Disc_Inf = 200,
-                              filtroRT_Conf_Sup = 5000,
-                              filtroRT_Conf_Inf = 0,
-                              filtroTrial = 20)
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
 
-
-d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g # 
-
-d1 = d.sin.normalizar.solo.FyM.mc.filter
-
-# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
-d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
-         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
-         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
-         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172
-         & d1$sujetos != 123 & d1$sujetos != 1135 & d1$sujetos != 1154 # en esta fila agrego 4 que no estaban antes (contamos mal visualmente)
-         & d1$sujetos != 1185, ] 
-
-# sujetos que tienen menos de 90 de trials
-d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
-           d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
-           d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
-           d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
-           d2$sujetos != 1010 & d2$sujetos != 1046 &
-           d2$sujetos != 1069 & d2$sujetos != 1112 &
-           d2$sujetos != 1127 & d2$sujetos != 1135 &
-           d2$sujetos != 1154 & d2$sujetos != 1171 &
-           d2$sujetos != 1191 & d2$sujetos != 1239 &
-           d2$sujetos != 1250 & d2$sujetos != 1251 &
-           d2$sujetos != 1260,]
-
+# a = df_total.solo.FyM
+# b = d.sin.normalizar
+# c = d.normalizado
+# d = d.sin.normalizar.solo.FyM
+d3 <- DF_list$d
 
 mc.sorted <-  d3[order(d3$mc),]
 subjects <- 1:nrow(mc.sorted)
 mc.sorted$s <- subjects
 
 ggplot(mc.sorted, aes(s)) +                   
-  geom_point(aes(x = s, y=mc, colour="AUROC2")) +  
+  geom_point(aes(x = s, y=mc, colour="Metacognition")) +  
   geom_point(aes(x = s, y=pc, colour="Performance")) +  
   scale_y_continuous(expand = expansion(mult = c(0, .1)))+
   scale_x_continuous(expand = c(.009, 0)) +
@@ -282,61 +231,45 @@ ggplot(mc.sorted, aes(s)) +
 ### Regression model ###
 ########################
 
-# voy a la carpeta del proyecto
 root <- rprojroot::is_rstudio_project
-basename(getwd())
+basename(getwd())               
 
-# load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
 
-# get the df list
-# experimento = 1,2,ambos
-DF_list <- DataFrame_Filtered(experimento = "ambos", 
-                              filtroRT_Disc_Sup = 5000,
-                              filtroRT_Disc_Inf = 200,
-                              filtroRT_Conf_Sup = 5000,
-                              filtroRT_Conf_Inf = 0,
-                              filtroTrial = 20)
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
 
-d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g 
+# a = df_total.solo.FyM
+# b = d.sin.normalizar
+# c = d.normalizado
+# d = d.sin.normalizar.solo.FyM
+d.sin.normalizar.solo.FyM <- DF_list$d
+
+###############
+### library ###
+###############
+library(arm)
+library(dplyr)
+
+###########################
+### Regression Analysis ###
+###########################
 
 ### lineas para hacer regresion 
 
-d.sin.normalizar.solo.FyM.mc.filter$aq.norm <- (d.sin.normalizar.solo.FyM.mc.filter$aq - mean(d.sin.normalizar.solo.FyM.mc.filter$aq))/
-  sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
+d1 = d.sin.normalizar.solo.FyM
 
-d.sin.normalizar.solo.FyM.mc.filter$mc.norm <- (d.sin.normalizar.solo.FyM.mc.filter$mc 
-                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$mc))/ sd(d.sin.normalizar.solo.FyM.mc.filter$mc)
+d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
 
-d.sin.normalizar.solo.FyM.mc.filter$edad.norm <- (d.sin.normalizar.solo.FyM.mc.filter$edad 
-                                                  - mean(d.sin.normalizar.solo.FyM.mc.filter$edad))/ sd(d.sin.normalizar.solo.FyM.mc.filter$edad)
+d1$mc.norm <- (d1$mc - mean(d1$mc))/ sd(d1$mc)
 
-d1 = d.sin.normalizar.solo.FyM.mc.filter
+d1$edad.norm <- (d1$edad - mean(d1$edad))/ sd(d1$edad)
+
 d1[d1 == "Masculino"] <- "1"
 d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
-
-# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
-d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
-         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
-         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
-         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172
-         & d1$sujetos != 123 & d1$sujetos != 1135 & d1$sujetos != 1154 # en esta fila agrego 4 que no estaban antes (contamos mal visualmente)
-         & d1$sujetos != 1185, ] 
-
-# sujetos que tienen menos de 90 de trials
-d3 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
-           d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
-           d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
-           d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
-           d2$sujetos != 1010 & d2$sujetos != 1046 &
-           d2$sujetos != 1069 & d2$sujetos != 1112 &
-           d2$sujetos != 1127 & d2$sujetos != 1135 &
-           d2$sujetos != 1154 & d2$sujetos != 1171 &
-           d2$sujetos != 1191 & d2$sujetos != 1239 &
-           d2$sujetos != 1250 & d2$sujetos != 1251 &
-           d2$sujetos != 1260,]
 
 # corro el modelo
 a=lm(mc ~ aq.norm +
@@ -344,7 +277,7 @@ a=lm(mc ~ aq.norm +
        edad.norm+
        aq.norm: Im+
        aq.norm:edad.norm,
-     data = d3) 
+     data = d1) 
 summary(a)
 
 
@@ -372,10 +305,10 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender-Male'='Im','Age' = 'edad.norm',
 ###################
 
 p <- plot_model(a, type = "pred", terms = c("aq.norm", "Im"),
-                axis.labels = c('AQ standardized','AUROC2'),
+                axis.labels = c('standardized AQ','Metacognition'),
                 legend.title = '',
                 title = '', 
-                axis.title = c('AQ standardized','AUROC2'),
+                axis.title = c('standardized AQ','Metacognition'),
                 show.data = FALSE)
 p +theme_sjplot(base_size = 25)
 

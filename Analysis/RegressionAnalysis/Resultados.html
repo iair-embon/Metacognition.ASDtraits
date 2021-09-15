@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Embon,Barttfeld &amp; Solovey" />
+<meta name="author" content="Embon, Barttfeld &amp; Solovey" />
 
 
 <title>Regression Analysis</title>
@@ -165,7 +165,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Regression Analysis</h1>
-<h4 class="author">Embon,Barttfeld &amp; Solovey</h4>
+<h4 class="author">Embon, Barttfeld &amp; Solovey</h4>
 <h4 class="date">8/9/2021</h4>
 
 </div>
@@ -175,29 +175,24 @@ pre code {
 <h2>Levantar datos</h2>
 <pre class="r"><code># voy a la carpeta del proyecto
 root &lt;- rprojroot::is_rstudio_project
-basename(getwd())</code></pre>
-<pre><code>## [1] &quot;RegressionAnalysis&quot;</code></pre>
-<pre class="r"><code># load the function to get the df list
-source(root$find_file(&quot;Analysis/AuxiliaryFunctions/DataFrame_Filtered.R&quot;))
+basename(getwd())               </code></pre>
+<pre><code>## [1] &quot;Metacognition.ASDtraits&quot;</code></pre>
+<pre class="r"><code>####### data frames and filters
+
+# load the function to get the df list
+#source(root$find_file(&quot;Analysis/AuxiliaryFunctions/DataFrame_Filtered.R&quot;))
 
 # get the df list
 # experimento = 1,2,ambos
-DF_list &lt;- DataFrame_Filtered(experimento = &quot;todos&quot;, 
-                                 filtroRT_Disc_Sup = 5000,
-                                 filtroRT_Disc_Inf = 200,
-                                 filtroRT_Conf_Sup = 5000,
-                                 filtroRT_Conf_Inf = 0,
-                                 filtroTrial = 20,
-                                 cant_trial_filter = 90)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code># DF_list:
+#DF_list &lt;- DataFrame_Filtered(experimento = &quot;todos&quot;, 
+#                                 filtroRT_Disc_Sup = 5000,
+#                                 filtroRT_Disc_Inf = 200,
+#                                 filtroRT_Conf_Sup = 5000,
+#                                 filtroRT_Conf_Inf = 0,
+#                                 filtroTrial = 20,
+#                                 cant_trial_filter = 90)
+
+# DF_list:
 # a df_total
 # b d.sin.normalizar
 # c d.sin.normalizar.mc.filter
@@ -206,53 +201,67 @@ DF_list &lt;- DataFrame_Filtered(experimento = &quot;todos&quot;,
 # f d.sin.normalizar.solo.FyM
 # g d.sin.normalizar.solo.FyM.mc.filter
 # h d.solo.FyM.mc.filter
+#df_total &lt;- DF_list$a
+#d.sin.normalizar.solo.FyM.mc.filter &lt;- DF_list$g # 
 
-df_total &lt;- DF_list$a
-d.sin.normalizar.solo.FyM.mc.filter &lt;- DF_list$g # 
+####### data frames with filters already applied
+filepath &lt;- root$find_file(&quot;Data/All_exp_exclusion_criteria/df_total.Rda&quot;)
+load(file= filepath)
+
+source(root$find_file(&quot;Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R&quot;))
+DF_list &lt;- DataFrame_Filtered_already_applied(df_total)
+
+# a = df_total.solo.FyM
+# b = d.sin.normalizar
+# c = d.normalizado
+# d = d.sin.normalizar.solo.FyM
+d.sin.normalizar.solo.FyM &lt;- DF_list$d
+
 ###############
 ### library ###
 ###############
 library(arm)</code></pre>
 <pre><code>## Loading required package: MASS</code></pre>
-<pre><code>## 
-## Attaching package: &#39;MASS&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     select</code></pre>
 <pre><code>## Loading required package: Matrix</code></pre>
 <pre><code>## Loading required package: lme4</code></pre>
 <pre><code>## 
 ## arm (Version 1.11-2, built: 2020-7-27)</code></pre>
-<pre><code>## Working directory is /home/iair/Documents/Investigación/Metacog.Tea/Metacognition.ASDtraits/Analysis/RegressionAnalysis</code></pre>
-<pre class="r"><code>library(dplyr)
-
-###########################
+<pre><code>## Working directory is /home/iair/Documents/Investigación/Metacog.Tea/Metacognition.ASDtraits</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:MASS&#39;:
+## 
+##     select</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>###########################
 ### Regression Analysis ###
 ###########################
 
 ### lineas para hacer regresion 
 
-d.sin.normalizar.solo.FyM.mc.filter$aq.norm &lt;- (d.sin.normalizar.solo.FyM.mc.filter$aq - mean(d.sin.normalizar.solo.FyM.mc.filter$aq))/
-        sd(d.sin.normalizar.solo.FyM.mc.filter$aq)
+d1 = d.sin.normalizar.solo.FyM
 
-d.sin.normalizar.solo.FyM.mc.filter$mc.norm &lt;- (d.sin.normalizar.solo.FyM.mc.filter$mc 
-                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$mc))/ sd(d.sin.normalizar.solo.FyM.mc.filter$mc)
+d1$aq.norm &lt;- (d1$aq - mean(d1$aq))/ sd(d1$aq)
 
-d.sin.normalizar.solo.FyM.mc.filter$edad.norm &lt;- (d.sin.normalizar.solo.FyM.mc.filter$edad 
-                                                - mean(d.sin.normalizar.solo.FyM.mc.filter$edad))/ sd(d.sin.normalizar.solo.FyM.mc.filter$edad)
+d1$mc.norm &lt;- (d1$mc - mean(d1$mc))/ sd(d1$mc)
 
-d1 = d.sin.normalizar.solo.FyM.mc.filter
+d1$edad.norm &lt;- (d1$edad - mean(d1$edad))/ sd(d1$edad)
+
 d1[d1 == &quot;Masculino&quot;] &lt;- &quot;1&quot;
 d1[d1 == &quot;Femenino&quot;] &lt;- &quot;0&quot;
 d1$Im &lt;- as.integer(d1$Im)
 
 # sujetos que tienen un 85 % de trials en una misma respuesta de confianza
 
-source(root$find_file(&quot;Analysis/AuxiliaryFunctions/discard_by_x_same_confidence.R&quot;))
-sujetos_a_descartar &lt;- discard_by_x_same_confidence(85)</code></pre>
-<pre><code>## Warning: `data_frame()` was deprecated in tibble 1.1.0.
-## Please use `tibble()` instead.</code></pre>
-<pre class="r"><code>d2 &lt;- d1[! d1$sujetos %in% sujetos_a_descartar,]</code></pre>
+#source(root$find_file(&quot;Analysis/AuxiliaryFunctions/discard_by_x_same_confidence.R&quot;))
+#sujetos_a_descartar &lt;- discard_by_x_same_confidence(85)
+#d2 &lt;- d1[! d1$sujetos %in% sujetos_a_descartar,]</code></pre>
 <div id="empiezo-a-correr-modelos-de-regresiones" class="section level5">
 <h5>Empiezo a correr modelos de regresiones</h5>
 </div>
@@ -264,63 +273,63 @@ sujetos_a_descartar &lt;- discard_by_x_same_confidence(85)</code></pre>
        edad.norm+
        es +
        aq.norm: Im,
-     data = d2) 
+     data = d1) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = mc ~ aq.norm + Im + edad.norm + es + aq.norm:Im, 
-##     data = d2)
+##     data = d1)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.125095 -0.040616 -0.003324  0.035153  0.150508 
+## -0.126227 -0.042062 -0.002929  0.038391  0.150113 
 ## 
 ## Coefficients:
-##                            Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)               0.6048733  0.0099195  60.978   &lt;2e-16 ***
-## aq.norm                  -0.0027896  0.0037232  -0.749   0.4542    
-## Im                        0.0051184  0.0067460   0.759   0.4485    
-## edad.norm                -0.0009026  0.0038897  -0.232   0.8166    
-## esPosgrado incompleto     0.0213923  0.0132573   1.614   0.1075    
-## esSecundaria completa     0.0194590  0.0177106   1.099   0.2727    
-## esSecundaria incompleta   0.0347020  0.0583357   0.595   0.5523    
-## esUniversidad completa    0.0038837  0.0111995   0.347   0.7290    
-## esUniversidad incompleta  0.0211299  0.0117787   1.794   0.0737 .  
-## aq.norm:Im                0.0149927  0.0069748   2.150   0.0323 *  
+##                           Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)               0.601755   0.009702  62.021   &lt;2e-16 ***
+## aq.norm                  -0.001979   0.003577  -0.553   0.5804    
+## Im                        0.009209   0.006688   1.377   0.1694    
+## edad.norm                -0.001152   0.003667  -0.314   0.7536    
+## esPosgrado incompleto     0.020406   0.012941   1.577   0.1157    
+## esSecundaria completa     0.008960   0.016961   0.528   0.5976    
+## esSecundaria incompleta   0.037840   0.059055   0.641   0.5221    
+## esUniversidad completa    0.005948   0.010868   0.547   0.5845    
+## esUniversidad incompleta  0.020842   0.011465   1.818   0.0699 .  
+## aq.norm:Im                0.013967   0.006850   2.039   0.0422 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.05762 on 339 degrees of freedom
-## Multiple R-squared:  0.04414,    Adjusted R-squared:  0.01877 
-## F-statistic:  1.74 on 9 and 339 DF,  p-value: 0.079</code></pre>
+## Residual standard error: 0.05836 on 365 degrees of freedom
+## Multiple R-squared:  0.04136,    Adjusted R-squared:  0.01773 
+## F-statistic:  1.75 on 9 and 365 DF,  p-value: 0.07652</code></pre>
 </div>
 <div id="modelo-2" class="section level2">
 <h2>Modelo 2</h2>
 <pre class="r"><code>a=lm(mc ~ aq.norm +
        Im +
        aq.norm: Im,
-     data = d2) 
+     data = d1) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = mc ~ aq.norm + Im + aq.norm:Im, data = d2)
+## lm(formula = mc ~ aq.norm + Im + aq.norm:Im, data = d1)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.119613 -0.043807 -0.002798  0.039647  0.156988 
+## -0.118957 -0.044689 -0.002675  0.041454  0.156314 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.618634   0.003735 165.618   &lt;2e-16 ***
-## aq.norm     -0.004304   0.003699  -1.164   0.2454    
-## Im           0.006635   0.006736   0.985   0.3253    
-## aq.norm:Im   0.016338   0.006950   2.351   0.0193 *  
+## (Intercept)  0.615280   0.003602 170.829   &lt;2e-16 ***
+## aq.norm     -0.003250   0.003556  -0.914   0.3613    
+## Im           0.010522   0.006678   1.576   0.1159    
+## aq.norm:Im   0.015295   0.006833   2.238   0.0258 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.0579 on 345 degrees of freedom
-## Multiple R-squared:  0.01776,    Adjusted R-squared:  0.009217 
-## F-statistic: 2.079 on 3 and 345 DF,  p-value: 0.1027</code></pre>
+## Residual standard error: 0.05857 on 371 degrees of freedom
+## Multiple R-squared:  0.01868,    Adjusted R-squared:  0.01074 
+## F-statistic: 2.354 on 3 and 371 DF,  p-value: 0.07174</code></pre>
 </div>
 <div id="modelo-3" class="section level2">
 <h2>Modelo 3</h2>
@@ -330,32 +339,32 @@ summary(a)</code></pre>
        aq.norm: Im+
        aq.norm:edad.norm+
        Im:edad.norm,
-     data = d2) 
+     data = d1) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = mc ~ aq.norm + Im + edad.norm + aq.norm:Im + aq.norm:edad.norm + 
-##     Im:edad.norm, data = d2)
+##     Im:edad.norm, data = d1)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.123521 -0.041244 -0.001299  0.039249  0.160136 
+## -0.113788 -0.043090 -0.002413  0.040680  0.159437 
 ## 
 ## Coefficients:
 ##                    Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)        0.619475   0.003728 166.159   &lt;2e-16 ***
-## aq.norm           -0.002378   0.003733  -0.637   0.5245    
-## Im                 0.007197   0.006762   1.064   0.2880    
-## edad.norm         -0.008565   0.003682  -2.326   0.0206 *  
-## aq.norm:Im         0.013880   0.006960   1.994   0.0469 *  
-## aq.norm:edad.norm -0.003888   0.002872  -1.354   0.1766    
-## Im:edad.norm       0.014272   0.007405   1.927   0.0548 .  
+## (Intercept)        0.616201   0.003588 171.717   &lt;2e-16 ***
+## aq.norm           -0.001196   0.003607  -0.332   0.7403    
+## Im                 0.010633   0.006664   1.595   0.1115    
+## edad.norm         -0.008494   0.003533  -2.404   0.0167 *  
+## aq.norm:Im         0.013054   0.006821   1.914   0.0564 .  
+## aq.norm:edad.norm -0.004249   0.002752  -1.544   0.1235    
+## Im:edad.norm       0.013519   0.006930   1.951   0.0518 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.05742 on 342 degrees of freedom
-## Multiple R-squared:  0.04231,    Adjusted R-squared:  0.02551 
-## F-statistic: 2.518 on 6 and 342 DF,  p-value: 0.02127</code></pre>
+## Residual standard error: 0.05806 on 368 degrees of freedom
+## Multiple R-squared:  0.04336,    Adjusted R-squared:  0.02776 
+## F-statistic:  2.78 on 6 and 368 DF,  p-value: 0.01176</code></pre>
 </div>
 <div id="modelo-4" class="section level2">
 <h2>Modelo 4</h2>
@@ -367,42 +376,42 @@ summary(a)</code></pre>
        aq.norm:edad.norm+
        Im:edad.norm+
        es:aq.norm,
-     data = d2) 
+     data = d1) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = mc ~ aq.norm + Im + edad.norm + es + aq.norm:Im + 
-##     aq.norm:edad.norm + Im:edad.norm + es:aq.norm, data = d2)
+##     aq.norm:edad.norm + Im:edad.norm + es:aq.norm, data = d1)
 ## 
 ## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -0.11995 -0.04126 -0.00173  0.03466  0.15735 
+##       Min        1Q    Median        3Q       Max 
+## -0.120356 -0.042669 -0.002749  0.037755  0.155935 
 ## 
 ## Coefficients: (1 not defined because of singularities)
-##                                    Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)                       0.6046429  0.0101253  59.716   &lt;2e-16 ***
-## aq.norm                          -0.0003497  0.0106306  -0.033   0.9738    
-## Im                                0.0059552  0.0068318   0.872   0.3840    
-## edad.norm                        -0.0042811  0.0043162  -0.992   0.3220    
-## esPosgrado incompleto             0.0226503  0.0134807   1.680   0.0939 .  
-## esSecundaria completa             0.0230884  0.0181158   1.274   0.2034    
-## esSecundaria incompleta           0.0367459  0.0581387   0.632   0.5278    
-## esUniversidad completa            0.0054642  0.0114248   0.478   0.6328    
-## esUniversidad incompleta          0.0225881  0.0119755   1.886   0.0601 .  
-## aq.norm:Im                        0.0134140  0.0070460   1.904   0.0578 .  
-## aq.norm:edad.norm                -0.0030506  0.0037221  -0.820   0.4130    
-## Im:edad.norm                      0.0145161  0.0075239   1.929   0.0545 .  
-## aq.norm:esPosgrado incompleto    -0.0022336  0.0147875  -0.151   0.8800    
-## aq.norm:esSecundaria completa     0.0026101  0.0163691   0.159   0.8734    
-## aq.norm:esSecundaria incompleta          NA         NA      NA       NA    
-## aq.norm:esUniversidad completa   -0.0101829  0.0118541  -0.859   0.3909    
-## aq.norm:esUniversidad incompleta  0.0015247  0.0122752   0.124   0.9012    
+##                                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                       0.603551   0.009964  60.572   &lt;2e-16 ***
+## aq.norm                          -0.002411   0.010280  -0.234   0.8147    
+## Im                                0.009998   0.006728   1.486   0.1381    
+## edad.norm                        -0.005152   0.004087  -1.261   0.2082    
+## esPosgrado incompleto             0.019943   0.013210   1.510   0.1320    
+## esSecundaria completa             0.011056   0.017320   0.638   0.5237    
+## esSecundaria incompleta           0.038363   0.058856   0.652   0.5149    
+## esUniversidad completa            0.004650   0.011135   0.418   0.6765    
+## esUniversidad incompleta          0.019716   0.011659   1.691   0.0917 .  
+## aq.norm:Im                        0.012485   0.006890   1.812   0.0708 .  
+## aq.norm:edad.norm                -0.002560   0.003465  -0.739   0.4606    
+## Im:edad.norm                      0.013810   0.007002   1.972   0.0494 *  
+## aq.norm:esPosgrado incompleto    -0.002329   0.014584  -0.160   0.8732    
+## aq.norm:esSecundaria completa     0.010441   0.015727   0.664   0.5072    
+## aq.norm:esSecundaria incompleta         NA         NA      NA       NA    
+## aq.norm:esUniversidad completa   -0.005546   0.011229  -0.494   0.6217    
+## aq.norm:esUniversidad incompleta  0.004669   0.011678   0.400   0.6895    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.05739 on 333 degrees of freedom
-## Multiple R-squared:  0.06857,    Adjusted R-squared:  0.02661 
-## F-statistic: 1.634 on 15 and 333 DF,  p-value: 0.06323</code></pre>
+## Residual standard error: 0.05813 on 359 degrees of freedom
+## Multiple R-squared:  0.06448,    Adjusted R-squared:  0.02539 
+## F-statistic:  1.65 on 15 and 359 DF,  p-value: 0.05927</code></pre>
 </div>
 <div id="modelo-5" class="section level2">
 <h2>Modelo 5</h2>
@@ -412,30 +421,30 @@ summary(a)</code></pre>
        aq.norm: Im,
        #aq.norm:edad.norm+
        #Im:edad.norm,
-     data = d2) 
+     data = d1) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = mc.norm ~ aq.norm + Im + edad.norm + aq.norm:Im, 
-##     data = d2)
+##     data = d1)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -2.06837 -0.69297 -0.01514  0.65952  2.58537 
+## -2.10356 -0.76567 -0.02743  0.69322  2.60240 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)  0.02871    0.06255   0.459   0.6465  
-## aq.norm     -0.05871    0.06243  -0.940   0.3477  
-## Im           0.09370    0.11324   0.827   0.4085  
-## edad.norm   -0.09082    0.05370  -1.691   0.0917 .
-## aq.norm:Im   0.27100    0.11635   2.329   0.0204 *
+## (Intercept) -0.03944    0.06107  -0.646   0.5188  
+## aq.norm     -0.04444    0.06058  -0.734   0.4636  
+## Im           0.16341    0.11348   1.440   0.1507  
+## edad.norm   -0.08752    0.05183  -1.689   0.0921 .
+## aq.norm:Im   0.25608    0.11577   2.212   0.0276 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.9692 on 344 degrees of freedom
-## Multiple R-squared:  0.02586,    Adjusted R-squared:  0.01453 
-## F-statistic: 2.283 on 4 and 344 DF,  p-value: 0.06017</code></pre>
+## Residual standard error: 0.9921 on 370 degrees of freedom
+## Multiple R-squared:  0.02618,    Adjusted R-squared:  0.01566 
+## F-statistic: 2.487 on 4 and 370 DF,  p-value: 0.04314</code></pre>
 </div>
 <div id="modelo-6-este-es-el-modelo-final-que-usariamos" class="section level2">
 <h2>Modelo 6 (este es el modelo final que usariamos)</h2>
@@ -445,31 +454,31 @@ summary(a)</code></pre>
        aq.norm: Im+
        aq.norm:edad.norm,
        #Im:edad.norm,
-     data = d2) 
+     data = d1) 
 summary(a)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = mc ~ aq.norm + Im + edad.norm + aq.norm:Im + aq.norm:edad.norm, 
-##     data = d2)
+##     data = d1)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.122580 -0.039746 -0.001627  0.038851  0.154275 
+## -0.123281 -0.043187 -0.001735  0.040554  0.153502 
 ## 
 ## Coefficients:
 ##                    Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)        0.619407   0.003743 165.494   &lt;2e-16 ***
-## aq.norm           -0.002850   0.003740  -0.762   0.4465    
-## Im                 0.005567   0.006736   0.827   0.4091    
-## edad.norm         -0.005030   0.003205  -1.569   0.1175    
-## aq.norm:Im         0.015581   0.006931   2.248   0.0252 *  
-## aq.norm:edad.norm -0.004215   0.002878  -1.465   0.1439    
+## (Intercept)        0.616066   0.003601 171.062   &lt;2e-16 ***
+## aq.norm           -0.001547   0.003616  -0.428   0.6690    
+## Im                 0.009555   0.006667   1.433   0.1526    
+## edad.norm         -0.004965   0.003047  -1.630   0.1040    
+## aq.norm:Im         0.014234   0.006820   2.087   0.0376 *  
+## aq.norm:edad.norm -0.004596   0.002757  -1.667   0.0963 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.05765 on 343 degrees of freedom
-## Multiple R-squared:  0.03191,    Adjusted R-squared:  0.0178 
-## F-statistic: 2.261 on 5 and 343 DF,  p-value: 0.04807</code></pre>
+## Residual standard error: 0.05828 on 369 degrees of freedom
+## Multiple R-squared:  0.03347,    Adjusted R-squared:  0.02037 
+## F-statistic: 2.555 on 5 and 369 DF,  p-value: 0.02731</code></pre>
 </div>
 
 

@@ -64,6 +64,8 @@ DataFrame_Filtered_already_applied <- function(df_total){
   d$m_c <- (d$m_c - mean(d$m_c)) / sd(d$m_c)
   d$sd_c <- (d$sd_c - mean(d$sd_c)) / sd(d$sd_c)
   
+  d.normalizado <- d
+  
   d.sin.normalizar.solo.FyM <- d.sin.normalizar[d.sin.normalizar$Im == "Masculino" | d.sin.normalizar$Im == "Femenino",]
   df_total.solo.FyM <-  df_total[df_total$genero == 'Femenino' | df_total$genero == 'Masculino',]
   
