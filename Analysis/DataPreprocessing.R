@@ -354,7 +354,7 @@ df_total <- df_total[df_total$t_ensayo_discriminacion >= 200,]
 cat("Cantidad de trials luego de filtrar por >200 en tarea t1: ", nrow(df_total))
 df_total <- df_total[df_total$t_ensayo_confianza <=5000,]
 cat("Cantidad de trials luego de filtrar por <5000 en tarea t2: ", nrow(df_total))
-df_total <- df_total[df_total$t_ensayo_confianza >=0,]
+df_total <- df_total[df_total$t_ensayo_confianza >=0,] 
 cat("Cantidad de trials luego de filtrar por >0 en tarea t2: ", nrow(df_total))
 
 ## burning the first 20 trials of each subject

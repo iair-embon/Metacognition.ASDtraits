@@ -281,8 +281,8 @@ a=lm(mc ~ aq.norm +
 summary(a)
 
 
-plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender-Male'='Im','Age' = 'edad.norm',
-                        'AQ:Gender-Male'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,
+plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender'='Im','Age' = 'edad.norm',
+                        'AQ:Gender'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,
            plot.distributions = FALSE, colors = "black")+
   ylab("") +
   xlab("Regression coefficient") +
@@ -312,6 +312,216 @@ p <- plot_model(a, type = "pred", terms = c("aq.norm", "Im"),
                 show.data = FALSE)
 p +theme_sjplot(base_size = 25)
 
+
+########################
+### AUROC2-GENDER-AQ ###
+########################
+
+root <- rprojroot::is_rstudio_project
+basename(getwd())               
+
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
+
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+
+# a = df_total.solo.FyM
+# b = d.sin.normalizar
+# c = d.normalizado
+# d = d.sin.normalizar.solo.FyM
+df_total.solo.FyM <- DF_list$a
+d.sin.normalizar.solo.FyM <- DF_list$d
+
+# create the df for plot
+df_for_plot <- data.frame(Nsuj = d.sin.normalizar.solo.FyM$sujetos,
+                          Gender = d.sin.normalizar.solo.FyM$Im,
+                          AQ = d.sin.normalizar.solo.FyM$aq)
+
+
+Nsuj <- length(unique(df_total.solo.FyM$sujetos))
+ExistingSubjects <- unique(df_total.solo.FyM$sujetos)
+
+# create empty vectors to save the cumH2 and cumF2 for each subject
+cum_H2_0 <- c()
+cum_H2_1 <- c()
+cum_H2_2 <- c()
+cum_H2_3 <- c()
+cum_H2_4 <- c()
+cum_FA2_0 <- c()
+cum_FA2_1 <- c()
+cum_FA2_2 <- c()
+cum_FA2_3 <- c()
+cum_FA2_4 <- c()
+
+for (i in 1:Nsuj) {
+  correct <- df_total.solo.FyM$discrimination_is_correct[df_total.solo.FyM$sujetos==ExistingSubjects[i]]
+  conf <- df_total.solo.FyM$confidence_key[df_total.solo.FyM$sujetos==ExistingSubjects[i]]
+  Nratings <- 4
+  
+  H2  <- rep(NA, Nratings)
+  FA2 <- rep(NA, Nratings)
+  i   <- Nratings+1
+  for (c in 1:Nratings){
+    H2[i-1]  <- sum(conf == c & correct) + 0.5
+    FA2[i-1] <- sum(conf == c & !correct) + 0.5
+    i        <- i-1
+  }
+  
+  H2      <- H2/sum(H2)
+  FA2     <- FA2/sum(FA2)
+  cum_H2  <- append(0, cumsum(H2))
+  cum_FA2 <- append(0, cumsum(FA2))
+  
+  cum_H2_0 <- c(cum_H2_0,cum_H2[1])
+  cum_H2_1 <- c(cum_H2_1,cum_H2[2])
+  cum_H2_2 <- c(cum_H2_2,cum_H2[3])
+  cum_H2_3 <- c(cum_H2_3,cum_H2[4])
+  cum_H2_4 <- c(cum_H2_4,cum_H2[5])
+  cum_FA2_0 <- c(cum_FA2_0,cum_FA2[1])
+  cum_FA2_1 <- c(cum_FA2_1,cum_FA2[2])
+  cum_FA2_2 <- c(cum_FA2_2,cum_FA2[3])
+  cum_FA2_3 <- c(cum_FA2_3,cum_FA2[4])
+  cum_FA2_4 <- c(cum_FA2_4,cum_FA2[5])
+}
+
+# create empty df to save the cumH2 and cumF2 for each subject
+df_for_plot$cum_H2_0  <- cum_H2_0
+df_for_plot$cum_H2_1  <- cum_H2_1
+df_for_plot$cum_H2_2  <- cum_H2_2
+df_for_plot$cum_H2_3  <- cum_H2_3
+df_for_plot$cum_H2_4  <- cum_H2_4
+df_for_plot$cum_FA2_0 <- cum_FA2_0
+df_for_plot$cum_FA2_1 <- cum_FA2_1
+df_for_plot$cum_FA2_2 <- cum_FA2_2
+df_for_plot$cum_FA2_3 <- cum_FA2_3
+df_for_plot$cum_FA2_4 <- cum_FA2_4
+
+
+# PLOT AUROC2 FOR MALE PARTICIPANTS
+df_for_plot_male <-  df_for_plot[df_for_plot$Gender == "Masculino",]
+
+# split by AQ first and last quartiles
+df_for_plot_male_AQ_1 <- df_for_plot_male[df_for_plot_male$AQ <= quantile(df_for_plot_male$AQ)[[2]],]
+df_for_plot_male_AQ_4 <- df_for_plot_male[df_for_plot_male$AQ >= quantile(df_for_plot_male$AQ)[[4]],]
+
+cum_H2_male_AQ_1 <- c(mean(df_for_plot_male_AQ_1$cum_H2_0),
+                 mean(df_for_plot_male_AQ_1$cum_H2_1),
+                 mean(df_for_plot_male_AQ_1$cum_H2_2),
+                 mean(df_for_plot_male_AQ_1$cum_H2_3),
+                 mean(df_for_plot_male_AQ_1$cum_H2_4))
+
+cum_FA2_male_AQ_1 <- c(mean(df_for_plot_male_AQ_1$cum_FA2_0),
+                 mean(df_for_plot_male_AQ_1$cum_FA2_1),
+                 mean(df_for_plot_male_AQ_1$cum_FA2_2),
+                 mean(df_for_plot_male_AQ_1$cum_FA2_3),
+                 mean(df_for_plot_male_AQ_1$cum_FA2_4))
+
+cum_H2_male_AQ_4 <- c(mean(df_for_plot_male_AQ_4$cum_H2_0),
+                      mean(df_for_plot_male_AQ_4$cum_H2_1),
+                      mean(df_for_plot_male_AQ_4$cum_H2_2),
+                      mean(df_for_plot_male_AQ_4$cum_H2_3),
+                      mean(df_for_plot_male_AQ_4$cum_H2_4))
+
+cum_FA2_male_AQ_4 <- c(mean(df_for_plot_male_AQ_4$cum_FA2_0),
+                       mean(df_for_plot_male_AQ_4$cum_FA2_1),
+                       mean(df_for_plot_male_AQ_4$cum_FA2_2),
+                       mean(df_for_plot_male_AQ_4$cum_FA2_3),
+                       mean(df_for_plot_male_AQ_4$cum_FA2_4))
+
+
+AQ_1 <- mean(df_for_plot_male_AQ_1$AQ)
+AQ_4 <- mean(df_for_plot_male_AQ_4$AQ)
+
+df <- data.frame(cum_H2_male_AQ_1 = cum_H2_male_AQ_1,
+                 cum_H2_male_AQ_4 = cum_H2_male_AQ_4,
+                 cum_FA2_male_AQ_1 = cum_FA2_male_AQ_1,
+                 cum_FA2_male_AQ_4 = cum_FA2_male_AQ_1)
+
+ggplot(df) +                   
+  geom_line(aes(x = cum_FA2_male_AQ_1, y=cum_H2_male_AQ_1, colour="Low AQ"),size = 3) +  
+  geom_line(aes(x = cum_FA2_male_AQ_4, y=cum_H2_male_AQ_4, colour="High AQ"),size = 3) +  
+  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
+  scale_y_continuous(expand = expansion(mult = c(.02, .1)))+
+  scale_x_continuous(expand = c(.02, 0)) +
+  labs(x="Participants", y="", color = "") +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
+
+
+
+# PLOT AUROC2 FOR FEMALE PARTICIPANTS
+df_for_plot_female <-  df_for_plot[df_for_plot$Gender == "Femenino",]
+
+# split by AQ first and last quartiles
+df_for_plot_female_AQ_1 <- df_for_plot_female[df_for_plot_female$AQ <= quantile(df_for_plot_female$AQ)[[2]],]
+df_for_plot_female_AQ_4 <- df_for_plot_female[df_for_plot_female$AQ >= quantile(df_for_plot_female$AQ)[[4]],]
+
+cum_H2_female_AQ_1 <- c(mean(df_for_plot_female_AQ_1$cum_H2_0),
+                      mean(df_for_plot_female_AQ_1$cum_H2_1),
+                      mean(df_for_plot_female_AQ_1$cum_H2_2),
+                      mean(df_for_plot_female_AQ_1$cum_H2_3),
+                      mean(df_for_plot_female_AQ_1$cum_H2_4))
+
+cum_FA2_female_AQ_1 <- c(mean(df_for_plot_female_AQ_1$cum_FA2_0),
+                       mean(df_for_plot_female_AQ_1$cum_FA2_1),
+                       mean(df_for_plot_female_AQ_1$cum_FA2_2),
+                       mean(df_for_plot_female_AQ_1$cum_FA2_3),
+                       mean(df_for_plot_female_AQ_1$cum_FA2_4))
+
+cum_H2_female_AQ_4 <- c(mean(df_for_plot_female_AQ_4$cum_H2_0),
+                      mean(df_for_plot_female_AQ_4$cum_H2_1),
+                      mean(df_for_plot_female_AQ_4$cum_H2_2),
+                      mean(df_for_plot_female_AQ_4$cum_H2_3),
+                      mean(df_for_plot_female_AQ_4$cum_H2_4))
+
+cum_FA2_female_AQ_4 <- c(mean(df_for_plot_female_AQ_4$cum_FA2_0),
+                       mean(df_for_plot_female_AQ_4$cum_FA2_1),
+                       mean(df_for_plot_female_AQ_4$cum_FA2_2),
+                       mean(df_for_plot_female_AQ_4$cum_FA2_3),
+                       mean(df_for_plot_female_AQ_4$cum_FA2_4))
+
+
+AQ_1 <- mean(df_for_plot_female_AQ_1$AQ)
+AQ_4 <- mean(df_for_plot_female_AQ_4$AQ)
+
+df <- data.frame(cum_H2_female_AQ_1 = cum_H2_female_AQ_1,
+                 cum_H2_female_AQ_4 = cum_H2_female_AQ_4,
+                 cum_FA2_female_AQ_1 = cum_FA2_female_AQ_1,
+                 cum_FA2_female_AQ_4 = cum_FA2_female_AQ_1)
+
+ggplot(df) +                   
+  geom_line(aes(x = cum_FA2_female_AQ_1, y=cum_H2_female_AQ_1, colour="Low AQ"),size = 3) +  
+  geom_line(aes(x = cum_FA2_female_AQ_4, y=cum_H2_female_AQ_4, colour="High AQ"),size = 3) +  
+  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
+  scale_y_continuous(expand = expansion(mult = c(.02, .1)))+
+  scale_x_continuous(expand = c(.02, 0)) +
+  labs(x="Participants", y="", color = "") +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
 
 
 
