@@ -9,36 +9,8 @@ output: html_document
                                  
 ```{r levantar datos, echo=TRUE}
 
-# voy a la carpeta del proyecto
 root <- rprojroot::is_rstudio_project
 basename(getwd())               
-
-####### data frames and filters
-
-# load the function to get the df list
-#source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
-
-# get the df list
-# experimento = 1,2,ambos
-#DF_list <- DataFrame_Filtered(experimento = "todos", 
-#                                 filtroRT_Disc_Sup = 5000,
-#                                 filtroRT_Disc_Inf = 200,
-#                                 filtroRT_Conf_Sup = 5000,
-#                                 filtroRT_Conf_Inf = 0,
-#                                 filtroTrial = 20,
-#                                 cant_trial_filter = 90)
-
-# DF_list:
-# a df_total
-# b d.sin.normalizar
-# c d.sin.normalizar.mc.filter
-# d d
-# e d.mc.filter
-# f d.sin.normalizar.solo.FyM
-# g d.sin.normalizar.solo.FyM.mc.filter
-# h d.solo.FyM.mc.filter
-#df_total <- DF_list$a
-#d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g # 
 
 ####### data frames with filters already applied
 filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
@@ -47,17 +19,8 @@ load(file= filepath)
 source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
 DF_list <- DataFrame_Filtered_already_applied(df_total)
 
-# a = df_total.solo.FyM
-# b = d.sin.normalizar
-# c = d.normalizado
-# d = d.sin.normalizar.solo.FyM
 d.sin.normalizar.solo.FyM <- DF_list$d
 
-###############
-### library ###
-###############
-library(arm)
-library(dplyr)
 
 ###########################
 ### Regression Analysis ###
@@ -77,12 +40,6 @@ d1[d1 == "Masculino"] <- "1"
 d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
 
-# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
-
-#source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence.R"))
-#sujetos_a_descartar <- discard_by_x_same_confidence(85)
-#d2 <- d1[! d1$sujetos %in% sujetos_a_descartar,]
-
 ```
 
 ##### Empiezo a correr modelos de regresiones
@@ -90,7 +47,7 @@ d1$Im <- as.integer(d1$Im)
 ## Modelo 1
 ```{r modelo 1, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(m_c ~ aq.norm +
        Im +
        edad.norm+
        es +
@@ -103,7 +60,7 @@ summary(a)
 
 ```{r Modelo 2, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(m_c ~ aq.norm +
        Im +
        aq.norm: Im,
      data = d1) 
@@ -114,7 +71,7 @@ summary(a)
 
 ```{r Modelo 3, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(m_c ~ aq.norm +
        Im +
        edad.norm+
        aq.norm: Im+
@@ -129,7 +86,7 @@ summary(a)
 
 ```{r Modelo 4, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(m_c ~ aq.norm +
        Im +
        edad.norm+
        es +
@@ -159,7 +116,7 @@ summary(a)
 
 ```{r Modelo 6, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(m_c ~ aq.norm +
        Im +
        edad.norm+
        aq.norm: Im+
@@ -168,4 +125,28 @@ a=lm(mc ~ aq.norm +
      data = d1) 
 summary(a)
 
+```
+
+## Modelo 7 - separado para masculinos y femeninos
+
+```{r Modelo 7, echo=TRUE}
+d.f <- d1[d1$Im== "0",]
+
+a.f =lm(m_c ~ aq.norm +
+       #Im +
+       edad.norm+
+       #aq.norm: Im+
+       aq.norm:edad.norm,
+     data = d.f) 
+summary(a.f)
+
+d.m <- d1[d1$Im== "1",]
+
+a.m =lm(m_c ~ aq.norm +
+       #Im +
+       edad.norm+
+       #aq.norm: Im+
+       aq.norm:edad.norm,
+     data = d.m) 
+summary(a.m)
 ```

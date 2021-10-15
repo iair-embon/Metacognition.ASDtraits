@@ -440,7 +440,7 @@ dtf1 <- data.frame(Predictor = names.coef,
 row.names(dtf1) <- NULL
 
 ggplot(dtf1, aes(Predictor, y)) +
-  geom_bar(stat = "identity", aes(fill = Predictor), colour="black", , width = 0.9) +
+  geom_bar(stat = "identity", aes(fill = Predictor), colour="black", width = 0.9) +
   scale_fill_brewer(palette = "Greys")+
   geom_errorbar(aes(ymin=y-sd, ymax=y+sd), width=.2,
                 position=position_dodge(.9)) +
