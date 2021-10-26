@@ -47,7 +47,7 @@ d1$Im <- as.integer(d1$Im)
 ## Modelo 1
 ```{r modelo 1, echo=TRUE}
 
-a=lm(m_c ~ aq.norm +
+a=lm(mc ~ aq.norm +
        Im +
        edad.norm+
        es +
@@ -60,7 +60,7 @@ summary(a)
 
 ```{r Modelo 2, echo=TRUE}
 
-a=lm(m_c ~ aq.norm +
+a=lm(mc ~ aq.norm +
        Im +
        aq.norm: Im,
      data = d1) 
@@ -71,7 +71,7 @@ summary(a)
 
 ```{r Modelo 3, echo=TRUE}
 
-a=lm(m_c ~ aq.norm +
+a=lm(mc ~ aq.norm +
        Im +
        edad.norm+
        aq.norm: Im+
@@ -86,7 +86,7 @@ summary(a)
 
 ```{r Modelo 4, echo=TRUE}
 
-a=lm(m_c ~ aq.norm +
+a=lm(mc ~ aq.norm +
        Im +
        edad.norm+
        es +
@@ -116,7 +116,7 @@ summary(a)
 
 ```{r Modelo 6, echo=TRUE}
 
-a=lm(m_c ~ aq.norm +
+a=lm(mc ~ aq.norm +
        Im +
        edad.norm+
        aq.norm: Im+
@@ -132,7 +132,7 @@ summary(a)
 ```{r Modelo 7, echo=TRUE}
 d.f <- d1[d1$Im== "0",]
 
-a.f =lm(m_c ~ aq.norm +
+a.f =lm(mc ~ aq.norm +
        #Im +
        edad.norm+
        #aq.norm: Im+
@@ -142,7 +142,7 @@ summary(a.f)
 
 d.m <- d1[d1$Im== "1",]
 
-a.m =lm(m_c ~ aq.norm +
+a.m =lm(mc ~ aq.norm +
        #Im +
        edad.norm+
        #aq.norm: Im+

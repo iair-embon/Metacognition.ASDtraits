@@ -13,84 +13,205 @@ library(dotwhisker)
 library(reshape2)
 library(ggExtra)
 
-########################
-### Normal densities ###  FIG 1 B
-########################
+########################################
+### Correct and incorrect barplot ###  FIG 2 a
+########################################
 
-# close curves
-N1 <- 100000
-N2 <- 100000
-m1 <- 0
-m2 <- 1
-s1 <- 1
-s2 <- 1
-X1 <- rnorm(n=N1, mean=m1, sd=s1)
-X2 <- rnorm(n=N2, mean=m2, sd=s2)
+#### good metacognition barplot
 
-x <- data.frame(Stim1=X1,Stim2=X2)
-data<- melt(x)
+## answers
+cant_trials <- 130
+percent_correct <- 75
+n_correct <- round((75*cant_trials)/100)
+n_incorrect <- cant_trials - n_correct
+correct <- rep(1,n_correct)
+incorrect <- rep(0,n_incorrect)
+answers <- c(correct,incorrect)
 
-ggplot(data,aes(x=value, color = variable)) + 
-  geom_density(alpha=0.25,size=2)+
-  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  geom_vline(xintercept =(m1+m2)/2, linetype="dashed", color = "black")+
-  scale_color_grey(start = 0.6, end = 0) + 
+## confidence
+
+# percentage of conf answer for correct and incorrect
+per_conf_cor_4 <- round((50*n_correct)/100)
+per_conf_cor_3 <- round((30*n_correct)/100)
+per_conf_cor_2 <- round((15*n_correct)/100)
+per_conf_cor_1 <- round((5*n_correct)/100)
+per_conf_incor_4 <- round((5*n_incorrect)/100)
+per_conf_incor_3 <- round((15*n_incorrect)/100)
+per_conf_incor_2 <- round((30*n_incorrect)/100)
+per_conf_incor_1 <- round((50*n_incorrect)/100)
+  
+# confidence answers
+conf_cor_4 <- rep(4,per_conf_cor_4)
+conf_cor_3 <- rep(3,per_conf_cor_3)
+conf_cor_2 <- rep(2,per_conf_cor_2)
+conf_cor_1 <- rep(1,per_conf_cor_1)
+conf_incor_4 <- rep(4,per_conf_incor_4)
+conf_incor_3 <- rep(3,per_conf_incor_3)
+conf_incor_2 <- rep(2,per_conf_incor_2)
+conf_incor_1 <- rep(1,per_conf_incor_1)
+
+# concatenate confidence answers vectors
+conf_correct <- c(conf_cor_4,conf_cor_3,conf_cor_2,conf_cor_1)
+conf_correct <-conf_correct[1:n_correct]
+conf_incorrect <- c(conf_incor_4,conf_incor_3,conf_incor_2,conf_incor_1)
+conf_incorrect <-conf_incorrect[1:n_incorrect]
+confidence <- c(conf_correct,conf_incorrect)
+
+# nraitings
+Nratings<- 4
+
+# calculate AUROC2
+H2  <- rep(NA, Nratings)
+FA2 <- rep(NA, Nratings)
+i   <- Nratings+1
+for (c in 1:Nratings){
+  H2[i-1]  <- sum(confidence == c & answers) + 0.5
+  FA2[i-1] <- sum(confidence == c & !answers) + 0.5
+  i        <- i-1
+}
+
+H2      <- H2/sum(H2)
+FA2     <- FA2/sum(FA2)
+cum_H2  <- append(0, cumsum(H2))
+cum_FA2 <- append(0, cumsum(FA2))
+
+k <- rep(NA, Nratings)
+i <- 1
+for (c in 1:Nratings){
+  k[i] <- (cum_H2[c+1] - cum_FA2[c])^2 - (cum_H2[c] - cum_FA2[c+1])^2
+  i    <- i+1
+}
+good_auroc2 <- 0.5 + 0.25*sum(k)
+
+S2 <- c(rev(H2),rev(FA2)) # lo invierto, ya que fue no invertido para obviar la inversa de la normal
+Names <- c("C1","C2","C3","C4", "C1","C2","C3","C4")
+Group <- c(rep("H2", length(H2)), rep("FA2", length(FA2)))
+
+df_good <- data.frame(S2 = S2,
+                      Names = Names,
+                      Group = Group
+                      )
+# we need these values later
+good_cum_H2 <- cum_H2
+good_cum_FA2 <- cum_FA2
+
+# good metacognition bar plots
+ggplot(df_good, aes(fill=Group, x=Names, y=S2)) + 
+  geom_bar(position="dodge", stat="identity")+
+  scale_x_discrete(expand = expansion(mult = c(0, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_fill_manual(values = c("#000000","#808080"))+
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         plot.margin = margin(1, 1,1, 1, "cm"),
-        legend.position = 'none',
         panel.background = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank(),
+        axis.text.y = element_text(size = 30),
         axis.title.y = element_blank(),
+        strip.text = element_text(size = 20),
         axis.title.x = element_blank())
 
-# distant curves
-N1 <- 100000
-N2 <- 100000
-m1 <- 0
-m2 <- 5
-s1 <- 1
-s2 <- 1
-X1 <- rnorm(n=N1, mean=m1, sd=s1)
-X2 <- rnorm(n=N2, mean=m2, sd=s2)
 
-x <- data.frame(Stim1=X1,Stim2=X2)
-data<- melt(x)
+#### poor metacognition histograms
 
-ggplot(data,aes(x=value, color = variable)) + 
-  geom_density(alpha=0.25,size=2)+
-  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  geom_vline(xintercept =(m1+m2)/2, linetype="dashed", color = "black")+
-  scale_color_grey(start = 0.6, end = 0) + 
+## confidence
+
+# percentage of conf answer for correct and incorrect
+per_conf_cor_4 <- ceiling((25*n_correct)/100)
+per_conf_cor_3 <- ceiling((25*n_correct)/100)
+per_conf_cor_2 <- round((25*n_correct)/100)
+per_conf_cor_1 <- round((25*n_correct)/100)
+per_conf_incor_4 <- round((25*n_incorrect)/100)
+per_conf_incor_3 <- round((25*n_incorrect)/100)
+per_conf_incor_2 <- round((25*n_incorrect)/100)
+per_conf_incor_1 <- round((25*n_incorrect)/100)
+
+# confidence answers
+conf_cor_4 <- rep(4,per_conf_cor_4)
+conf_cor_3 <- rep(3,per_conf_cor_3)
+conf_cor_2 <- rep(2,per_conf_cor_2)
+conf_cor_1 <- rep(1,per_conf_cor_1)
+conf_incor_4 <- rep(4,per_conf_incor_4)
+conf_incor_3 <- rep(3,per_conf_incor_3)
+conf_incor_2 <- rep(2,per_conf_incor_2)
+conf_incor_1 <- rep(1,per_conf_incor_1)
+
+# concatenate confidence answers vectors
+conf_correct <- c(conf_cor_4,conf_cor_3,conf_cor_2,conf_cor_1)
+conf_correct <-conf_correct[1:n_correct]
+conf_incorrect <- c(conf_incor_4,conf_incor_3,conf_incor_2,conf_incor_1)
+conf_incorrect <-conf_incorrect[1:n_incorrect]
+confidence <- c(conf_correct,conf_incorrect)
+
+# nraitings
+Nratings<- 4
+
+# calculate AUROC2
+H2  <- rep(NA, Nratings)
+FA2 <- rep(NA, Nratings)
+i   <- Nratings+1
+for (c in 1:Nratings){
+  H2[i-1]  <- sum(confidence == c & answers) + 0.5
+  FA2[i-1] <- sum(confidence == c & !answers) + 0.5
+  i        <- i-1
+}
+
+H2      <- H2/sum(H2)
+FA2     <- FA2/sum(FA2)
+cum_H2  <- append(0, cumsum(H2))
+cum_FA2 <- append(0, cumsum(FA2))
+
+k <- rep(NA, Nratings)
+i <- 1
+for (c in 1:Nratings){
+  k[i] <- (cum_H2[c+1] - cum_FA2[c])^2 - (cum_H2[c] - cum_FA2[c+1])^2
+  i    <- i+1
+}
+poor_auroc2 <- 0.5 + 0.25*sum(k)
+
+S2 <- c(rev(H2),rev(FA2)) # lo invierto, ya que fue no invertido para obviar la inversa de la normal
+Names <- c("C1","C2","C3","C4", "C1","C2","C3","C4")
+Group <- c(rep("H2", length(H2)), rep("FA2", length(FA2)))
+
+df_poor <- data.frame(S2 = S2,
+                      Names = Names,
+                      Group = Group
+)
+
+# we need these values later
+poor_cum_H2 <- cum_H2
+poor_cum_FA2 <- cum_FA2
+
+# poor metacognition bar plots
+ggplot(df_poor, aes(fill=Group, x=Names, y=S2)) + 
+  geom_bar(position="dodge", stat="identity")+
+  scale_x_discrete(expand = expansion(mult = c(0, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_fill_manual(values = c("#000000","#808080"))+
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         plot.margin = margin(1, 1,1, 1, "cm"),
-        legend.position = 'none',
         panel.background = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank(),
+        axis.text.y = element_text(size = 30),
         axis.title.y = element_blank(),
+        strip.text = element_text(size = 20),
         axis.title.x = element_blank())
 
-###################################
-### AUROC2 close-distant curves ### FIG 1 C
-###################################
+#########################
+### AUROC2 good-poor  ### FIG 2 b
+#########################
 
-# close
-df <- data.frame(H2 = c(0,0.2325767,0.5870690,0.8445881,1), 
-                 FA2 = c(0,0.1225967,0.4390442,0.7550646,1))
+# good AUROC2
+df <- data.frame(H2 = good_cum_H2, 
+                 FA2 = good_cum_FA2)
 
 ggplot(df) +                   
-  geom_line(aes(x = FA2, y=H2),size = 3, color = 'white') +  # la pinto de blanco y la edito en inskape
+  geom_line(aes(x = FA2, y=H2),size = 3, color = 'black') +  # la pinto de blanco y la edito en inskape
   geom_abline(intercept = 0, slope = 1, color = "grey", linetype="dashed", 
               size = 1.5) +
   scale_x_continuous(expand = expansion(mult = c(0, 0))) +
@@ -109,16 +230,16 @@ ggplot(df) +
         axis.title.y = element_blank(),
         axis.title.x = element_blank()) 
 
-# distant
-df <- data.frame(H2 = c(0,0.5,0.85,0.96,1), 
-                 FA2 = c(0,0.1225967,0.4390442,0.7550646,1))
+# poor
+df <- data.frame(H2 = poor_cum_H2, 
+                 FA2 = poor_cum_FA2)
 
 ggplot(df) +                   
-  geom_line(aes(x = FA2, y=H2),size = 3) +  
-  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
-  scale_y_continuous(expand = expansion(mult = c(.02, .1)))+
-  scale_x_continuous(expand = c(.02, 0)) +
-  labs(x="", y="", color = "") +
+  geom_line(aes(x = FA2, y=H2),size = 3, color = 'black') +  # la pinto de blanco y la edito en inskape
+  geom_abline(intercept = 0, slope = 1, color = "grey", linetype="dashed", 
+              size = 1.5) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -132,106 +253,6 @@ ggplot(df) +
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.title.x = element_blank()) 
-
-
-
-#################
-### Staircase ###
-#################
-
-# voy a la carpeta del proyecto
-root <- rprojroot::is_rstudio_project
-basename(getwd())
-
-# load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
-
-# get the df list
-# experimento = 1,2,ambos
-DF_list <- DataFrame_Filtered(experimento = "ambos",
-                              filtroRT_Disc_Sup = 20000,
-                              filtroRT_Disc_Inf = 0,
-                              filtroRT_Conf_Sup = 20000,
-                              filtroRT_Conf_Inf = 0,
-                              filtroTrial = 0)
-
-# DF_list:
-# a df_total
-# b d.sin.normalizar
-# c d.sin.normalizar.mc.filter
-# d d
-# e d.mc.filter
-# f d.sin.normalizar.solo.FyM
-# g d.sin.normalizar.solo.FyM.mc.filter
-# h d.solo.FyM.mc.filter
-
-df_total <- DF_list$a
-d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
-
-### plotting the performance by trial
-
-d1 <- df_total
-d1 <- d1[d1$genero == 'Femenino' | d1$genero == 'Masculino',]
-
-# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
-d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
-         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
-         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
-         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
-
-# sujetos que tienen menos de 90 de trials
-d4 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
-           d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
-           d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
-           d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
-           d2$sujetos != 1010 & d2$sujetos != 1046 &
-           d2$sujetos != 1069 & d2$sujetos != 1112 &
-           d2$sujetos != 1127 & d2$sujetos != 1135 &
-           d2$sujetos != 1154 & d2$sujetos != 1171 &
-           d2$sujetos != 1191 & d2$sujetos != 1239 &
-           d2$sujetos != 1250 & d2$sujetos != 1251 &
-           d2$sujetos != 1260,]
-
-d3 <- d.sin.normalizar.solo.FyM.mc.filter 
-# saco a los que tienen metacog menor a 1,5 de desvio de la media para abajo
-d5 <- d4[d4$sujetos %in% d3$sujetos,] # d3 es el df de datos unicos, ya con la 
-# metacog filtrada a 1.5 de desvio
-
-d5$discrimination_is_correct[d5$discrimination_is_correct=='TRUE'] <- "1"
-d5$discrimination_is_correct[d5$discrimination_is_correct=='FALSE'] <- "0"
-
-total_trials <- max(d5$trials)-min(d5$trials)
-
-MeanPerformanceByTrial <- rep(NA,total_trials)
-#sd <- rep(NA,total_trials)
-
-for (i in 1:total_trials){
-  trial_colum <- d5[d5$trials == i,]  # getting data by trial
-  MeanPerformanceByTrial[i] <- mean(as.integer(trial_colum$discrimination_is_correct))
-  #sd[i] <- sd(as.integer(trial_colum$discrimination_is_correct))
-}
-
-df2 <- data.frame(TrialNumber = 1:length(MeanPerformanceByTrial),
-                  MeanPerformanceByTrial = MeanPerformanceByTrial)
-
-ggplot(data=df2, aes(x=TrialNumber, y=MeanPerformanceByTrial)) +
-  geom_line( color="black", size=1.2)+
-  #geom_point(color="red", size=3) +
-  scale_x_continuous(expand = c(0, 0)) + #scale_y_continuous(expand = c(0, 0))
-  xlab("Trial number") + ylab("Performance mean")+
-  geom_vline(xintercept =20, linetype="dashed", color = "black")+
-  theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        plot.margin = margin(1, 1,1, 1, "cm"),
-        panel.background = element_blank(),
-        axis.text.x = element_text(size = 30),
-        axis.text.y = element_text(size = 30),
-        axis.title.y = element_text(size = 30),
-        axis.title.x = element_text(size = 30)) 
-
 
 #####################
 ### AQ histograms ###
@@ -274,7 +295,7 @@ ggplot(d3, aes(x = aq))+
 
 # male
 ggplot(d3, aes(x = aq))+
-  geom_bar(data=subset(d3, Im == 'Male'), fill = "grey")+
+  geom_bar(data=subset(d3, Im == 'Male'), fill = "black")+
   scale_x_continuous(expand = expansion(mult = c(0, 0))) +
   scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   #xlab("AQ") +
@@ -772,6 +793,233 @@ ggplot(d, aes(x=t_ensayo_confianza))+
         axis.text.y = element_text(size = 25),
         axis.title.y = element_text(size = 25),
         axis.title.x = element_text(size = 25)) 
+
+
+
+                      ############################
+                      ### DEBAJO DE LA ALFOMRA ###
+                      ############################
+
+# figuras que no queremos borrar pero no van por ahora en el paper
+
+########################
+### Normal densities ###  FIG 2 a
+########################
+
+# close curves
+N1 <- 100000
+N2 <- 100000
+m1 <- 0
+m2 <- 1
+s1 <- 1
+s2 <- 1
+X1 <- rnorm(n=N1, mean=m1, sd=s1)
+X2 <- rnorm(n=N2, mean=m2, sd=s2)
+
+x <- data.frame(Stim1=X1,Stim2=X2)
+data<- melt(x)
+
+ggplot(data,aes(x=value, color = variable)) + 
+  geom_density(alpha=0.25,size=2)+
+  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  geom_vline(xintercept =(m1+m2)/2, linetype="dashed", color = "black")+
+  scale_color_grey(start = 0.6, end = 0) + 
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.position = 'none',
+        panel.background = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank())
+
+# distant curves
+N1 <- 100000
+N2 <- 100000
+m1 <- 0
+m2 <- 5
+s1 <- 1
+s2 <- 1
+X1 <- rnorm(n=N1, mean=m1, sd=s1)
+X2 <- rnorm(n=N2, mean=m2, sd=s2)
+
+x <- data.frame(Stim1=X1,Stim2=X2)
+data<- melt(x)
+
+ggplot(data,aes(x=value, color = variable)) + 
+  geom_density(alpha=0.25,size=2)+
+  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  geom_vline(xintercept =(m1+m2)/2, linetype="dashed", color = "black")+
+  scale_color_grey(start = 0.6, end = 0) + 
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.position = 'none',
+        panel.background = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank())
+
+###################################
+### AUROC2 close-distant curves ### FIG 2 b
+###################################
+
+# close
+df <- data.frame(H2 = c(0,0.2325767,0.5870690,0.8445881,1), 
+                 FA2 = c(0,0.1225967,0.4390442,0.7550646,1))
+
+ggplot(df) +                   
+  geom_line(aes(x = FA2, y=H2),size = 3, color = 'white') +  # la pinto de blanco y la edito en inskape
+  geom_abline(intercept = 0, slope = 1, color = "grey", linetype="dashed", 
+              size = 1.5) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank()) 
+
+# distant
+df <- data.frame(H2 = c(0,0.5,0.85,0.96,1), 
+                 FA2 = c(0,0.1225967,0.4390442,0.7550646,1))
+
+ggplot(df) +                   
+  geom_line(aes(x = FA2, y=H2),size = 3) +  
+  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
+  scale_y_continuous(expand = expansion(mult = c(.02, .1)))+
+  scale_x_continuous(expand = c(.02, 0)) +
+  labs(x="", y="", color = "") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank()) 
+
+
+#################
+### Staircase ###
+#################
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+# load the function to get the df list
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+
+# get the df list
+# experimento = 1,2,ambos
+DF_list <- DataFrame_Filtered(experimento = "ambos",
+                              filtroRT_Disc_Sup = 20000,
+                              filtroRT_Disc_Inf = 0,
+                              filtroRT_Conf_Sup = 20000,
+                              filtroRT_Conf_Inf = 0,
+                              filtroTrial = 0)
+
+# DF_list:
+# a df_total
+# b d.sin.normalizar
+# c d.sin.normalizar.mc.filter
+# d d
+# e d.mc.filter
+# f d.sin.normalizar.solo.FyM
+# g d.sin.normalizar.solo.FyM.mc.filter
+# h d.solo.FyM.mc.filter
+
+df_total <- DF_list$a
+d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
+
+### plotting the performance by trial
+
+d1 <- df_total
+d1 <- d1[d1$genero == 'Femenino' | d1$genero == 'Masculino',]
+
+# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
+d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
+         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
+         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
+         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
+         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
+
+# sujetos que tienen menos de 90 de trials
+d4 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
+           d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
+           d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
+           d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
+           d2$sujetos != 1010 & d2$sujetos != 1046 &
+           d2$sujetos != 1069 & d2$sujetos != 1112 &
+           d2$sujetos != 1127 & d2$sujetos != 1135 &
+           d2$sujetos != 1154 & d2$sujetos != 1171 &
+           d2$sujetos != 1191 & d2$sujetos != 1239 &
+           d2$sujetos != 1250 & d2$sujetos != 1251 &
+           d2$sujetos != 1260,]
+
+d3 <- d.sin.normalizar.solo.FyM.mc.filter 
+# saco a los que tienen metacog menor a 1,5 de desvio de la media para abajo
+d5 <- d4[d4$sujetos %in% d3$sujetos,] # d3 es el df de datos unicos, ya con la 
+# metacog filtrada a 1.5 de desvio
+
+d5$discrimination_is_correct[d5$discrimination_is_correct=='TRUE'] <- "1"
+d5$discrimination_is_correct[d5$discrimination_is_correct=='FALSE'] <- "0"
+
+total_trials <- max(d5$trials)-min(d5$trials)
+
+MeanPerformanceByTrial <- rep(NA,total_trials)
+#sd <- rep(NA,total_trials)
+
+for (i in 1:total_trials){
+  trial_colum <- d5[d5$trials == i,]  # getting data by trial
+  MeanPerformanceByTrial[i] <- mean(as.integer(trial_colum$discrimination_is_correct))
+  #sd[i] <- sd(as.integer(trial_colum$discrimination_is_correct))
+}
+
+df2 <- data.frame(TrialNumber = 1:length(MeanPerformanceByTrial),
+                  MeanPerformanceByTrial = MeanPerformanceByTrial)
+
+ggplot(data=df2, aes(x=TrialNumber, y=MeanPerformanceByTrial)) +
+  geom_line( color="black", size=1.2)+
+  #geom_point(color="red", size=3) +
+  scale_x_continuous(expand = c(0, 0)) + #scale_y_continuous(expand = c(0, 0))
+  xlab("Trial number") + ylab("Performance mean")+
+  geom_vline(xintercept =20, linetype="dashed", color = "black")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
+
 
 
 
