@@ -98,8 +98,8 @@ good_cum_FA2 <- cum_FA2
 # good metacognition bar plots
 ggplot(df_good, aes(fill=Group, x=Names, y=S2)) + 
   geom_bar(position="dodge", stat="identity")+
-  scale_x_discrete(expand = expansion(mult = c(0, 0))) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_x_discrete(expand = expansion(mult = c(0.2, 0.2))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0)), limits=c(0,0.6)) +
   scale_fill_manual(values = c("#000000","#808080"))+
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -108,7 +108,7 @@ ggplot(df_good, aes(fill=Group, x=Names, y=S2)) +
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 30),
+        axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         strip.text = element_text(size = 20),
         axis.title.x = element_blank())
@@ -187,8 +187,8 @@ poor_cum_FA2 <- cum_FA2
 # poor metacognition bar plots
 ggplot(df_poor, aes(fill=Group, x=Names, y=S2)) + 
   geom_bar(position="dodge", stat="identity")+
-  scale_x_discrete(expand = expansion(mult = c(0, 0))) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_x_discrete(expand = expansion(mult = c(0.2, 0.2))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0)), limits=c(0,0.6)) +
   scale_fill_manual(values = c("#000000","#808080"))+
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -197,7 +197,7 @@ ggplot(df_poor, aes(fill=Group, x=Names, y=S2)) +
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_text(size = 30),
+        axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         strip.text = element_text(size = 20),
         axis.title.x = element_blank())
@@ -277,7 +277,7 @@ d3[d3 == "Femenino"] <- 'Female'
 # female
 ggplot(d3, aes(x = aq))+
   geom_bar(data=subset(d3, Im == 'Female'), fill = "black")+
-  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_x_discrete(expand = expansion(mult = c(0.05, 0)), limits=seq(15,38,6)) +
   scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   #xlab("AQ") +
   #ylab("Participants")+
@@ -296,7 +296,7 @@ ggplot(d3, aes(x = aq))+
 # male
 ggplot(d3, aes(x = aq))+
   geom_bar(data=subset(d3, Im == 'Male'), fill = "black")+
-  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_x_discrete(expand = expansion(mult = c(0.13, 0.31)), limits=seq(15,38,6)) +
   scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   #xlab("AQ") +
   #ylab("Participants")+
@@ -311,6 +311,8 @@ ggplot(d3, aes(x = aq))+
         axis.title.y = element_blank(),
         strip.text = element_text(size = 20),
         axis.title.x = element_blank())
+
+
 
 ##########################
 ### AUROC2-Performance ###
@@ -400,7 +402,7 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender'='Im','Age' = 'edad.norm',
                         'AQ:Gender'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,
            plot.distributions = FALSE, colors = "black")+
   ylab("") +
-  xlab("Regression coefficient") +
+  xlab("") +#xlab("Regression coefficient") +
   scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
@@ -410,7 +412,7 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender'='Im','Age' = 'edad.norm',
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 25),
-        axis.text.y = element_text(size = 20, angle = (45)),
+        axis.text.y = element_blank(),#element_text(size = 20, angle = (45)),
         axis.title.y = element_text(size = 20),
         axis.title.x = element_text(size = 25))
 

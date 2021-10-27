@@ -182,6 +182,8 @@ confidence_key_2 <- rep(NA, nrow(df_DatosUnicos_mod))
 confidence_key_3 <- rep(NA, nrow(df_DatosUnicos_mod))
 confidence_key_4 <- rep(NA, nrow(df_DatosUnicos_mod))
 
+ExistingSubjects <- unique(df_exp_mod$sujetos)
+
 for(i in 1:nrow(df_DatosUnicos_mod)){
   # confidence columns are created to iterate by subject
   confidence_key_1_total <- 0
@@ -190,19 +192,19 @@ for(i in 1:nrow(df_DatosUnicos_mod)){
   confidence_key_4_total <- 0
   
   df_prueba <- df_exp_mod[df_exp_mod$confidence_key =='1',]
-  confidence_key_1_total <- nrow(df_prueba[df_prueba$sujetos==i,])
+  confidence_key_1_total <- nrow(df_prueba[df_prueba$sujetos== ExistingSubjects[i],])
   confidence_key_1[i] <- confidence_key_1_total
   
   df_prueba <- df_exp_mod[df_exp_mod$confidence_key =='2',]
-  confidence_key_2_total <- nrow(df_prueba[df_prueba$sujetos==i,])
+  confidence_key_2_total <- nrow(df_prueba[df_prueba$sujetos==ExistingSubjects[i],])
   confidence_key_2[i] <- confidence_key_2_total
   
   df_prueba <- df_exp_mod[df_exp_mod$confidence_key =='3',]
-  confidence_key_3_total <- nrow(df_prueba[df_prueba$sujetos==i,])
+  confidence_key_3_total <- nrow(df_prueba[df_prueba$sujetos==ExistingSubjects[i],])
   confidence_key_3[i] <- confidence_key_3_total
   
   df_prueba <- df_exp_mod[df_exp_mod$confidence_key =='4',]
-  confidence_key_4_total <- nrow(df_prueba[df_prueba$sujetos==i,])
+  confidence_key_4_total <- nrow(df_prueba[df_prueba$sujetos==ExistingSubjects[i],])
   confidence_key_4[i] <- confidence_key_4_total
 }
 
@@ -217,8 +219,8 @@ media_confidence <- rep(NA, nrow(df_DatosUnicos_mod))
 sd_confidence <- rep(NA, nrow(df_DatosUnicos_mod))
 
 for(i in 1:nrow(df_DatosUnicos_mod)){
-  media_confidence[i] <- mean(df_exp_mod[df_exp_mod$sujetos==i,"confidence_key"])
-  sd_confidence[i] <- sd(df_exp_mod[df_exp_mod$sujetos==i,"confidence_key"])
+  media_confidence[i] <- mean(df_exp_mod[df_exp_mod$sujetos==ExistingSubjects[i],"confidence_key"])
+  sd_confidence[i] <- sd(df_exp_mod[df_exp_mod$sujetos==ExistingSubjects[i],"confidence_key"])
 }
 
 df_DatosUnicos_mod$media_confidence <- media_confidence
@@ -229,8 +231,8 @@ media_tr_discri <- rep(NA, nrow(df_DatosUnicos_mod))
 sd_tr_discri <- rep(NA, nrow(df_DatosUnicos_mod))
 
 for(i in 1:nrow(df_DatosUnicos_mod)){
-  media_tr_discri[i] <- mean(df_exp_mod[df_exp_mod$sujetos==i,"t_ensayo_discriminacion"])
-  sd_tr_discri[i] <- sd(df_exp_mod[df_exp_mod$sujetos==i,"t_ensayo_discriminacion"])
+  media_tr_discri[i] <- mean(df_exp_mod[df_exp_mod$sujetos==ExistingSubjects[i],"t_ensayo_discriminacion"])
+  sd_tr_discri[i] <- sd(df_exp_mod[df_exp_mod$sujetos==ExistingSubjects[i],"t_ensayo_discriminacion"])
 }
 
 df_DatosUnicos_mod$media_tr_discri <- media_tr_discri
@@ -241,8 +243,8 @@ media_tr_confi <- rep(NA, nrow(df_DatosUnicos_mod))
 sd_tr_confi <- rep(NA, nrow(df_DatosUnicos_mod))
 
 for(i in 1:nrow(df_DatosUnicos_mod)){
-  media_tr_confi[i] <- mean(df_exp_mod[df_exp_mod$sujetos==i,"t_ensayo_confianza"])
-  sd_tr_confi[i] <- sd(df_exp_mod[df_exp_mod$sujetos==i,"t_ensayo_confianza"])
+  media_tr_confi[i] <- mean(df_exp_mod[df_exp_mod$sujetos==ExistingSubjects[i],"t_ensayo_confianza"])
+  sd_tr_confi[i] <- sd(df_exp_mod[df_exp_mod$sujetos==ExistingSubjects[i],"t_ensayo_confianza"])
 }
 
 df_DatosUnicos_mod$media_tr_confi <- media_tr_confi
@@ -287,13 +289,13 @@ df_total <- df_DatosUnicos_mod2[0,]
 ExistingSubjects <- unique(df_exp_mod2$sujetos)
 
 # iterar por sujeto existente
-for (i in ExistingSubjects) {
+for (i in 1:length(ExistingSubjects)){
   # saco la cantidad de trials del sujeto
-  sujeto_df_exp <- df_exp_mod2[df_exp_mod2$sujetos== i,]
+  sujeto_df_exp <- df_exp_mod2[df_exp_mod2$sujetos== ExistingSubjects[i],]
   cant_trials <- nrow(sujeto_df_exp)
   
   # repito cada fila del sujeto segun la cantidad de trials que le quedaron
-  sujeto_df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$sujetos== i,]
+  sujeto_df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$sujetos== ExistingSubjects[i],]
   df <- as.data.frame(lapply(sujeto_df_DatosUnicos_mod2, rep, cant_trials))
   
   # lo agrego al df_total
