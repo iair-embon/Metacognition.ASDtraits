@@ -70,16 +70,66 @@ cant_sujetos <- nrow(df_DatosUnicos)
 ubicacion_comp_AQ <- 2
 
 # load the function to get the AQ quotient  
-source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ.R"))
-
+#source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ.R"))
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_CORREGIDA.R"))
 # get the AQ quotient
-puntaje_AQ_sujetos <- puntaje_AQ(cant_sujetos,
-                                 cant_componentes_por_sujetos,
-                                 ubicacion_comp_AQ,
-                                 AQ)
+#puntaje_AQ_sujetos <- puntaje_AQ(cant_sujetos,
+#                                 cant_componentes_por_sujetos,
+#                                 ubicacion_comp_AQ,
+#                                 AQ)
+###### esta es la funcion corregida para aq
+puntaje_AQ_sujetos <- puntaje_AQ_corregido(cant_sujetos,
+                                           cant_componentes_por_sujetos,
+                                           ubicacion_comp_AQ,
+                                           AQ)
+### esta es la funcion para sub escala social del aq
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_social.R"))
+
+puntaje_AQ_sujetos_social <- puntaje_AQ_social(cant_sujetos,
+                                           cant_componentes_por_sujetos,
+                                           ubicacion_comp_AQ,
+                                           AQ)
+
+### esta es la funcion para sub escala atencion switch del aq
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_atencion_switch.R"))
+
+puntaje_AQ_sujetos_atencion_switch <- puntaje_AQ_atencion_switch(cant_sujetos,
+                                               cant_componentes_por_sujetos,
+                                               ubicacion_comp_AQ,
+                                               AQ)
+
+### esta es la funcion para sub escala atencion detail del aq
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_atencion_detail.R"))
+
+puntaje_AQ_sujetos_atencion_detail <- puntaje_AQ_atencion_detail(cant_sujetos,
+                                                                 cant_componentes_por_sujetos,
+                                                                 ubicacion_comp_AQ,
+                                                                 AQ)
+
+
+### esta es la funcion para sub escala comunication del aq
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_communication.R"))
+
+puntaje_AQ_sujetos_communication <- puntaje_AQ_communication(cant_sujetos,
+                                                                 cant_componentes_por_sujetos,
+                                                                 ubicacion_comp_AQ,
+                                                                 AQ)
+
+### esta es la funcion para sub escala comunication del aq
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_imagination.R"))
+
+puntaje_AQ_sujetos_imagination <- puntaje_AQ_imagination(cant_sujetos,
+                                                            cant_componentes_por_sujetos,
+                                                            ubicacion_comp_AQ,
+                                                            AQ)
 
 # add to df_DatosUnicos
 df_DatosUnicos$AQ <- puntaje_AQ_sujetos 
+df_DatosUnicos$AQ_social <- puntaje_AQ_sujetos_social
+df_DatosUnicos$AQ_atencion_switch <- puntaje_AQ_sujetos_atencion_switch
+df_DatosUnicos$AQ_atencion_detail <- puntaje_AQ_sujetos_atencion_detail
+df_DatosUnicos$AQ_communication <- puntaje_AQ_sujetos_communication
+df_DatosUnicos$AQ_imagination <- puntaje_AQ_sujetos_imagination
 
 ####### Adding columns of
 

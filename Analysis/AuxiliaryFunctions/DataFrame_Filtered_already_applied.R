@@ -5,6 +5,11 @@ DataFrame_Filtered_already_applied <- function(df_total){
   mc <- rep(NaN, length(unique(df_total$sujetos)))
   genero <- rep(NaN, length(unique(df_total$sujetos)))
   AQ <- rep(NaN, length(unique(df_total$sujetos)))
+  AQ_social <- rep(NaN, length(unique(df_total$sujetos)))
+  AQ_atencion_switch <- rep(NaN, length(unique(df_total$sujetos)))
+  AQ_atencion_detail <- rep(NaN, length(unique(df_total$sujetos)))
+  AQ_communication <- rep(NaN, length(unique(df_total$sujetos)))
+  AQ_imagination <- rep(NaN, length(unique(df_total$sujetos)))
   horasSueno <- rep(NaN, length(unique(df_total$sujetos)))
   edad <- rep(NaN, length(unique(df_total$sujetos)))
   estudio <- rep(NaN, length(unique(df_total$sujetos)))
@@ -21,6 +26,11 @@ DataFrame_Filtered_already_applied <- function(df_total){
     mc[i] <- unique(df_total[df_total$sujetos == ExistingSubjects[i],"mc"])
     genero[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"genero"]) # 1 femenino, 2 # masculino
     AQ[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"AQ"])
+    AQ_social[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"AQ_social"])
+    AQ_atencion_switch[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"AQ_atencion_switch"])
+    AQ_atencion_detail[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"AQ_atencion_detail"])
+    AQ_communication[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"AQ_atencion_communication"])
+    AQ_imagination[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"AQ_atencion_imagination"])
     horasSueno[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"horasSueno"])
     edad[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"edad"])
     estudio[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"estudio"])
@@ -44,6 +54,11 @@ DataFrame_Filtered_already_applied <- function(df_total){
                                 Im = genero, 
                                 pc  = PC,
                                 aq = AQ,
+                                aq_social = AQ_social,
+                                aq_atention_switch = AQ_atencion_switch,
+                                aq_atencion_detail = AQ_atencion_detail,
+                                aq_communication = AQ_communication,
+                                aq_imagination = AQ_imagination,
                                 hs = horasSueno,
                                 edad = edad,
                                 es = estudio,
@@ -59,6 +74,11 @@ DataFrame_Filtered_already_applied <- function(df_total){
   d$edad <- (d$edad - mean(d$edad)) / sd(d$edad)
   d$mc <- (d$mc - mean(d$mc)) / sd(d$mc)
   d$aq <- (d$aq - mean(d$aq)) / sd(d$aq)
+  d$aq_social <- (d$aq_social - mean(d$aq_social)) / sd(d$aq_social)
+  d$aq_atention_switch <- (d$aq_atention_switch - mean(d$aq_atention_switch)) / sd(d$aq_atention_switch)
+  d$aq_atencion_detail <- (d$aq_atencion_detail - mean(d$aq_atencion_detail)) / sd(d$aq_atencion_detail)
+  d$aq_communication <- (d$aq_communication - mean(d$aq_communication)) / sd(d$aq_communication)
+  d$aq_imagination <- (d$aq_imagination - mean(d$aq_imagination)) / sd(d$aq_imagination)
   d$tr_d <- (d$tr_d - mean(d$tr_d)) / sd(d$tr_d)
   d$tr_c <- (d$tr_c - mean(d$tr_c)) / sd(d$tr_c)
   d$m_c <- (d$m_c - mean(d$m_c)) / sd(d$m_c)
