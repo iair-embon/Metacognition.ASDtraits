@@ -30,11 +30,11 @@ d.sin.normalizar.solo.FyM <- DF_list$d
 
 d1 = d.sin.normalizar.solo.FyM
 
-d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
-d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
-d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
-d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
-d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
+d1$aq_social.norm <- (d1$aq_social - mean(d1$aq_social))/ sd(d1$aq_social)
+d1$aq_at_sw.norm <- (d1$aq_atention_switch - mean(d1$aq_atention_switch))/ sd(d1$aq_atention_switch)
+d1$aq_at_de.norm <- (d1$aq_atencion_detail - mean(d1$aq_atencion_detail))/ sd(d1$aq_atencion_detail)
+d1$aq_com.norm <- (d1$aq_communication - mean(d1$aq_communication))/ sd(d1$aq_communication)
+d1$aq_im.norm <- (d1$aq_imagination - mean(d1$aq_imagination))/ sd(d1$aq_imagination)
 
 d1$mc.norm <- (d1$mc - mean(d1$mc))/ sd(d1$mc)
 
@@ -51,11 +51,12 @@ d1$Im <- as.integer(d1$Im)
 ## Modelo 1
 ```{r modelo 1, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(mc ~ aq_social.norm +
        Im +
        edad.norm+
-       es +
-       aq.norm: Im,
+       aq_social.norm: Im+
+       aq_social.norm:edad.norm,
+       #Im:edad.norm,
      data = d1) 
 summary(a)
 
@@ -64,9 +65,12 @@ summary(a)
 
 ```{r Modelo 2, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(mc ~ aq_at_sw.norm +
        Im +
-       aq.norm: Im,
+       edad.norm+
+       aq_at_sw.norm: Im+
+       aq_at_sw.norm:edad.norm,
+       #Im:edad.norm,
      data = d1) 
 summary(a)
 
@@ -74,13 +78,12 @@ summary(a)
 ## Modelo 3
 
 ```{r Modelo 3, echo=TRUE}
-
-a=lm(mc ~ aq.norm +
+a=lm(mc ~ aq_at_de.norm +
        Im +
        edad.norm+
-       aq.norm: Im+
-       aq.norm:edad.norm+
-       Im:edad.norm,
+       aq_at_de.norm: Im+
+       aq_at_de.norm:edad.norm,
+       #Im:edad.norm,
      data = d1) 
 summary(a)
 
@@ -90,14 +93,12 @@ summary(a)
 
 ```{r Modelo 4, echo=TRUE}
 
-a=lm(mc ~ aq.norm +
+a=lm(mc ~ aq_com.norm +
        Im +
        edad.norm+
-       es +
-       aq.norm: Im+
-       aq.norm:edad.norm+
-       Im:edad.norm+
-       es:aq.norm,
+       aq_com.norm: Im+
+       aq_com.norm:edad.norm,
+       #Im:edad.norm,
      data = d1) 
 summary(a)
 
@@ -106,51 +107,27 @@ summary(a)
 
 ```{r Modelo 5, echo=TRUE}
 
-a=lm(mc.norm ~ aq.norm +
+a=lm(mc ~ aq_im.norm +
        Im +
        edad.norm+
-       aq.norm: Im,
-       #aq.norm:edad.norm+
+       aq_im.norm: Im+
+       aq_im.norm:edad.norm,
        #Im:edad.norm,
      data = d1) 
 summary(a)
 
 ```
-## Modelo 6 (este es el modelo final que usariamos)
+
+## Modelo 6 - todos las subescalas como parte de un mismo modelo
 
 ```{r Modelo 6, echo=TRUE}
-
-a=lm(mc ~ aq.norm +
-       Im +
-       edad.norm+
-       aq.norm: Im+
-       aq.norm:edad.norm,
-       #Im:edad.norm,
+a=lm(mc ~ aq_social.norm+
+             aq_at_sw.norm+
+             aq_at_de.norm+
+             aq_com.norm+
+             aq_im.norm+
+             Im +
+             edad.norm,
      data = d1) 
 summary(a)
-
-```
-
-## Modelo 7 - separado para masculinos y femeninos
-
-```{r Modelo 7, echo=TRUE}
-d.f <- d1[d1$Im== "0",]
-
-a.f =lm(mc ~ aq.norm +
-       #Im +
-       edad.norm+
-       #aq.norm: Im+
-       aq.norm:edad.norm,
-     data = d.f) 
-summary(a.f)
-
-d.m <- d1[d1$Im== "1",]
-
-a.m =lm(mc ~ aq.norm +
-       #Im +
-       edad.norm+
-       #aq.norm: Im+
-       aq.norm:edad.norm,
-     data = d.m) 
-summary(a.m)
 ```
