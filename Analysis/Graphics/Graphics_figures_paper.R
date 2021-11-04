@@ -277,7 +277,7 @@ d3[d3 == "Femenino"] <- 'Female'
 # female
 ggplot(d3, aes(x = aq))+
   geom_bar(data=subset(d3, Im == 'Female'), fill = "black")+
-  scale_x_discrete(expand = expansion(mult = c(0.05, 0)), limits=seq(15,38,6)) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0)),limits = c(0, 40)) +
   scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   #xlab("AQ") +
   #ylab("Participants")+
@@ -296,7 +296,7 @@ ggplot(d3, aes(x = aq))+
 # male
 ggplot(d3, aes(x = aq))+
   geom_bar(data=subset(d3, Im == 'Male'), fill = "black")+
-  scale_x_discrete(expand = expansion(mult = c(0.13, 0.31)), limits=seq(15,38,6)) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0)),limits = c(0, 40)) +
   scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   #xlab("AQ") +
   #ylab("Participants")+
@@ -376,6 +376,7 @@ d.sin.normalizar.solo.FyM <- DF_list$d
 
 ### lineas para hacer regresion 
 
+
 d1 = d.sin.normalizar.solo.FyM
 
 d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
@@ -387,6 +388,8 @@ d1$edad.norm <- (d1$edad - mean(d1$edad))/ sd(d1$edad)
 d1[d1 == "Masculino"] <- "1"
 d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
+
+############ metacog y AQ
 
 # corro el modelo
 a=lm(mc ~ aq.norm +
@@ -412,39 +415,229 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender'='Im','Age' = 'edad.norm',
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_text(size = 25),
-        axis.text.y = element_blank(),#element_text(size = 20, angle = (45)),
+        axis.text.y = element_blank(), #element_text(size = 20, angle = (45)), 
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_text(size = 25))
+
+## regression line and scatter plot
+ggplot(d1, aes(x=aq.norm, y=mc)) + 
+  geom_point()+
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[2]))+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
+
+############ confidence y AQ
+
+d1$m_c.norm <- (d1$m_c - mean(d1$m_c))/ sd(d1$m_c)
+#d1$sd_c.norm <- (d1$sd_c - mean(d1$sd_c))/ sd(d1$sd_c)
+
+# corro el modelo
+a=lm(m_c.norm ~ aq.norm +
+       Im +
+       edad.norm+
+       aq.norm: Im+
+       aq.norm:edad.norm,
+     data = d1) 
+summary(a)
+
+
+plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender'='Im','Age' = 'edad.norm',
+                        'AQ:Gender'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,
+           plot.distributions = FALSE, colors = "black")+
+  ylab("") +
+  xlab("") +#xlab("Regression coefficient") +
+  #scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_blank(), #element_text(size = 20, angle = (45)), 
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_text(size = 25))
+
+## regression line and scatter plot
+ggplot(d1, aes(x=aq.norm, y=m_c.norm)) + 
+  geom_point()+
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[2]))+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
+
+############ metacog y AQ subscales
+
+d1$aq_social.norm <- (d1$aq_social - mean(d1$aq_social))/ sd(d1$aq_social)
+d1$aq_at_sw.norm <- (d1$aq_atention_switch - mean(d1$aq_atention_switch))/ sd(d1$aq_atention_switch)
+d1$aq_at_de.norm <- (d1$aq_atencion_detail - mean(d1$aq_atencion_detail))/ sd(d1$aq_atencion_detail)
+d1$aq_com.norm <- (d1$aq_communication - mean(d1$aq_communication))/ sd(d1$aq_communication)
+d1$aq_im.norm <- (d1$aq_imagination - mean(d1$aq_imagination))/ sd(d1$aq_imagination)
+
+# corro el modelo
+a=lm(mc ~ aq_social.norm+
+       aq_at_sw.norm+
+       aq_at_de.norm+
+       aq_com.norm+
+       aq_im.norm+
+       Im +
+       edad.norm,
+     data = d1) 
+summary(a)
+
+plot_summs(a, coefs = c('social skill' = 'aq_social.norm',
+                        'attention switching'='aq_at_sw.norm',
+                        'attention to detail' = 'aq_at_de.norm',
+                        'communication'='aq_com.norm',
+                        'imagination'='aq_im.norm',
+                        'gender'='Im',
+                        'age' = 'edad.norm') ,
+           plot.distributions = FALSE, colors = "black")+
+  ylab("") +
+  xlab("") +#xlab("Regression coefficient") +
+  #scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_blank(), #element_text(size = 20, angle = (45)),
         axis.title.y = element_text(size = 20),
         axis.title.x = element_text(size = 25))
 
 
-###################
-### Interaccion ###
-###################
+### regression line and scatter plot
 
-plot_model(a, type = "pred", terms = c("aq.norm", "Im"),
-           axis.labels = c('standardized AQ','Metacognition'),
-           legend.title = '',
-           title = '', 
-           colors = "bw",
-           axis.title = c('standardized AQ','AUROC2'),
-           show.data = FALSE) + 
-  theme_sjplot(base_size = 25)
+# for all subscales
+df_regression <- data.frame(id = c(1:5),
+                            b0 = rep(unname(coefficients(a)[1]),5),
+                            b1 = unname(coefficients(a)[2:6])) 
 
+ggplot(df_regression)  +
+  geom_abline(aes(intercept = b0, slope = b1, color=factor(id)), size = 0.7) +
+  xlim(-4, 4) +
+  ylim(0.5, 0.7)+
+  scale_colour_grey(start = 0, end = .9) +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        legend.text = element_blank(),
+        legend.title = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
 
+## for each subscale
 
-#################################
-### without gender separation ###
-#################################
+# social
+ggplot(d1, aes(x=aq_social.norm, y=mc)) + 
+  geom_point()+
+  xlim(-3, 4) +
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[2]))+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
 
-p <- plot_model(a, type = "pred", terms = "aq.norm",
-                axis.labels = c('standardized AQ','Metacognition'),
-                legend.title = '',
-                title = '', 
-                axis.title = c('standardized AQ','Metacognition'),
-                show.data = FALSE)
-p +theme_sjplot(base_size = 25)+
-  ylim(.55, .70)
+# attention sw
+ggplot(d1, aes(x=aq_at_sw.norm, y=mc)) + 
+  geom_point()+
+  xlim(-3, 4) +
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[3]))+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
 
+# attention det
+ggplot(d1, aes(x=aq_at_de.norm, y=mc)) + 
+  geom_point()+
+  xlim(-3, 4) +
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[4]))+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
+
+# communication
+ggplot(d1, aes(x=aq_com.norm, y=mc)) + 
+  geom_point()+
+  xlim(-3, 4) +
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[5]))+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
+
+# im
+ggplot(d1, aes(x=aq_im.norm , y=mc)) + 
+  geom_point()+
+  xlim(-3, 4) +
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[6]))+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_blank())
 
 #######################################
 ### Bar plot regression coefficient ###
@@ -484,250 +677,6 @@ ggplot(dtf1, aes(Predictor, y)) +
         axis.ticks.x=element_blank(),
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30))
-
-
-################
-### Marginal ###
-################
-
-# Male
-
-d.male <- d1[d1$Im =='1' ,]
-
-ggplot(d.male, aes(x=aq, y=mc)) +
-  geom_point() +
-  xlab('AQ')+
-  ylab('AUROC2')+
-  ggtitle('Male participants')+
-  theme_bw() +
-  theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        plot.margin = margin(1, 1,1, 1, "cm"),
-        panel.background = element_blank(),
-        axis.text.x = element_text(size = 25),
-        axis.text.y = element_text(size = 20),
-        axis.title.y = element_text(size = 20),
-        axis.title.x = element_text(size = 25))
-
-# Female
-
-d.female <- d1[d1$Im =='0' ,]
-
-ggplot(d.female, aes(x=aq, y=mc)) +
-  geom_point() +
-  xlab('AQ')+
-  ylab('AUROC2')+
-  ggtitle('Female participants')+
-  theme_bw() +
-  theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        plot.margin = margin(1, 1,1, 1, "cm"),
-        panel.background = element_blank(),
-        axis.text.x = element_text(size = 25),
-        axis.text.y = element_text(size = 20),
-        axis.title.y = element_text(size = 20),
-        axis.title.x = element_text(size = 25))
-
-
-########################
-### AUROC2-GENDER-AQ ###
-########################
-root <- rprojroot::is_rstudio_project
-basename(getwd())               
-
-####### data frames with filters already applied
-filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
-load(file= filepath)
-
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
-DF_list <- DataFrame_Filtered_already_applied(df_total)
-df_total.solo.FyM <- DF_list$a
-d.sin.normalizar.solo.FyM <- DF_list$d
-
-Nsuj <- length(unique(df_total.solo.FyM$sujetos))
-ExistingSubjects <- unique(df_total.solo.FyM$sujetos)
-
-# create empty df to save the cumH2 and cumF2 for each subject
-df.AUROC2 <- data.frame(cum_H2_0 = integer(),
-                        cum_H2_1 = integer(),
-                        cum_H2_2 = integer(),
-                        cum_H2_3 = integer(),
-                        cum_H2_4 = integer(),
-                        cum_FA2_0 = integer(),
-                        cum_FA2_1 = integer(),
-                        cum_FA2_2 = integer(),
-                        cum_FA2_3 = integer(),
-                        cum_FA2_4 = integer())
-
-source(root$find_file("Analysis/AuxiliaryFunctions/auroc2 (ELIMINAR).R"))
-
-#### for each subject, with function
-for (i in 1:Nsuj) {
-  correct <- df_total.solo.FyM$discrimination_is_correct[df_total.solo.FyM$sujetos==ExistingSubjects[i]]
-  conf <- df_total.solo.FyM$confidence_key[df_total.solo.FyM$sujetos==ExistingSubjects[i]]
-  Nratings <- 4
-  
-  lista <- type2roc(correct,conf, 4)
-  cum_H2 <- lista$cum_H2
-  cum_FA2 <- lista$cum_FA2
-  
-  df.AUROC2[nrow(df.AUROC2) + 1,] = c(cum_H2,cum_FA2)
-}
-
-# create the df for plot
-df.AUROC2$Nsuj <- d.sin.normalizar.solo.FyM$sujetos
-df.AUROC2$Gender <- d.sin.normalizar.solo.FyM$Im
-df.AUROC2$AQ <- d.sin.normalizar.solo.FyM$aq
-
-# PLOT AUROC2 FOR MALE PARTICIPANTS
-# split by AQ first and last quartiles
-
-cum_H2_male_AQ_1 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
-
-cum_FA2_male_AQ_1 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                 mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
-
-cum_H2_male_AQ_4 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
-
-cum_FA2_male_AQ_4 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
-
-df <- data.frame(cum_H2_male_AQ_1 = cum_H2_male_AQ_1,
-                 cum_H2_male_AQ_4 = cum_H2_male_AQ_4,
-                 cum_FA2_male_AQ_1 = cum_FA2_male_AQ_1,
-                 cum_FA2_male_AQ_4 = cum_FA2_male_AQ_1)
-
-d <- data.frame(far = cum_FA2_male_AQ_1, hr = cum_H2_male_AQ_1, aq = "Low AQ")
-d <- rbind(d, data.frame(far = cum_FA2_male_AQ_4, hr = cum_H2_male_AQ_4, aq = "High AQ"))
-
-ggplot(data = d, mapping = aes(x = far, y = hr, color = aq)) + 
-  geom_line(size = 2) +
-  geom_point(size = 4) + 
-  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
-  coord_fixed()+
-  labs(x = "False alarm rate", y = "Hit rate", color = "AQ level") +
-  theme_bw(base_size = 18)+
-  theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        plot.margin = margin(1, 1,1, 1, "cm"),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 20),
-        panel.background = element_blank(),
-        axis.text.x = element_text(size = 30),
-        axis.text.y = element_text(size = 30),
-        axis.title.y = element_text(size = 30),
-        axis.title.x = element_text(size = 30)) 
-
-
-# PLOT AUROC2 FOR FEMALE PARTICIPANTS
-# split by AQ first and last quartiles
-
-cum_H2_female_AQ_1 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                      mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                      mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                      mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                      mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
-
-cum_FA2_female_AQ_1 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                       mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                       mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                       mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
-                       mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
-
-cum_H2_female_AQ_4 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                      mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
-
-cum_FA2_female_AQ_4 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
-                       mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
-
-df <- data.frame(cum_H2_female_AQ_1 = cum_H2_female_AQ_1,
-                 cum_H2_female_AQ_4 = cum_H2_female_AQ_4,
-                 cum_FA2_female_AQ_1 = cum_FA2_female_AQ_1,
-                 cum_FA2_female_AQ_4 = cum_FA2_female_AQ_1)
-
-d <- data.frame(far = cum_FA2_female_AQ_1, hr = cum_H2_female_AQ_1, aq = "Low AQ")
-d <- rbind(d, data.frame(far = cum_FA2_female_AQ_4, hr = cum_H2_female_AQ_4, aq = "High AQ"))
-
-ggplot(data = d, mapping = aes(x = far, y = hr, color = aq)) + 
-  geom_line(size = 2) +
-  geom_point(size = 4) + 
-  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
-  coord_fixed()+
-  labs(x = "False alarm rate", y = "Hit rate", color = "AQ level") +
-  theme_bw(base_size = 18)+
-  theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        plot.margin = margin(1, 1,1, 1, "cm"),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 20),
-        panel.background = element_blank(),
-        axis.text.x = element_text(size = 30),
-        axis.text.y = element_text(size = 30),
-        axis.title.y = element_text(size = 30),
-        axis.title.x = element_text(size = 30)) 
-
-
-## box plot 
-
-d <- d.sin.normalizar.solo.FyM
-aq.q <- rep(NaN, nrow(d))
-for (i in 1:nrow(d)) {
-  if (d$aq[i] <= quantile(d$aq)[[2]]){
-    aq.q[i] <- "<=23"
-  } else if (d$aq[i]  >= quantile(d$aq)[[4]]){
-    aq.q[i] <- ">=28"
-  } else{
-    aq.q[i] <-"<=23 & >=28"
-      }
-}
-
-d$aq.q <- aq.q
-ggplot(d.sin.normalizar.solo.FyM, aes(x=aq.q, y=mc, fill= Im)) + 
-  geom_boxplot()+
-  xlab('AQ quartils')+
-  ylab("AUROC2")+
-  theme_bw() +
-  theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        plot.margin = margin(1, 1,1, 1, "cm"),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 20),
-        panel.background = element_blank(),
-        axis.text.x = element_text(size = 30),
-        axis.text.y = element_text(size = 30),
-        axis.title.y = element_text(size = 30),
-        axis.title.x = element_text(size = 30)) 
-
 
 
 #####################
@@ -803,6 +752,201 @@ ggplot(d, aes(x=t_ensayo_confianza))+
                       ############################
 
 # figuras que no queremos borrar pero no van por ahora en el paper
+
+########################
+### AUROC2-GENDER-AQ ###
+########################
+root <- rprojroot::is_rstudio_project
+basename(getwd())               
+
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
+
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+df_total.solo.FyM <- DF_list$a
+d.sin.normalizar.solo.FyM <- DF_list$d
+
+Nsuj <- length(unique(df_total.solo.FyM$sujetos))
+ExistingSubjects <- unique(df_total.solo.FyM$sujetos)
+
+# create empty df to save the cumH2 and cumF2 for each subject
+df.AUROC2 <- data.frame(cum_H2_0 = integer(),
+                        cum_H2_1 = integer(),
+                        cum_H2_2 = integer(),
+                        cum_H2_3 = integer(),
+                        cum_H2_4 = integer(),
+                        cum_FA2_0 = integer(),
+                        cum_FA2_1 = integer(),
+                        cum_FA2_2 = integer(),
+                        cum_FA2_3 = integer(),
+                        cum_FA2_4 = integer())
+
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2 (ELIMINAR).R"))
+
+#### for each subject, with function
+for (i in 1:Nsuj) {
+  correct <- df_total.solo.FyM$discrimination_is_correct[df_total.solo.FyM$sujetos==ExistingSubjects[i]]
+  conf <- df_total.solo.FyM$confidence_key[df_total.solo.FyM$sujetos==ExistingSubjects[i]]
+  Nratings <- 4
+  
+  lista <- type2roc(correct,conf, 4)
+  cum_H2 <- lista$cum_H2
+  cum_FA2 <- lista$cum_FA2
+  
+  df.AUROC2[nrow(df.AUROC2) + 1,] = c(cum_H2,cum_FA2)
+}
+
+# create the df for plot
+df.AUROC2$Nsuj <- d.sin.normalizar.solo.FyM$sujetos
+df.AUROC2$Gender <- d.sin.normalizar.solo.FyM$Im
+df.AUROC2$AQ <- d.sin.normalizar.solo.FyM$aq
+
+# PLOT AUROC2 FOR MALE PARTICIPANTS
+# split by AQ first and last quartiles
+
+cum_H2_male_AQ_1 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                      mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                      mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                      mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                      mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
+
+cum_FA2_male_AQ_1 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                       mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                       mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                       mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                       mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
+
+cum_H2_male_AQ_4 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                      mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                      mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                      mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                      mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
+
+cum_FA2_male_AQ_4 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                       mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                       mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                       mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                       mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Masculino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
+
+df <- data.frame(cum_H2_male_AQ_1 = cum_H2_male_AQ_1,
+                 cum_H2_male_AQ_4 = cum_H2_male_AQ_4,
+                 cum_FA2_male_AQ_1 = cum_FA2_male_AQ_1,
+                 cum_FA2_male_AQ_4 = cum_FA2_male_AQ_1)
+
+d <- data.frame(far = cum_FA2_male_AQ_1, hr = cum_H2_male_AQ_1, aq = "Low AQ")
+d <- rbind(d, data.frame(far = cum_FA2_male_AQ_4, hr = cum_H2_male_AQ_4, aq = "High AQ"))
+
+ggplot(data = d, mapping = aes(x = far, y = hr, color = aq)) + 
+  geom_line(size = 2) +
+  geom_point(size = 4) + 
+  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
+  coord_fixed()+
+  labs(x = "False alarm rate", y = "Hit rate", color = "AQ level") +
+  theme_bw(base_size = 18)+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
+
+
+# PLOT AUROC2 FOR FEMALE PARTICIPANTS
+# split by AQ first and last quartiles
+
+cum_H2_female_AQ_1 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                        mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                        mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                        mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                        mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
+
+cum_FA2_female_AQ_1 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                         mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                         mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                         mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]),
+                         mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ < quantile(df.AUROC2$AQ)[[2]]]))
+
+cum_H2_female_AQ_4 <- c(mean(df.AUROC2$cum_H2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                        mean(df.AUROC2$cum_H2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                        mean(df.AUROC2$cum_H2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                        mean(df.AUROC2$cum_H2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                        mean(df.AUROC2$cum_H2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
+
+cum_FA2_female_AQ_4 <- c(mean(df.AUROC2$cum_FA2_0[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                         mean(df.AUROC2$cum_FA2_1[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                         mean(df.AUROC2$cum_FA2_2[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                         mean(df.AUROC2$cum_FA2_3[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]),
+                         mean(df.AUROC2$cum_FA2_4[df.AUROC2$Gender=='Femenino' & df.AUROC2$AQ >= quantile(df.AUROC2$AQ)[[4]]]))
+
+df <- data.frame(cum_H2_female_AQ_1 = cum_H2_female_AQ_1,
+                 cum_H2_female_AQ_4 = cum_H2_female_AQ_4,
+                 cum_FA2_female_AQ_1 = cum_FA2_female_AQ_1,
+                 cum_FA2_female_AQ_4 = cum_FA2_female_AQ_1)
+
+d <- data.frame(far = cum_FA2_female_AQ_1, hr = cum_H2_female_AQ_1, aq = "Low AQ")
+d <- rbind(d, data.frame(far = cum_FA2_female_AQ_4, hr = cum_H2_female_AQ_4, aq = "High AQ"))
+
+ggplot(data = d, mapping = aes(x = far, y = hr, color = aq)) + 
+  geom_line(size = 2) +
+  geom_point(size = 4) + 
+  geom_abline(intercept = 0, slope = 1, color = "grey", size = 2) +
+  coord_fixed()+
+  labs(x = "False alarm rate", y = "Hit rate", color = "AQ level") +
+  theme_bw(base_size = 18)+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
+
+
+## box plot 
+
+d <- d.sin.normalizar.solo.FyM
+aq.q <- rep(NaN, nrow(d))
+for (i in 1:nrow(d)) {
+  if (d$aq[i] <= quantile(d$aq)[[2]]){
+    aq.q[i] <- "<=23"
+  } else if (d$aq[i]  >= quantile(d$aq)[[4]]){
+    aq.q[i] <- ">=28"
+  } else{
+    aq.q[i] <-"<=23 & >=28"
+  }
+}
+
+d$aq.q <- aq.q
+ggplot(d.sin.normalizar.solo.FyM, aes(x=aq.q, y=mc, fill= Im)) + 
+  geom_boxplot()+
+  xlab('AQ quartils')+
+  ylab("AUROC2")+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30)) 
 
 ########################
 ### Normal densities ###  FIG 2 a
