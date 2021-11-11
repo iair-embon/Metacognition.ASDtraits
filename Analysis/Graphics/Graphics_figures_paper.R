@@ -1073,75 +1073,25 @@ ggplot(df) +
 ### Staircase ###
 #################
 
-# voy a la carpeta del proyecto
 root <- rprojroot::is_rstudio_project
-basename(getwd())
+basename(getwd())               
 
-# load the function to get the df list
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered.R"))
+####### data frames with inclusion filters already applied
+filepath <- root$find_file("Data/All_exp_inclusion_criteria/df_total.Rda")
+load(file= filepath)
 
-# get the df list
-# experimento = 1,2,ambos
-DF_list <- DataFrame_Filtered(experimento = "ambos",
-                              filtroRT_Disc_Sup = 20000,
-                              filtroRT_Disc_Inf = 0,
-                              filtroRT_Conf_Sup = 20000,
-                              filtroRT_Conf_Inf = 0,
-                              filtroTrial = 0)
+d <- df_total
 
-# DF_list:
-# a df_total
-# b d.sin.normalizar
-# c d.sin.normalizar.mc.filter
-# d d
-# e d.mc.filter
-# f d.sin.normalizar.solo.FyM
-# g d.sin.normalizar.solo.FyM.mc.filter
-# h d.solo.FyM.mc.filter
+d$discrimination_is_correct[d$discrimination_is_correct=='TRUE'] <- "1"
+d$discrimination_is_correct[d$discrimination_is_correct=='FALSE'] <- "0"
 
-df_total <- DF_list$a
-d.sin.normalizar.solo.FyM.mc.filter <- DF_list$g
-
-### plotting the performance by trial
-
-d1 <- df_total
-d1 <- d1[d1$genero == 'Femenino' | d1$genero == 'Masculino',]
-
-# sujetos que tienen un 85 % de trials en una misma respuesta de confianza
-d2 <- d1[d1$sujetos != 57 & d1$sujetos != 63 & d1$sujetos != 83
-         & d1$sujetos != 109 & d1$sujetos != 1029 & d1$sujetos != 1121
-         & d1$sujetos != 1159 & d1$sujetos != 1193 & d1$sujetos != 36
-         & d1$sujetos != 170 & d1$sujetos != 1081 & d1$sujetos != 1086
-         & d1$sujetos != 1095 & d1$sujetos != 1110 & d1$sujetos != 1172, ]
-
-# sujetos que tienen menos de 90 de trials
-d4 <- d2[d2$sujetos != 55 & d2$sujetos != 57 & d2$sujetos != 83 &
-           d2$sujetos != 122 & d2$sujetos != 131 & d2$sujetos != 141 &
-           d2$sujetos != 172 & d2$sujetos != 173 & d2$sujetos != 179 &
-           d2$sujetos != 189 & d2$sujetos != 193 & d2$sujetos != 195 &
-           d2$sujetos != 1010 & d2$sujetos != 1046 &
-           d2$sujetos != 1069 & d2$sujetos != 1112 &
-           d2$sujetos != 1127 & d2$sujetos != 1135 &
-           d2$sujetos != 1154 & d2$sujetos != 1171 &
-           d2$sujetos != 1191 & d2$sujetos != 1239 &
-           d2$sujetos != 1250 & d2$sujetos != 1251 &
-           d2$sujetos != 1260,]
-
-d3 <- d.sin.normalizar.solo.FyM.mc.filter 
-# saco a los que tienen metacog menor a 1,5 de desvio de la media para abajo
-d5 <- d4[d4$sujetos %in% d3$sujetos,] # d3 es el df de datos unicos, ya con la 
-# metacog filtrada a 1.5 de desvio
-
-d5$discrimination_is_correct[d5$discrimination_is_correct=='TRUE'] <- "1"
-d5$discrimination_is_correct[d5$discrimination_is_correct=='FALSE'] <- "0"
-
-total_trials <- max(d5$trials)-min(d5$trials)
+total_trials <- (max(d$trials)+1)-min(d$trials)
 
 MeanPerformanceByTrial <- rep(NA,total_trials)
 #sd <- rep(NA,total_trials)
 
 for (i in 1:total_trials){
-  trial_colum <- d5[d5$trials == i,]  # getting data by trial
+  trial_colum <- d[d$trials == i,]  # getting data by trial
   MeanPerformanceByTrial[i] <- mean(as.integer(trial_colum$discrimination_is_correct))
   #sd[i] <- sd(as.integer(trial_colum$discrimination_is_correct))
 }
