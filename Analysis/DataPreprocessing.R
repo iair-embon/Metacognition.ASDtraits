@@ -362,7 +362,7 @@ df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discriminati
 
 ####### save the df_total
 
-# # RESULTS_EXP1
+# # RESULTS_EXP
 filepath <- root$find_file("Data/All_exp_inclusion_criteria/df_total.Rda")
 save(df_total,file = filepath)
 
