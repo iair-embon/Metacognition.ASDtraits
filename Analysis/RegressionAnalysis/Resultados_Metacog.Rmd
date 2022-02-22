@@ -36,6 +36,10 @@ d1$mc.norm <- (d1$mc - mean(d1$mc))/ sd(d1$mc)
 
 d1$edad.norm <- (d1$edad - mean(d1$edad))/ sd(d1$edad)
 
+d1$m_dp.norm <- (d1$m_dp - mean(d1$m_dp))/ sd(d1$m_dp)
+d1$sd_dp.norm <- (d1$sd_dp - mean(d1$sd_dp))/ sd(d1$sd_dp)
+
+
 d1[d1 == "Masculino"] <- "1"
 d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
@@ -149,4 +153,19 @@ a.m =lm(mc ~ aq.norm +
        aq.norm:edad.norm,
      data = d.m) 
 summary(a.m)
+```
+
+## Modelo 8 (modelo de prueba, para la ver posible efecto de diferencia de puntitos)
+
+```{r Modelo 8, echo=TRUE}
+
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+             sd_dp.norm, #+ 
+       #aq.norm: Im+
+       #aq.norm:edad.norm,
+     data = d1) 
+summary(a)
+
 ```

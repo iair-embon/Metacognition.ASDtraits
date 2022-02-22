@@ -17,6 +17,8 @@ DataFrame_Filtered_already_applied <- function(df_total){
   media_tr_confi <- rep(NaN, length(unique(df_total$sujetos)))
   media_confidence <- rep(NaN, length(unique(df_total$sujetos)))
   sd_confidence <- rep(NaN, length(unique(df_total$sujetos)))
+  m_difer_puntitos <- rep(NaN, length(unique(df_total$sujetos)))
+  sd_difer_puntitos <- rep(NaN, length(unique(df_total$sujetos)))
   
   # sujetos que quedaron
   ExistingSubjects <- unique(df_total$sujetos)
@@ -38,6 +40,8 @@ DataFrame_Filtered_already_applied <- function(df_total){
     media_tr_confi[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"media_tr_confi"])
     media_confidence[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"media_confidence"])
     sd_confidence[i]<- unique(df_total[df_total$sujetos == ExistingSubjects[i],"sd_confidence"])
+    m_difer_puntitos[i]<- unique(mean(df_total[df_total$sujetos == ExistingSubjects[i],"diferencia_puntitos"]))
+    sd_difer_puntitos[i]<- unique(sd(df_total[df_total$sujetos == ExistingSubjects[i],"diferencia_puntitos"]))
   }
   
   for (i in 1:length(genero)) {
@@ -65,7 +69,9 @@ DataFrame_Filtered_already_applied <- function(df_total){
                                 tr_d = media_tr_discri,
                                 tr_c = media_tr_confi,
                                 m_c = media_confidence,
-                                sd_c = sd_confidence)
+                                sd_c = sd_confidence,
+                                m_dp = m_difer_puntitos,
+                                sd_dp = sd_difer_puntitos)
   
   d <- d.sin.normalizar
 
@@ -83,6 +89,8 @@ DataFrame_Filtered_already_applied <- function(df_total){
   d$tr_c <- (d$tr_c - mean(d$tr_c)) / sd(d$tr_c)
   d$m_c <- (d$m_c - mean(d$m_c)) / sd(d$m_c)
   d$sd_c <- (d$sd_c - mean(d$sd_c)) / sd(d$sd_c)
+  d$m_dp <- (d$m_dp - mean(d$m_dp)) / sd(d$m_dp)
+  d$sd_dp <- (d$sd_dp - mean(d$sd_dp)) / sd(d$sd_dp)
   
   d.normalizado <- d
   
