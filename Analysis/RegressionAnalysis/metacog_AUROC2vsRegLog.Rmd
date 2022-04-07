@@ -179,3 +179,62 @@ ggplot(metacog_x2, aes(x=reg.log.mix.2.metacog, y=AUROC2.metacog)) +
         axis.title.y = element_text(size = 20))
 ```
 
+## Cuantifico las respeustas correctas vs las predicciones del modelo
+
+```{r metacog_X2_2, echo=TRUE}
+
+# respuestas correctas e incorrectas datos reales
+resp_correctas_datos <- sum(d$discrimination_is_correct)
+resp_incorrectas_datos <- nrow(d) - sum(d$discrimination_is_correct)
+
+
+a_b1 <- ranef(a)[["sujetos"]][["confidence_key.norm"]]
+a_intercept <- fixef(a)[["(Intercept)"]]
+a2_b1 <- ranef(a2)[["sujetos"]][["confidence_key.norm"]]
+a2_intercept <- ranef(a2)[["sujetos"]][["(Intercept)"]]
+
+
+y.model_a <- c()
+y.model_a2 <- c()
+  
+for (j in 1:length(unique(d$sujetos))) {
+  d_sujeto <- d[d$sujeto == unique(d$sujetos)[j],]
+  
+  y.model_a_sujeto <- rep(NaN, length(d_sujeto$confidence_key.norm))
+  y.model_a2_sujeto <- rep(NaN, length(d_sujeto$confidence_key.norm))
+  
+  for (i in 1:length(d_sujeto$confidence_key.norm)) {
+    # equation model a
+    y.model_a_sujeto[i] <- invlogit(a_intercept +  a_b1[j] * d_sujeto$confidence_key.norm[i])
+    
+    # equation model a2
+    y.model_a2_sujeto[i] <- invlogit(a2_intercept[j] +  a_b1[j] * d_sujeto$confidence_key.norm[i])
+  }
+  
+  # save y values
+  y.model_a <- c(y.model_a , y.model_a_sujeto)
+  y.model_a2 <- c(y.model_a2 , y.model_a2_sujeto)
+  
+}
+
+# respuestas correctas e incorrectas modelo
+resp_correctas_modelo_a <- sum(y.model_a > 0.5)
+resp_incorrectas_modelo_a <- sum(y.model_a < 0.5)
+resp_correctas_modelo_a2 <- sum(y.model_a2 > 0.5)
+resp_incorrectas_modelo_a2 <- sum(y.model_a2 < 0.5)
+
+respuestas     <- matrix( c(resp_correctas_datos,
+                    resp_incorrectas_datos,
+                    resp_correctas_modelo_a,
+                    resp_incorrectas_modelo_a,
+                    resp_correctas_modelo_a2,
+                    resp_incorrectas_modelo_a2), ncol = 3, byrow = TRUE) 
+
+df <- data.frame(fuente = rep(c("datos", "modelo_a", "modelo_a2"), each=2),
+                 es_correcta = rep(c("correctas","incorrectas"), times = 3),
+                 nro_correctas = ´)
+
+tab <- table(df$fuente, df$es_correcta)
+
+```
+
