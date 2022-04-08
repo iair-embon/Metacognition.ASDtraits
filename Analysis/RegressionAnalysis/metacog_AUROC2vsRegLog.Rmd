@@ -54,7 +54,8 @@ library(ggplot2)
 ```{r reg log, echo=TRUE}
 
 
-a <- glmer(discrimination_is_correct ~ (0 + confidence_key.norm|sujetos),
+a <- glmer(discrimination_is_correct ~ confidence_key.norm + 
+             (0 + confidence_key.norm|sujetos),
            data = d,
            family = binomial,
            control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
@@ -130,7 +131,8 @@ ggplot(metacog_x2, aes(x=reg.log.mix.metacog, y=AUROC2.metacog)) +
 ```{r reg log 2, echo=TRUE}
 
 
-a2 <- glmer(discrimination_is_correct ~ (1 + confidence_key.norm|sujetos),
+a2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+              (1 + confidence_key.norm|sujetos),
            data = d,
            family = binomial,
            control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
@@ -159,7 +161,7 @@ metacog_log_reg_mixt2 <-  ranef(a2)[["sujetos"]]
 
 ## Lo agrego al df de metacog_x2 y lo exploro
 
-```{r metacog_X2_2, echo=TRUE}
+```{r metacog_X2_3, echo=TRUE}
 metacog_x2$reg.log.mix.2.metacog <- metacog_log_reg_mixt2$confidence_key.norm
 
 ggplot(metacog_x2, aes(x=reg.log.mix.2.metacog, y=AUROC2.metacog)) + 
@@ -234,5 +236,6 @@ respuestas     <- matrix( c(resp_correctas_datos,
 colnames(respuestas) <- c("datos", "modelo_a", "modelo_a2")
 rownames(respuestas) <- c("correctas","incorrectas")
 
+print(respuestas)
 ```
 
