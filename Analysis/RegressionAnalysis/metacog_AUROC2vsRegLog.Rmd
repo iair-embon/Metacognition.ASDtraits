@@ -208,7 +208,7 @@ for (j in 1:length(unique(d$sujetos))) {
     y.model_a_sujeto[i] <- invlogit(a_intercept +  a_b1[j] * d_sujeto$confidence_key.norm[i])
     
     # equation model a2
-    y.model_a2_sujeto[i] <- invlogit(a2_intercept[j] +  a_b1[j] * d_sujeto$confidence_key.norm[i])
+    y.model_a2_sujeto[i] <- invlogit(a2_intercept[j] +  a2_b1[j] * d_sujeto$confidence_key.norm[i])
   }
   
   # save y values
@@ -228,13 +228,11 @@ respuestas     <- matrix( c(resp_correctas_datos,
                     resp_correctas_modelo_a,
                     resp_incorrectas_modelo_a,
                     resp_correctas_modelo_a2,
-                    resp_incorrectas_modelo_a2), ncol = 3, byrow = TRUE) 
+                    resp_incorrectas_modelo_a2), ncol = 3, byrow = FALSE) 
 
-df <- data.frame(fuente = rep(c("datos", "modelo_a", "modelo_a2"), each=2),
-                 es_correcta = rep(c("correctas","incorrectas"), times = 3),
-                 nro_correctas = ´)
 
-tab <- table(df$fuente, df$es_correcta)
+colnames(respuestas) <- c("datos", "modelo_a", "modelo_a2")
+rownames(respuestas) <- c("correctas","incorrectas")
 
 ```
 
