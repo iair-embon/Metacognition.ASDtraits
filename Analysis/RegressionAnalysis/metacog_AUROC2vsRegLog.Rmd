@@ -189,11 +189,16 @@ ggplot(metacog_x2, aes(x=reg.log.mix.2.metacog, y=AUROC2.metacog)) +
 resp_correctas_datos <- sum(d$discrimination_is_correct)
 resp_incorrectas_datos <- nrow(d) - sum(d$discrimination_is_correct)
 
+# model a
+a_b1_fix <- fixef(a)[["confidence_key.norm"]]
+a_intercept_fix <- fixef(a)[["(Intercept)"]]  
+a_b1_rand <- ranef(a)[["sujetos"]][["confidence_key.norm"]]
 
-a_b1 <- ranef(a)[["sujetos"]][["confidence_key.norm"]]
-a_intercept <- fixef(a)[["(Intercept)"]]
-a2_b1 <- ranef(a2)[["sujetos"]][["confidence_key.norm"]]
-a2_intercept <- ranef(a2)[["sujetos"]][["(Intercept)"]]
+# model a2
+a2_b1_fix <- fixef(a2)[["confidence_key.norm"]]
+a2_intercept_fix <- fixef(a2)[["(Intercept)"]]
+a2_b1_rand <- ranef(a2)[["sujetos"]][["confidence_key.norm"]]
+a2_intercept_rand <- ranef(a2)[["sujetos"]][["(Intercept)"]]
 
 
 y.model_a <- c()
@@ -207,10 +212,14 @@ for (j in 1:length(unique(d$sujetos))) {
   
   for (i in 1:length(d_sujeto$confidence_key.norm)) {
     # equation model a
-    y.model_a_sujeto[i] <- invlogit(a_intercept +  a_b1[j] * d_sujeto$confidence_key.norm[i])
+    y.model_a_sujeto[i] <- invlogit(a_intercept_fix + 
+                                      (a_b1_rand[j] + a_b1_fix) * 
+                                      d_sujeto$confidence_key.norm[i])
     
     # equation model a2
-    y.model_a2_sujeto[i] <- invlogit(a2_intercept[j] +  a2_b1[j] * d_sujeto$confidence_key.norm[i])
+    y.model_a2_sujeto[i] <- invlogit((a2_intercept_rand[j] + a2_intercept_fix ) +
+                                       (a2_b1_rand[j] + a2_b1_fix) 
+                                     * d_sujeto$confidence_key.norm[i])
   }
   
   # save y values
