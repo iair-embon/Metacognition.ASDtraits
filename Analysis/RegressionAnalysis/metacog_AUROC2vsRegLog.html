@@ -1152,11 +1152,16 @@ ggplot(metacog_x2, aes(x=reg.log.mix.2.metacog, y=AUROC2.metacog)) +
 resp_correctas_datos &lt;- sum(d$discrimination_is_correct)
 resp_incorrectas_datos &lt;- nrow(d) - sum(d$discrimination_is_correct)
 
+# model a
+a_b1_fix &lt;- fixef(a)[[&quot;confidence_key.norm&quot;]]
+a_intercept_fix &lt;- fixef(a)[[&quot;(Intercept)&quot;]]  
+a_b1_rand &lt;- ranef(a)[[&quot;sujetos&quot;]][[&quot;confidence_key.norm&quot;]]
 
-a_b1 &lt;- ranef(a)[[&quot;sujetos&quot;]][[&quot;confidence_key.norm&quot;]]
-a_intercept &lt;- fixef(a)[[&quot;(Intercept)&quot;]]
-a2_b1 &lt;- ranef(a2)[[&quot;sujetos&quot;]][[&quot;confidence_key.norm&quot;]]
-a2_intercept &lt;- ranef(a2)[[&quot;sujetos&quot;]][[&quot;(Intercept)&quot;]]
+# model a2
+a2_b1_fix &lt;- fixef(a2)[[&quot;confidence_key.norm&quot;]]
+a2_intercept_fix &lt;- fixef(a2)[[&quot;(Intercept)&quot;]]
+a2_b1_rand &lt;- ranef(a2)[[&quot;sujetos&quot;]][[&quot;confidence_key.norm&quot;]]
+a2_intercept_rand &lt;- ranef(a2)[[&quot;sujetos&quot;]][[&quot;(Intercept)&quot;]]
 
 
 y.model_a &lt;- c()
@@ -1170,10 +1175,14 @@ for (j in 1:length(unique(d$sujetos))) {
   
   for (i in 1:length(d_sujeto$confidence_key.norm)) {
     # equation model a
-    y.model_a_sujeto[i] &lt;- invlogit(a_intercept +  a_b1[j] * d_sujeto$confidence_key.norm[i])
+    y.model_a_sujeto[i] &lt;- invlogit(a_intercept_fix + 
+                                      (a_b1_rand[j] + a_b1_fix) * 
+                                      d_sujeto$confidence_key.norm[i])
     
     # equation model a2
-    y.model_a2_sujeto[i] &lt;- invlogit(a2_intercept[j] +  a2_b1[j] * d_sujeto$confidence_key.norm[i])
+    y.model_a2_sujeto[i] &lt;- invlogit((a2_intercept_rand[j] + a2_intercept_fix ) +
+                                       (a2_b1_rand[j] + a2_b1_fix) 
+                                     * d_sujeto$confidence_key.norm[i])
   }
   
   # save y values
@@ -1201,8 +1210,8 @@ rownames(respuestas) &lt;- c(&quot;correctas&quot;,&quot;incorrectas&quot;)
 
 print(respuestas)</code></pre>
 <pre><code>##             datos modelo_a modelo_a2
-## correctas   28119    38110     19263
-## incorrectas 10315      324     19171</code></pre>
+## correctas   28119    38434     38434
+## incorrectas 10315        0         0</code></pre>
 </div>
 
 
