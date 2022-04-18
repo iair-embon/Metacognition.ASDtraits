@@ -311,7 +311,7 @@ grid.arrange(p1, p2, ncol=2)
 
 ## Grafico la curva para un sujeto
 
-```{r grafico_curva_log_clasica, echo=TRUE}
+```{r grafico_curva_log_clasica_un_sujeto, echo=TRUE}
 # ploteo una curva para todos los sujetos desde una log clasica
 
 d_sujeto <-  d[d$sujeto == unique(d$sujetos)[1],]
@@ -362,3 +362,20 @@ grid.arrange(p1, p2, ncol=2)
 
 ```
 # Ver como hacer para que represente el modelo mixto
+```{r grafico_curva_log_multinivel_un_sujeto, echo=TRUE}
+
+### ver si puedo hacer algo con estas lineas, pueden servir
+d_sujeto <-  d[d$sujeto == unique(d$sujetos)[1],]
+
+y_predicted_sujeto <- y.model_a2[1:nrow(d_sujeto)]
+
+d_sujeto_uni_slope <- data.frame(y = y_predicted_sujeto,
+                                 correct = d_sujeto$discrimination_is_correct,
+                                 conf = d_sujeto$confidence_key.norm)
+d_sujeto_uni_slope < d_sujeto_uni_slope[y == ]
+
+plot(discrimination_is_correct ~ confidence_key.norm, 
+     data=d_sujeto, col="steelblue")
+lines(y_predicted_sujeto ~ d_sujeto$confidence_key.norm, 
+      lwd=2)
+```
