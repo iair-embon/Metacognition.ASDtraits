@@ -47,6 +47,13 @@ library(dplyr)
 library(lme4)
 library(tibble)
 library(ggplot2)
+library(car)
+library(DescTools)
+library(gridExtra)
+library(faraway)
+library(knitr)
+library(performance)
+library(ResourceSelection)
 ```
 
 ## Corro reg log mixta, sujetos variable random, solo varia el slope, intercept fija
@@ -253,89 +260,105 @@ plot(sort(y.model_a2))
 ```
 
 
-## Hago lo mismo pero con un modelo de reg log clasica, para ver errores
+## Grafico la curva para una log clasica para todos los sujetos
 
-```{r metacog_log_clasica, echo=TRUE}
+```{r grafico_curva_log_clasica, echo=TRUE}
+# ploteo una curva para todos los sujetos desde una log clasica
+df <- data.frame(x = d$confidence_key.norm,
+                 y = d$discrimination_is_correct)
 
-# corro modelo de regresion clasica
-# modelo a3
-a3 <- glm(discrimination_is_correct ~ confidence_key.norm,
-           family=binomial(link="logit"), 
-           data = d)
+p1 <- ggplot(df, aes(x=x, y=y)) +
+  geom_point(alpha=0.33) + 
+  stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial),
+              col="red", lty=2)+
+  scale_x_continuous(limits = c(0,1))+
+  xlab("Confianza.norm") +
+  ylab("Prob.Acertar") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15))
 
-# muestro los resultados
-print(summary(a3))
-
-# cuantifico los aciertos de los valores predichos con los verdaderos
-y <- d$discrimination_is_correct - trunc(2*a3$fitted)
-hits <- sum(y==0)
-hitratio <- hits/length(y)
-
-# respuestas correctas e incorrectas datos reales
-resp_correctas_datos <- sum(d$discrimination_is_correct)
-resp_incorrectas_datos <- nrow(d) - sum(d$discrimination_is_correct)
-
-# model a
-a_b1_fix <- fixef(a)[["confidence_key.norm"]]
-a_intercept_fix <- fixef(a)[["(Intercept)"]]  
-a_b1_rand <- ranef(a)[["sujetos"]][["confidence_key.norm"]]
-
-# model a2
-a2_b1_fix <- fixef(a2)[["confidence_key.norm"]]
-a2_intercept_fix <- fixef(a2)[["(Intercept)"]]
-a2_b1_rand <- ranef(a2)[["sujetos"]][["confidence_key.norm"]]
-a2_intercept_rand <- ranef(a2)[["sujetos"]][["(Intercept)"]]
-
-
-y.model_a <- c()
-y.model_a2 <- c()
-  
-for (j in 1:length(unique(d$sujetos))) {
-  d_sujeto <- d[d$sujeto == unique(d$sujetos)[j],]
-  
-  y.model_a_sujeto <- rep(NaN, length(d_sujeto$confidence_key.norm))
-  y.model_a2_sujeto <- rep(NaN, length(d_sujeto$confidence_key.norm))
-  
-  for (i in 1:length(d_sujeto$confidence_key.norm)) {
-    # equation model a
-    y.model_a_sujeto[i] <- invlogit(a_intercept_fix + 
-                                      (a_b1_rand[j] + a_b1_fix) * 
-                                      d_sujeto$confidence_key.norm[i])
-    
-    # equation model a2
-    y.model_a2_sujeto[i] <- invlogit((a2_intercept_rand[j] + a2_intercept_fix ) +
-                                       (a2_b1_rand[j] + a2_b1_fix) 
-                                     * d_sujeto$confidence_key.norm[i])
-  }
-  
-  # save y values
-  y.model_a <- c(y.model_a , y.model_a_sujeto)
-  y.model_a2 <- c(y.model_a2 , y.model_a2_sujeto)
-  
-}
-
-# respuestas correctas e incorrectas modelo
-resp_correctas_modelo_a <- sum(y.model_a > 0.5)
-resp_incorrectas_modelo_a <- sum(y.model_a < 0.5)
-resp_correctas_modelo_a2 <- sum(y.model_a2 > 0.5)
-resp_incorrectas_modelo_a2 <- sum(y.model_a2 < 0.5)
-
-respuestas     <- matrix( c(resp_correctas_datos,
-                    resp_incorrectas_datos,
-                    resp_correctas_modelo_a,
-                    resp_incorrectas_modelo_a,
-                    resp_correctas_modelo_a2,
-                    resp_incorrectas_modelo_a2), ncol = 3, byrow = FALSE) 
+p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + # group=y, color=y, fill=y
+  geom_bar(position = "dodge")+
+  scale_x_continuous(limits = c(-0.5,1.5))+
+  xlab("Confianza.norm") +
+  ylab("Cantidad") +
+  labs(fill = "Correcta")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        #plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        #axis.text.x = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 15))
 
 
-colnames(respuestas) <- c("datos", "modelo_a", "modelo_a2")
-rownames(respuestas) <- c("correctas","incorrectas")
+grid.arrange(p1, p2, ncol=2)
 
-print(respuestas)
 
-plot(sort(y.model_a))
-plot(sort(y.model_a2))
-plot(a)
-plot(a2)
-plot(a3)
 ```
+
+## Grafico la curva para un sujeto
+
+```{r grafico_curva_log_clasica, echo=TRUE}
+# ploteo una curva para todos los sujetos desde una log clasica
+
+d_sujeto <-  d[d$sujeto == unique(d$sujetos)[1],]
+
+
+df <- data.frame(x = d_sujeto$confidence_key.norm,
+                 y = d_sujeto$discrimination_is_correct)
+
+p1 <- ggplot(df, aes(x=x, y=y)) +
+  geom_point(alpha=0.33) + 
+  stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial),
+              col="red", lty=2)+
+  scale_x_continuous(limits = c(0,1))+
+  xlab("Confianza.norm") +
+  ylab("Prob.Acertar") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15))
+
+p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + # group=y, color=y, fill=y
+  geom_bar(position = "dodge")+
+  scale_x_continuous(limits = c(-0.5,1.5))+
+  xlab("Confianza.norm") +
+  ylab("Cantidad") +
+  labs(fill = "Correcta")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        #plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        #axis.text.x = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 15))
+
+
+grid.arrange(p1, p2, ncol=2)
+
+
+```
+# Ver como hacer para que represente el modelo mixto
