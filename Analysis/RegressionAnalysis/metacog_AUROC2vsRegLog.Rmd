@@ -29,16 +29,7 @@ d[d == "Femenino"] <- 0
 d$discrimination_is_correct <- ifelse(d$discrimination_is_correct == TRUE, 1, 0)
 d$sujetos <- factor(d$sujetos)
 d$confidence_key.norm <- (d$confidence_key - 1) / 3 
-#d$mc.norm <- (d$mc - mean(d$mc)) / sd(d$mc)
-#d$edad.norm <- (d$edad - mean(d$edad)) / sd(d$edad)
-#d$AQ.norm <- (d$AQ - mean(d$AQ)) / sd(d$AQ)
-#d$AQ_social.norm <- (d$AQ_social - mean(d$AQ_social)) / sd(d$AQ_social)
-#d$AQ_atencion_switch.norm  <- (d$AQ_atencion_switch - mean(d$AQ_atencion_switch)) / #sd(d$AQ_atencion_switch)
-#d$AQ_atencion_detail.norm <- (d$AQ_atencion_detail - mean(d$AQ_atencion_detail)) / #sd(d$AQ_atencion_detail)
-#d$AQ_communication.norm <- (d$AQ_communication - mean(d$AQ_communication)) / sd(d$AQ_communication)
-#d$AQ_imagination.norm <- (d$AQ_imagination - mean(d$AQ_imagination)) / sd(d$AQ_imagination)
 
-#print(str(d))
 ###############
 ### library ###
 ###############
@@ -59,7 +50,6 @@ library(ResourceSelection)
 ## Corro reg log mixta, sujetos variable random, solo varia el slope, intercept fija
 
 ```{r reg log, echo=TRUE}
-
 
 a <- glmer(discrimination_is_correct ~ confidence_key.norm + 
              (0 + confidence_key.norm|sujetos),
@@ -82,8 +72,6 @@ library(lattice)
 dotplot(ranef(a, which = "sujetos", condVar = TRUE), 
                 # con la siguiente linea saco a los sujetos del graf (eje y)
                  scales = list(y = list(alternating = 0)))
-                # , main="Sujetos var random",
-                # xlab="Confianza")
 
 # guardo metacog de cada sujeto en un df
 metacog_log_reg_mixt <-  ranef(a)[["sujetos"]]
@@ -104,7 +92,6 @@ source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_ap
 DF_list <- DataFrame_Filtered_already_applied(df_total)
 
 d.sin.normalizar.solo.FyM <- DF_list$d
-
 ```
 
 ## uno ambos puntajes de metacog en un df y lo exploro
@@ -136,8 +123,6 @@ ggplot(metacog_x2, aes(x=reg.log.mix.metacog, y=AUROC2.metacog)) +
 ## Corro reg log mixta, sujetos variable random, varia el slope y el intercept
 
 ```{r reg log 2, echo=TRUE}
-
-
 a2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
               (1 + confidence_key.norm|sujetos),
            data = d,
@@ -157,10 +142,7 @@ print(ranef(a2))
 ## ploteo los slope ordenados 
 library(lattice)
 dotplot(ranef(a2, which = "sujetos", condVar = TRUE), 
-                # con la siguiente linea saco a los sujetos del graf (eje y)
                  scales = list(y = list(alternating = 0)))
-                # , main="Sujetos var random",
-                # xlab="Confianza")
 
 # guardo metacog de cada sujeto en un df
 metacog_log_reg_mixt2 <-  ranef(a2)[["sujetos"]]
@@ -283,7 +265,7 @@ p1 <- ggplot(df, aes(x=x, y=y)) +
         strip.text = element_text(size = 15),
         axis.title.x = element_text(size = 15))
 
-p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + # group=y, color=y, fill=y
+p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + 
   geom_bar(position = "dodge")+
   scale_x_continuous(limits = c(-0.5,1.5))+
   xlab("Confianza.norm") +
@@ -293,20 +275,14 @@ p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + # group=y, color=y, fill=y
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        #plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
-        #axis.text.x = element_blank(),
-        #axis.text.y = element_blank(),
         axis.title.y = element_text(size = 15),
         strip.text = element_text(size = 15),
         axis.title.x = element_text(size = 15),
         legend.text = element_text(size = 10),
         legend.title = element_text(size = 15))
 
-
 grid.arrange(p1, p2, ncol=2)
-
-
 ```
 
 ## Grafico la curva para un sujeto
@@ -315,7 +291,6 @@ grid.arrange(p1, p2, ncol=2)
 # ploteo una curva para todos los sujetos desde una log clasica
 
 d_sujeto <-  d[d$sujeto == unique(d$sujetos)[1],]
-
 
 df <- data.frame(x = d_sujeto$confidence_key.norm,
                  y = d_sujeto$discrimination_is_correct)
@@ -336,7 +311,7 @@ p1 <- ggplot(df, aes(x=x, y=y)) +
         strip.text = element_text(size = 15),
         axis.title.x = element_text(size = 15))
 
-p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + # group=y, color=y, fill=y
+p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + 
   geom_bar(position = "dodge")+
   scale_x_continuous(limits = c(-0.5,1.5))+
   xlab("Confianza.norm") +
@@ -346,25 +321,19 @@ p2 <- ggplot(df, aes(x=x, fill= factor(y) )) + # group=y, color=y, fill=y
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        #plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
-        #axis.text.x = element_blank(),
-        #axis.text.y = element_blank(),
         axis.title.y = element_text(size = 15),
         strip.text = element_text(size = 15),
         axis.title.x = element_text(size = 15),
         legend.text = element_text(size = 10),
         legend.title = element_text(size = 15))
 
-
 grid.arrange(p1, p2, ncol=2)
-
-
 ```
-# Ver como hacer para que represente el modelo mixto
+
+# Grafico el modelo mixto para un solo sujeto
 ```{r grafico_curva_log_multinivel_un_sujeto, echo=TRUE}
 
-### ver si puedo hacer algo con estas lineas, pueden servir
 d_sujeto <-  d[d$sujeto == unique(d$sujetos)[1],]
 
 y_predicted_sujeto <- y.model_a2[1:nrow(d_sujeto)]
@@ -372,10 +341,125 @@ y_predicted_sujeto <- y.model_a2[1:nrow(d_sujeto)]
 d_sujeto_uni_slope <- data.frame(y = y_predicted_sujeto,
                                  correct = d_sujeto$discrimination_is_correct,
                                  conf = d_sujeto$confidence_key.norm)
-d_sujeto_uni_slope < d_sujeto_uni_slope[y == ]
 
-plot(discrimination_is_correct ~ confidence_key.norm, 
-     data=d_sujeto, col="steelblue")
-lines(y_predicted_sujeto ~ d_sujeto$confidence_key.norm, 
-      lwd=2)
+p1 <- ggplot(d_sujeto_uni_slope, aes(x=conf, y= y)) +
+  geom_point(alpha=0.33,size=2, shape=23) + 
+  geom_line()+
+  scale_x_continuous(limits = c(0,1))+
+  xlab("Confianza.norm") +
+  ylab("Prob.Acertar") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15))
+
+p2 <- ggplot(d_sujeto_uni_slope, aes(x=conf, fill= factor(correct) )) + 
+  geom_bar(position = "dodge")+
+  scale_x_continuous(limits = c(-0.5,1.5))+
+  xlab("Confianza.norm") +
+  ylab("Cantidad") +
+  labs(fill = "Correcta")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 15))
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+# Grafico el modelo mixto a2 para el sujeto con mayor metacog y el de menor metacog
+```{r grafico_curva_log_multinivel_mas_menos_metacog, echo=TRUE}
+
+ind_sub_max_metacog <-which.max(metacog_x2$reg.log.mix.2.metacog)
+ind_sub_min_metacog <-which.min(metacog_x2$reg.log.mix.2.metacog)
+max_metacog <- metacog_x2$sujetos[ind_sub_max_metacog]
+min_metacog <- metacog_x2$sujetos[ind_sub_min_metacog]
+
+df <- data.frame(sujetos = d$sujetos,
+                               y.predicted = y.model_a2,
+                               conf = d$confidence_key.norm,
+                               correct = d$discrimination_is_correct)
+
+d_max_metacog <-  df[df$sujetos == max_metacog,]
+d_min_metacog <-  df[df$sujetos == min_metacog,]
+
+# max metacog subject
+p1 <- ggplot(d_max_metacog, aes(x=conf, y= y.predicted)) +
+  geom_point(alpha=0.33,size=2, shape=23) + 
+  geom_line()+
+  xlab("Confianza.norm") +
+  ylab("Prob.Acertar") +
+  ggtitle("Sujeto con max metacog") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15))
+
+p2 <- ggplot(d_max_metacog, aes(x=conf, fill= factor(correct) )) + 
+  geom_bar(position = "dodge")+
+  scale_x_continuous(limits = c(-0.5,1.5))+
+  ggtitle("Sujeto con max metacog") +
+  xlab("Confianza.norm") +
+  ylab("Cantidad") +
+  labs(fill = "Correcta")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 15))
+
+# min metacog subject
+p3 <- ggplot(d_min_metacog, aes(x=conf, y= y.predicted)) +
+  geom_point(alpha=0.33,size=2, shape=23) + 
+  geom_line()+
+  xlab("Confianza.norm") +
+  ylab("Prob.Acertar") +
+  ggtitle("Sujeto con min metacog") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15))
+
+p4 <- ggplot(d_min_metacog, aes(x=conf, fill= factor(correct) )) + 
+  geom_bar(position = "dodge")+
+  scale_x_continuous(limits = c(-0.5,1.5))+
+  ggtitle("Sujeto con min metacog") +
+  xlab("Confianza.norm") +
+  ylab("Cantidad") +
+  labs(fill = "Correcta")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 15))
+
+grid.arrange(p1, p2, p3, p4, ncol=2)
 ```
