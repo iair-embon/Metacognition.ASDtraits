@@ -463,3 +463,37 @@ p4 <- ggplot(d_min_metacog, aes(x=conf, fill= factor(correct) )) +
 
 grid.arrange(p1, p2, p3, p4, ncol=2)
 ```
+
+# Grafico el modelo mixto a2 para todos los sujetos
+```{r grafico_curva_log_multinivel_todos_los_sujetos, echo=TRUE}
+
+df <- data.frame(sujetos = d$sujetos,
+                               y.predicted = y.model_a2,
+                               conf = d$confidence_key.norm,
+                               correct = d$discrimination_is_correct)
+
+med_by_conf <- df %>%
+  group_by(conf) %>%
+  summarise_at(vars(y.predicted), list(y.median = median))
+
+p1 <- ggplot() +
+  geom_point(med_by_conf, aes(x= conf, y= y.mean), size=3, shape=23) + # geom_point(df, aes(x= conf, y= y.predicted), size=3, shape=23) 
+  geom_line()+
+  xlab("Confianza.norm") +
+  ylab("Prob.Acertar") +
+  ggtitle("Sujeto con max metacog") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.y = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        axis.title.x = element_text(size = 15))
+
+for (s in 1:length(unique(df$sujetos))) {
+  d_sujeto <-  df[df$sujetos ==  unique(d$sujetos)[s],]
+}
+
+
+```
