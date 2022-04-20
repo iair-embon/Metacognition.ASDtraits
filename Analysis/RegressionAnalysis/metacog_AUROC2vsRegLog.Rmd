@@ -152,16 +152,17 @@ ggplot(metacog_x2, aes(x=reg.log.mix.2.metacog, y=AUROC2.metacog)) +
         axis.text.y = element_text(size = 30),
         axis.title.x = element_text(size = 20),
         axis.title.y = element_text(size = 20))
+
+# corro una correlacion entre ambos puntajes
+cor.test(metacog_x2$reg.log.mix.2.metacog, 
+         metacog_x2$AUROC2.metacog, 
+         method=c("pearson"))
+
 ```
 
-## Cuantifico las respeustas correctas vs las predicciones del modelo
+## calculo los y predichos por cada modelo
 
 ```{r metacog_X2_2, echo=TRUE}
-
-# respuestas correctas e incorrectas datos reales
-resp_correctas_datos <- sum(d$discrimination_is_correct)
-resp_incorrectas_datos <- nrow(d) - sum(d$discrimination_is_correct)
-
 # model a
 a_b1_fix <- fixef(a)[["confidence_key.norm"]]
 a_intercept_fix <- fixef(a)[["(Intercept)"]]  
@@ -172,7 +173,6 @@ a2_b1_fix <- fixef(a2)[["confidence_key.norm"]]
 a2_intercept_fix <- fixef(a2)[["(Intercept)"]]
 a2_b1_rand <- ranef(a2)[["sujetos"]][["confidence_key.norm"]]
 a2_intercept_rand <- ranef(a2)[["sujetos"]][["(Intercept)"]]
-
 
 y.model_a <- c()
 y.model_a2 <- c()
@@ -201,28 +201,9 @@ for (j in 1:length(unique(d$sujetos))) {
   
 }
 
-# respuestas correctas e incorrectas modelo
-resp_correctas_modelo_a <- sum(y.model_a > 0.5)
-resp_incorrectas_modelo_a <- sum(y.model_a < 0.5)
-resp_correctas_modelo_a2 <- sum(y.model_a2 > 0.5)
-resp_incorrectas_modelo_a2 <- sum(y.model_a2 < 0.5)
-
-respuestas     <- matrix( c(resp_correctas_datos,
-                    resp_incorrectas_datos,
-                    resp_correctas_modelo_a,
-                    resp_incorrectas_modelo_a,
-                    resp_correctas_modelo_a2,
-                    resp_incorrectas_modelo_a2), ncol = 3, byrow = FALSE) 
-
-
-colnames(respuestas) <- c("datos", "modelo_a", "modelo_a2")
-rownames(respuestas) <- c("correctas","incorrectas")
-
-print(respuestas)
-
+# veo los resultados
 plot(sort(y.model_a))
 plot(sort(y.model_a2))
-
 ```
 
 
@@ -234,7 +215,7 @@ df <- data.frame(x = d$confidence_key.norm,
                  y = d$discrimination_is_correct)
 
 p1 <- ggplot(df, aes(x=x, y=y)) +
-  geom_point(alpha=0.33) + 
+  geom_point() + 
   stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial),
               col="red", lty=2)+
   scale_x_continuous(limits = c(0,1))+
@@ -267,12 +248,14 @@ p2 <- ggplot(df, aes(x=x, fill= factor(y) )) +
         legend.title = element_text(size = 15))
 
 grid.arrange(p1, p2, ncol=2)
+
+### DUDA: tengo la impresion de que me tira dos lineas en lugar de una. 
 ```
 
-## Grafico la curva para un sujeto
+## Grafico la curva para un sujeto al azar
 
 ```{r grafico_curva_log_clasica_un_sujeto, echo=TRUE}
-# ploteo una curva para todos los sujetos desde una log clasica
+# ploteo una curva para un sujeto al azar desde una log clasica
 
 d_sujeto <-  d[d$sujeto == unique(d$sujetos)[1],]
 
@@ -280,7 +263,7 @@ df <- data.frame(x = d_sujeto$confidence_key.norm,
                  y = d_sujeto$discrimination_is_correct)
 
 p1 <- ggplot(df, aes(x=x, y=y)) +
-  geom_point(alpha=0.33) + 
+  geom_point() + 
   stat_smooth(method="glm", se=TRUE, method.args = list(family=binomial),
               col="red", lty=2)+
   scale_x_continuous(limits = c(0,1))+
