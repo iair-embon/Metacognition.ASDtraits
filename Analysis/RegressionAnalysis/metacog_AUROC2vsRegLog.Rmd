@@ -5,7 +5,7 @@ date: "4/6/2022"
 output: html_document
 ---
 
-## Levantar datos y preparo para obtener puntaje de metacog por reg log
+## Levanto datos y cargo librerias
 
 ```{r levantar datos, echo=TRUE}
 
@@ -45,9 +45,10 @@ library(faraway)
 library(knitr)
 library(performance)
 library(ResourceSelection)
+library(lattice)
 ```
 
-## Corro reg log mixta, sujetos variable random, solo varia el slope, intercept fija
+## Corro regresion logistica mixta y muestro los resultados. Modelo a: sujetos variable random, solo varia el slope, el intercept queda fija
 
 ```{r reg log, echo=TRUE}
 
@@ -61,36 +62,19 @@ a <- glmer(discrimination_is_correct ~ confidence_key.norm +
 print(summary(a))
 print(fixef(a))
 print(ranef(a))
-```
-
-## Visualizacion de los datos
-
-```{r visualizacion reg log, echo=TRUE}
 
 ## ploteo los slope ordenados 
-library(lattice)
 dotplot(ranef(a, which = "sujetos", condVar = TRUE), 
                 # con la siguiente linea saco a los sujetos del graf (eje y)
                  scales = list(y = list(alternating = 0)))
 
 # guardo metacog de cada sujeto en un df
-metacog_log_reg_mixt <-  ranef(a)[["sujetos"]]
+metacog_log_reg_mixt_a <-  ranef(a)[["sujetos"]]
 ```
 
-## Estimo la auroc2 por sujeto
+## Cargo el df que tiene calculado la metacognicion por AUROC2
 
 ```{r auroc2, echo=TRUE}
-
-root <- rprojroot::is_rstudio_project
-basename(getwd())               
-
-####### data frames with filters already applied
-filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
-load(file= filepath)
-
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
-DF_list <- DataFrame_Filtered_already_applied(df_total)
-
 d.sin.normalizar.solo.FyM <- DF_list$d
 ```
 
@@ -99,7 +83,7 @@ d.sin.normalizar.solo.FyM <- DF_list$d
 ```{r metacog_X2, echo=TRUE}
 metacog_x2 <- data.frame(
   sujetos = d.sin.normalizar.solo.FyM$sujetos,
-  reg.log.mix.metacog = metacog_log_reg_mixt$confidence_key.norm,
+  reg.log.mix.metacog = metacog_log_reg_mixt_a$confidence_key.norm,
   AUROC2.metacog = d.sin.normalizar.solo.FyM$mc
 )
 
@@ -118,9 +102,14 @@ ggplot(metacog_x2, aes(x=reg.log.mix.metacog, y=AUROC2.metacog)) +
         axis.text.y = element_text(size = 30),
         axis.title.x = element_text(size = 20),
         axis.title.y = element_text(size = 20))
+
+# corro una correlacion entre ambos puntajes
+cor.test(metacog_x2$reg.log.mix.metacog, 
+         metacog_x2$AUROC2.metacog, 
+         method=c("pearson"))
 ```
 
-## Corro reg log mixta, sujetos variable random, varia el slope y el intercept
+## Corro regresion logistica mixta y muestro los resultados. Modelo a2: sujetos es una variable random, varia el slope y el también intercept.
 
 ```{r reg log 2, echo=TRUE}
 a2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
@@ -133,19 +122,14 @@ a2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
 print(summary(a2))
 print(fixef(a2))
 print(ranef(a2))
-```
 
-## Visualizacion de los datos
-
-```{r visualizacion reg log 2, echo=TRUE}
-
-## ploteo los slope ordenados 
-library(lattice)
+## ploteo los slope e intercept ordenados 
 dotplot(ranef(a2, which = "sujetos", condVar = TRUE), 
                  scales = list(y = list(alternating = 0)))
 
 # guardo metacog de cada sujeto en un df
 metacog_log_reg_mixt2 <-  ranef(a2)[["sujetos"]]
+
 ```
 
 ## Lo agrego al df de metacog_x2 y lo exploro
