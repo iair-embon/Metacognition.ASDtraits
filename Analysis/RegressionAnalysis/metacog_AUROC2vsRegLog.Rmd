@@ -46,6 +46,7 @@ library(knitr)
 library(performance)
 library(ResourceSelection)
 library(lattice)
+library(reshape2)
 ```
 
 ## Corro regresion logistica mixta y muestro los resultados. Modelo a: sujetos variable random, solo varia el slope, el intercept queda fija
@@ -443,12 +444,20 @@ med_by_conf <- df %>%
   group_by(conf) %>%
   summarise_at(vars(y.predicted), list(y.median = median))
 
+y.general_median <- df$conf
+
+y.general_median[y.general_median == med_by_conf$conf[1]] <- med_by_conf$y.median[1]
+y.general_median[y.general_median == med_by_conf$conf[2]] <- med_by_conf$y.median[2]
+y.general_median[y.general_median == med_by_conf$conf[3]] <- med_by_conf$y.median[3]
+y.general_median[y.general_median == med_by_conf$conf[4]] <- med_by_conf$y.median[4]
+
+df$y.general_median <- y.general_median
+
 p1 <- ggplot() +
-  geom_point(med_by_conf, aes(x= conf, y= y.mean), size=3, shape=23) + # geom_point(df, aes(x= conf, y= y.predicted), size=3, shape=23) 
-  geom_line()+
+  geom_point(data=df, aes(x= conf, y= y.general_median),size=4, shape=23) +
   xlab("Confianza.norm") +
   ylab("Prob.Acertar") +
-  ggtitle("Sujeto con max metacog") +
+  ggtitle("Todos los sujetos") +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -458,9 +467,19 @@ p1 <- ggplot() +
         strip.text = element_text(size = 15),
         axis.title.x = element_text(size = 15))
 
+
+
 for (s in 1:length(unique(df$sujetos))) {
   d_sujeto <-  df[df$sujetos ==  unique(d$sujetos)[s],]
+
+  p1 <- p1 + 
+    geom_line(data=d_sujeto, aes(x = conf , y= y.predicted), color = "grey")
 }
 
+# agrego la linea general aca al final, sino se solapa con las otras.
+p1 <- p1 +
+    geom_line(data=df, aes(x= conf, y= y.general_median), size= 3)
+
+p1
 
 ```
