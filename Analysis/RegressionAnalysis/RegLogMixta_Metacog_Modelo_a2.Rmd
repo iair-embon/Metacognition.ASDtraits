@@ -183,3 +183,31 @@ dotplot(ranef(a2, which = "sujetos", condVar = TRUE),
 # guardo metacog de cada sujeto en un df
 #metacog <-  ranef(a2)[["sujetos"]]
 ```
+
+## Corro el modelo a2, pero con predictores muy parecidos a los que usamos para auroc2
+
+```{r reg log 2 + nuevas interacciones_3, echo=TRUE}
+a2 <- glmer(discrimination_is_correct ~ 
+              confidence_key.norm +
+              confidence_key.norm:AQ +
+              confidence_key.norm:genero +
+              confidence_key.norm:edad +
+              confidence_key.norm:AQ:genero +
+              confidence_key.norm:AQ:edad +
+              (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a2))
+print(fixef(a2))
+print(ranef(a2))  
+
+## ploteo los slope e intercept ordenados 
+dotplot(ranef(a2, which = "sujetos", condVar = TRUE), 
+                scales = list(y = list(alternating = 0)))
+
+# guardo metacog de cada sujeto en un df
+#metacog <-  ranef(a2)[["sujetos"]]
+```
