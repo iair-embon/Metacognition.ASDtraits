@@ -28,8 +28,7 @@ DF_list <- DataFrame_Filtered_already_applied(df_total)
 d <- df_total[df_total$genero == "Masculino" | df_total$genero == "Femenino",]
 
 # modifico las variables que me interesan modificar
-d[d == "Masculino"] <- 1
-d[d == "Femenino"] <- 0
+d$genero <- ifelse(d$genero == "Masculino",1,0)
 d$discrimination_is_correct <- ifelse(d$discrimination_is_correct == TRUE, 1, 0)
 d$sujetos <- factor(d$sujetos)
 d$confidence_key.norm <- (d$confidence_key - 1) / 3 
@@ -53,36 +52,14 @@ library(lattice)
 library(reshape2)
 ```
 
-## Corro regresion logistica mixta y muestro los resultados. Modelo a2: sujetos es una variable random, varia el slope y el también intercept.
-
-```{r reg log 2, echo=TRUE}
-a2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
-              (1 + confidence_key.norm|sujetos),
-           data = d,
-           family = binomial,
-           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
-
-# # muestro los resultados
-# print(summary(a2))
-# print(fixef(a2))
-# print(ranef(a2))
-
-# ## ploteo los slope e intercept ordenados 
-# dotplot(ranef(a2, which = "sujetos", condVar = TRUE), 
-#                  scales = list(y = list(alternating = 0)))
-
-# guardo metacog de cada sujeto en un df
-metacog <-  ranef(a2)[["sujetos"]]
-```
-
 ## Corro el modelo a2 con el predictor de edad y genero
 
 ```{r reg log 2 edad y genero, echo=TRUE}
 a2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
               genero +
-              edad +
+              #edad +
               confidence_key.norm:genero +
-              confidence_key.norm:edad +
+              #confidence_key.norm:edad +
               (1 + confidence_key.norm|sujetos),
            data = d,
            family = binomial,
@@ -194,6 +171,33 @@ a2 <- glmer(discrimination_is_correct ~
               confidence_key.norm:edad +
               confidence_key.norm:AQ:genero +
               confidence_key.norm:AQ:edad +
+              (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a2))
+print(fixef(a2))
+print(ranef(a2))  
+
+## ploteo los slope e intercept ordenados 
+dotplot(ranef(a2, which = "sujetos", condVar = TRUE), 
+                scales = list(y = list(alternating = 0)))
+
+# guardo metacog de cada sujeto en un df
+#metacog <-  ranef(a2)[["sujetos"]]
+```
+
+## El modelo anterior tiene el problema de signularidad. 
+## Pruebo correr un nuevo modelo sin edad. 
+
+```{r reg log 2 + nuevas interacciones_4, echo=TRUE}
+a2 <- glmer(discrimination_is_correct ~ 
+              confidence_key.norm +
+              confidence_key.norm:AQ +
+              confidence_key.norm:genero +
+              confidence_key.norm:AQ:genero +
               (1 + confidence_key.norm|sujetos),
            data = d,
            family = binomial,
