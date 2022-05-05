@@ -33,6 +33,12 @@ d$sujetos <- factor(d$sujetos)
 d$confidence_key.norm <- (d$confidence_key - 1) / 3 
 d$AQ.norm <-  (d$AQ - mean(d$AQ)) / sd(d$AQ)
 d$edad.norm <- (d$edad - mean(d$edad))/sd(d$edad)
+d$aq_social.norm <- (d$AQ_social - mean(d$AQ_social))/ sd(d$AQ_social)
+d$aq_at_sw.norm <- (d$AQ_atencion_switch - mean(d$AQ_atencion_switch))/ sd(d$AQ_atencion_switch)
+d$aq_at_de.norm <- (d$AQ_atencion_detail - mean(d$AQ_atencion_detail))/ sd(d$AQ_atencion_detail)
+d$aq_com.norm <- (d$AQ_communication - mean(d$AQ_communication))/ sd(d$AQ_communication)
+d$aq_im.norm <- (d$AQ_imagination - mean(d$AQ_imagination))/ sd(d$AQ_imagination)
+
 
 ###############
 ### library ###
@@ -54,56 +60,33 @@ library(reshape2)
 ```
 
 
+## Corro el modelo elegido pero ahora en vez de AQ.norm, va a estar cada
+## subescala normalizada.
 
-## El modelo anterior tiene el problema de signularidad. 
-## Pruebo correr un nuevo modelo sin edad y AQ normalizado. 
 
-```{r reg log 2 + nuevas interacciones_4, echo=TRUE}
-a2 <- glmer(discrimination_is_correct ~ 
-              confidence_key.norm +
-              confidence_key.norm:AQ.norm +
+```{r reg log, echo=TRUE}
+a1 <- glmer(discrimination_is_correct ~               confidence_key.norm +
+              confidence_key.norm:aq_social.norm +
+              confidence_key.norm:aq_at_sw.norm +
+              confidence_key.norm:aq_at_de.norm +
+              confidence_key.norm:aq_com.norm +
+              confidence_key.norm:aq_im.norm +
               confidence_key.norm:genero +
-              confidence_key.norm:AQ.norm:genero +
-              (1 + confidence_key.norm|sujetos),
-           data = d,
-           family = binomial,
-           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
-
-# muestro los resultados
-print(summary(a2))
-print(fixef(a2))
-print(ranef(a2))  
-
-## ploteo los slope e intercept ordenados 
-dotplot(ranef(a2, which = "sujetos", condVar = TRUE), 
-                scales = list(y = list(alternating = 0)))
-
-# guardo metacog de cada sujeto en un df
-#metacog <-  ranef(a2)[["sujetos"]]
-```
-
-
-## El modelo anterior tiene el problema de signularidad.
-## vario solo la intercept
-
-```{r reg log 2 + nuevas interacciones_5, echo=TRUE}
-a2 <- glmer(discrimination_is_correct ~ 
-              confidence_key.norm +
-              confidence_key.norm:AQ.norm +
-              confidence_key.norm:genero +
-              confidence_key.norm:AQ.norm:genero +
+              confidence_key.norm:edad.norm +
+              #confidence_key.norm:AQ.norm:genero +
+              #  confidence_key.norm:AQ.norm:genero +
               (1|sujetos),
            data = d,
            family = binomial,
            control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 
 # muestro los resultados
-print(summary(a2))
-print(fixef(a2))
-print(ranef(a2))  
+print(summary(a1))
+print(fixef(a1))
+print(ranef(a1))  
 
 ## ploteo los slope e intercept ordenados 
-dotplot(ranef(a2, which = "sujetos", condVar = TRUE), 
+dotplot(ranef(a1, which = "sujetos", condVar = TRUE), 
                 scales = list(y = list(alternating = 0)))
 
 # guardo metacog de cada sujeto en un df
