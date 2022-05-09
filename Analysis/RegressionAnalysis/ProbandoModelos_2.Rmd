@@ -88,6 +88,7 @@ dotplot(ranef(a2, which = "sujetos", condVar = TRUE),
 
 
 ## Mismo modelo que el anterior pero vario solo la intercept
+## este es el que quedo elegido
 
 ```{r reg log 2 + nuevas interacciones_5, echo=TRUE}
 a3 <- glmer(discrimination_is_correct ~               confidence_key.norm +

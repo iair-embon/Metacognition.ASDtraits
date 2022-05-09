@@ -12,6 +12,18 @@ library(sjPlot)
 library(dotwhisker)
 library(reshape2)
 library(ggExtra)
+library(dplyr)
+library(lme4)
+library(tibble)
+library(car)
+library(DescTools)
+library(gridExtra)
+library(faraway)
+library(knitr)
+library(performance)
+library(ResourceSelection)
+library(lattice)
+
 
 ########################################
 ### Correct and incorrect barplot ###  FIG 2 a
@@ -357,6 +369,8 @@ ggplot(mc.sorted, aes(x = s)) +
 ### Regression model ###
 ########################
 
+### linear regression model 
+
 root <- rprojroot::is_rstudio_project
 basename(getwd())               
 
@@ -639,6 +653,102 @@ ggplot(d1, aes(x=aq_im.norm , y=mc)) +
         axis.text.y = element_text(size = 30),
         axis.title.y = element_blank())
 
+
+
+##########################################
+### Mixed Logistic Regression Analysis ###
+##########################################
+
+# levanto los datos
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
+
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+
+# only male and female genders
+d <- df_total[df_total$genero == "Masculino" | df_total$genero == "Femenino",]
+
+# modifico las variables que me interesan modificar
+d$genero <- ifelse(d$genero == "Masculino",1,0)
+d$discrimination_is_correct <- ifelse(d$discrimination_is_correct == TRUE, 1, 0)
+d$sujetos <- factor(d$sujetos)
+d$confidence_key.norm <- (d$confidence_key - 1) / 3 
+d$AQ.norm <-  (d$AQ - mean(d$AQ)) / sd(d$AQ)
+d$edad.norm <- (d$edad - mean(d$edad))/sd(d$edad)
+
+a_log <- glmer(discrimination_is_correct ~ confidence_key.norm +
+                 confidence_key.norm:AQ.norm +
+                 confidence_key.norm:genero +
+                 confidence_key.norm:edad.norm +
+                 confidence_key.norm:AQ.norm:genero +
+                 confidence_key.norm:AQ.norm:genero +
+                 (1|sujetos),
+               data = d,
+               family = binomial,
+               control=glmerControl(optimizer="bobyqa",
+                                    optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a_log))
+
+## saco los nombres de los coeficientes
+lala <- coef(summary(a_log))
+coef_names <- rownames(lala)
+
+plot_summs(a_log, coefs = c('Confidence.norm'=  'confidence_key.norm',
+                        'Confidence.norm:AQ.norm' = 'confidence_key.norm:AQ.norm',
+                        'Confidence.norm:Gender' = 'confidence_key.norm:genero',
+                        'Confidence.norm:Age.norm' = 'confidence_key.norm:edad.norm',
+                        'Confidence.norm:AQ.norm:Gender' = 'confidence_key.norm:AQ.norm:genero'),
+           plot.distributions = FALSE, colors = "black")+
+  ylab("") +
+  xlab("") +#xlab("Regression coefficient") +
+  #scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_blank(), #element_text(size = 20, angle = (45)), 
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_text(size = 25))
+
+## showing the intercept varying by subject
+intercepts <- ranef(a_log)
+intercepts <- intercepts$sujetos[[1]]
+
+library(ggdist)
+library(tidyquant)
+
+df <- data.frame(subjects = 1:360,
+                 intercepts = intercepts)
+
+ggplot(df, aes(x = intercepts))+
+  geom_histogram(fill = "black")+
+  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_blank(),
+        strip.text = element_text(size = 20),
+        axis.title.x = element_blank())
+
 #######################################
 ### Bar plot regression coefficient ###
 #######################################
@@ -677,6 +787,7 @@ ggplot(dtf1, aes(Predictor, y)) +
         axis.ticks.x=element_blank(),
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30))
+
 
 
 #####################
