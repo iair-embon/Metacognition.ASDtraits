@@ -688,7 +688,7 @@ a_log <- glmer(discrimination_is_correct ~ confidence_key.norm +
                  confidence_key.norm:genero +
                  confidence_key.norm:edad.norm +
                  confidence_key.norm:AQ.norm:genero +
-                 confidence_key.norm:AQ.norm:genero +
+                 confidence_key.norm:AQ.norm:edad.norm +
                  (1|sujetos),
                data = d,
                family = binomial,
@@ -706,7 +706,8 @@ plot_summs(a_log, coefs = c('Confidence.norm'=  'confidence_key.norm',
                         'Confidence.norm:AQ.norm' = 'confidence_key.norm:AQ.norm',
                         'Confidence.norm:Gender' = 'confidence_key.norm:genero',
                         'Confidence.norm:Age.norm' = 'confidence_key.norm:edad.norm',
-                        'Confidence.norm:AQ.norm:Gender' = 'confidence_key.norm:AQ.norm:genero'),
+                        'Confidence.norm:AQ.norm:Gender' = 'confidence_key.norm:AQ.norm:genero',
+                        'Confidence.norm:AQ.norm:Age' = 'confidence_key.norm:AQ.norm:edad.norm'),
            plot.distributions = FALSE, colors = "black")+
   ylab("") +
   xlab("") +#xlab("Regression coefficient") +
