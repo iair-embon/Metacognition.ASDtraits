@@ -1,0 +1,103 @@
+######################################
+### Correct and incorrect barplot  ###  FIG 4
+######################################
+
+###############
+### library ###
+###############
+library(tidyverse)
+library(jtools)
+library(broom.mixed)
+
+########################
+### Regression model ###
+########################
+
+### linear regression model 
+
+root <- rprojroot::is_rstudio_project
+basename(getwd())               
+
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
+
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+
+d.sin.normalizar.solo.FyM <- DF_list$d
+
+
+###########################
+### Regression Analysis ###
+###########################
+
+### lineas para hacer regresion 
+
+
+d1 = d.sin.normalizar.solo.FyM
+
+d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
+
+d1$mc.norm <- (d1$mc - mean(d1$mc))/ sd(d1$mc)
+
+d1$edad.norm <- (d1$edad - mean(d1$edad))/ sd(d1$edad)
+
+d1[d1 == "Masculino"] <- "1"
+d1[d1 == "Femenino"] <- "0"
+d1$Im <- as.integer(d1$Im)
+
+############ metacog y AQ
+
+# corro el modelo
+a=lm(mc ~ aq.norm +
+       Im +
+       edad.norm+
+       aq.norm: Im+
+       aq.norm:edad.norm,
+     data = d1) 
+summary(a)
+
+### FIG 4a
+
+plot_summs(a, coefs = c('AQ' = 'aq.norm','Gender[m]'='Im','Age' = 'edad.norm',
+                        'AQ:Gender[m]'='aq.norm:Im','AQ:Age'='aq.norm:edad.norm') ,
+           plot.distributions = FALSE, colors = "black")+
+  ylab("") +
+  xlab("Regression coefficient") +
+  scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 20), 
+        axis.title.y = element_text(size = 25),
+        axis.title.x = element_text(size = 25))
+
+ggsave("Figures/Figuras_en_R/4a.png", 
+       width = 6, height = 4)
+
+## regression line and scatter plot
+ggplot(d1, aes(x=aq, y=mc)) + 
+  geom_point()+
+  geom_abline(intercept = unname(coefficients(a)[1]), 
+              slope = unname(coefficients(a)[2]))+
+  ylab("AUROC2") +
+  xlab("AQ") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(1, 1,1, 1, "cm"),
+        panel.background = element_blank(),
+        axis.title.x=element_text(size = 25),
+        axis.text.x=element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25))
+
+ggsave("Figures/Figuras_en_R/4b.png", 
+       width = 6, height = 4)

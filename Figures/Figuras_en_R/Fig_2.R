@@ -1,11 +1,23 @@
 ######################################
-### Correct and incorrect barplot  ###  FIG 2 a
+### Correct and incorrect barplot  ###  FIG 2
 ######################################
 
 ###############
 ### library ###
 ###############
 library(tidyverse)
+library(gridExtra)
+library(grid)
+
+## answers
+cant_trials <- 130
+percent_correct <- 75
+n_correct <- round((75*cant_trials)/100)
+n_incorrect <- cant_trials - n_correct
+correct <- rep(1,n_correct)
+incorrect <- rep(0,n_incorrect)
+answers <- c(correct,incorrect)
+
 
 #### poor metacognition barplot (Top)
 
@@ -65,11 +77,11 @@ for (c in 1:Nratings){
 poor_auroc2 <- 0.5 + 0.25*sum(k)
 
 S2 <- c(rev(H2),rev(FA2)) # lo invierto, ya que fue no invertido para obviar la inversa de la normal
-Names <- c("C1","C2","C3","C4", "C1","C2","C3","C4")
-Group <- c(rep("H2", length(H2)), rep("FA2", length(FA2)))
+Confidence <- c("C1","C2","C3","C4", "C1","C2","C3","C4")
+Group <- c(rep("Correct", length(H2)), rep("Incorrect", length(FA2)))
 
 df_poor <- data.frame(S2 = S2,
-                      Names = Names,
+                      Confidences = Confidence,
                       Group = Group
 )
 
@@ -77,11 +89,12 @@ df_poor <- data.frame(S2 = S2,
 poor_cum_H2 <- cum_H2
 poor_cum_FA2 <- cum_FA2
 
-# poor metacognition bar plots
-ggplot(df_poor, aes(fill=Group, x=Names, y=S2)) + 
+# good metacognition bar plots
+poor_metacog_barplot <- ggplot(df_poor, aes(fill=Group, x=Confidence, y=S2)) + 
   geom_bar(position="dodge", stat="identity")+
-  scale_x_discrete(expand = expansion(mult = c(0.2, 0.2))) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0)), limits=c(0,0.6)) +
+  scale_x_discrete(expand = expansion(mult = c(0.2, 0.2)))+
+  scale_y_continuous(expand = expansion(mult = c(0, 0)), 
+                     limits=c(0,0.6)) +
   scale_fill_manual(values = c("#000000","#808080"))+
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -90,27 +103,20 @@ ggplot(df_poor, aes(fill=Group, x=Names, y=S2)) +
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
         axis.text.x = element_blank(),
-        legend.position = "none",
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.position = c(0.2,0.7),
         strip.text = element_text(size = 20),
         axis.title.x = element_blank())
 
-
+poor_metacog_barplot
 ggsave("Figures/Figuras_en_R/2a_top.png", 
        width = 6, height = 4)
 
 
 #### good metacognition barplot (Botton)
-
-## answers
-cant_trials <- 130
-percent_correct <- 75
-n_correct <- round((75*cant_trials)/100)
-n_incorrect <- cant_trials - n_correct
-correct <- rep(1,n_correct)
-incorrect <- rep(0,n_incorrect)
-answers <- c(correct,incorrect)
 
 ## confidence
 
@@ -180,11 +186,11 @@ good_cum_H2 <- cum_H2
 good_cum_FA2 <- cum_FA2
 
 # good metacognition bar plots
-ggplot(df_good, aes(fill=Group, x=Confidence, y=S2)) + 
+good_metacog_barplot <- ggplot(df_good, aes(fill=Group, x=Confidence, y=S2)) + 
   geom_bar(position="dodge", stat="identity")+
   scale_x_discrete(expand = expansion(mult = c(0.2, 0.2)),
                    breaks = c("C1","C4"),
-                   labels = c("Low","High")) +
+                   labels = c("Low","High"))+
   scale_y_continuous(expand = expansion(mult = c(0, 0)), 
                      limits=c(0,0.6)) +
   scale_fill_manual(values = c("#000000","#808080"))+
@@ -198,13 +204,23 @@ ggplot(df_good, aes(fill=Group, x=Confidence, y=S2)) +
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         legend.title = element_blank(),
-        legend.text = element_text(size = 20),
+        legend.position = "none",
+        legend.text = element_blank(),
         strip.text = element_text(size = 20),
-        axis.title.x = element_text(size = 20))
+        axis.title.x = element_blank())
 
-
+good_metacog_barplot
 ggsave("Figures/Figuras_en_R/2a_botton.png", 
        width = 6, height = 4)
+### ---
+
+bottom <- textGrob("Confidence", gp = gpar(fontsize = 25))
+
+grid.arrange(poor_metacog_barplot,good_metacog_barplot, bottom = bottom, ncol=1)
+
+g <- arrangeGrob(poor_metacog_barplot,good_metacog_barplot, bottom = bottom, ncol=1)
+ggsave("Figures/Figuras_en_R/2a.png", g,
+       width = 6, height = 8)
 
 
 #########################
@@ -216,8 +232,8 @@ ggsave("Figures/Figuras_en_R/2a_botton.png",
 df <- data.frame(H2 = poor_cum_H2, 
                  FA2 = poor_cum_FA2)
 
-ggplot(df) +                   
-  geom_line(aes(x = FA2, y=H2),size = 3, color = 'black') +  # la pinto de blanco y la edito en inskape
+poor_metacog <- ggplot(df) +                   
+  geom_line(aes(x = FA2, y=H2),size = 3, color = 'black') + 
   geom_abline(intercept = 0, slope = 1, color = "grey", linetype="dashed", 
               size = 1.5) +
   scale_x_continuous(expand = expansion(mult = c(0, 0))) +
@@ -241,8 +257,8 @@ ggplot(df) +
 df <- data.frame(H2 = good_cum_H2, 
                  FA2 = good_cum_FA2)
 
-ggplot(df) +                   
-  geom_line(aes(x = FA2, y=H2),size = 3, color = 'black') +  # la pinto de blanco y la edito en inskape
+good_metacog <- ggplot(df) +                   
+  geom_line(aes(x = FA2, y=H2),size = 3, color = 'black') +  
   geom_abline(intercept = 0, slope = 1, color = "grey", linetype="dashed", 
               size = 1.5) +
   scale_x_continuous(expand = expansion(mult = c(0, 0))) +
@@ -260,3 +276,12 @@ ggplot(df) +
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.title.x = element_blank()) 
+
+yleft <- textGrob("P(confidence|correct)", rot = 90, gp = gpar(fontsize = 25))
+bottom <- textGrob("P(confidence|incorrect)", gp = gpar(fontsize = 25))
+
+grid.arrange(poor_metacog,good_metacog,left = yleft, bottom = bottom, ncol=1)
+
+g <- arrangeGrob(poor_metacog,good_metacog,left = yleft, bottom = bottom, ncol=1)
+ggsave("Figures/Figuras_en_R/2b.png", g,
+       width = 6, height = 8)
