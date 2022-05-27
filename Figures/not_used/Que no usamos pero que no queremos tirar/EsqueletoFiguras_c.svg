@@ -15,7 +15,7 @@
    id="svg5"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
    sodipodi:docname="EsqueletoFiguras_c.svg"
-   inkscape:export-filename="/home/iair/Documents/Investigación/Metacog.Tea/Metacognition.ASDtraits/Figures/Figuras que van a ir en el paper/EsqueletoFiguras.png"
+   inkscape:export-filename="D:\Windows\Descargas\Git_Metacog_Tea\Metacognition.ASDtraits\Figures\Nuevas Figuras que van a ir en el paper\C.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <metadata
@@ -26,6 +26,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -35,13 +36,13 @@
      bordercolor="#666666"
      borderopacity="1.0"
      inkscape:pageshadow="2"
-     inkscape:pageopacity="0"
+     inkscape:pageopacity="1"
      inkscape:pagecheckerboard="false"
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="1.5500841"
      inkscape:cx="218.1965"
-     inkscape:cy="812.26429"
+     inkscape:cy="915.4845"
      inkscape:window-width="1366"
      inkscape:window-height="705"
      inkscape:window-x="-8"
@@ -1247,10 +1248,10 @@
        x="43.43985"
        y="178.32098"
        id="text11278-3-6-0-31-5-2-2-5"
-       inkscape:transform-center-x="49.932912"
-       inkscape:transform-center-y="-122.83694"
+       inkscape:transform-center-x="63.094028"
+       inkscape:transform-center-y="-116.65621"
        clip-path="url(#clipPath314021-7-9-9-3)"
-       transform="rotate(-39.959623,105.88322,250.13318)"><tspan
+       transform="rotate(-46.240212,94.327088,242.99377)"><tspan
          sodipodi:role="line"
          id="tspan11276-6-2-9-9-6-7-28-4"
          style="font-size:3.52778px;fill:#000000;fill-opacity:1;stroke-width:0.264583"
@@ -1261,41 +1262,11 @@
        style="font-style:normal;font-weight:normal;font-size:3.52778px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        x="43.43985"
        y="178.32098"
-       id="text11278-3-6-0-31-5-2-6-9-7"
-       inkscape:transform-center-x="58.463792"
-       inkscape:transform-center-y="-118.83626"
-       clip-path="url(#clipPath314021-7-9-06-2-1)"
-       transform="rotate(-44.049307,112.24775,263.21743)"><tspan
-         sodipodi:role="line"
-         id="tspan11276-6-2-9-9-6-7-1-7-4"
-         style="font-size:3.52778px;fill:#000000;fill-opacity:1;stroke-width:0.264583"
-         x="43.43985"
-         y="178.32098">AQ:Gender</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:3.52778px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="43.43985"
-       y="178.32098"
-       id="text11278-3-6-0-31-5-2-9-3-4"
-       inkscape:transform-center-x="55.54439"
-       inkscape:transform-center-y="-120.39179"
-       clip-path="url(#clipPath314021-7-9-8-0-6)"
-       transform="rotate(-42.605635,120.07566,261.12065)"><tspan
-         sodipodi:role="line"
-         id="tspan11276-6-2-9-9-6-7-2-6-3"
-         style="font-size:3.52778px;fill:#000000;fill-opacity:1;stroke-width:0.264583"
-         x="43.43985"
-         y="178.32098">AQ:Age</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:3.52778px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="43.43985"
-       y="178.32098"
        id="text11278-3-6-0-31-5-2-7-1-0"
        inkscape:transform-center-x="56.424049"
        inkscape:transform-center-y="-120.00701"
        clip-path="url(#clipPath314021-7-9-02-3-2)"
-       transform="rotate(-43.135791,82.04797,237.80226)"><tspan
+       transform="rotate(-43.135791,81.783387,238.47162)"><tspan
          sodipodi:role="line"
          id="tspan11276-6-2-9-9-6-7-5-2-7"
          style="font-size:3.52778px;fill:#000000;fill-opacity:1;stroke-width:0.264583"
@@ -1462,5 +1433,35 @@
          style="font-size:4.23333px;stroke-width:0.264583"
          x="18.328226"
          y="196.84531">AUROC2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52778px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="43.43985"
+       y="178.32098"
+       id="text11278-3-6-0-31-5-2-9-3-4"
+       inkscape:transform-center-x="55.54439"
+       inkscape:transform-center-y="-120.39179"
+       clip-path="url(#clipPath314021-7-9-8-0-6)"
+       transform="rotate(-42.605635,119.13256,261.53459)"><tspan
+         sodipodi:role="line"
+         id="tspan11276-6-2-9-9-6-7-2-6-3"
+         style="font-size:3.52778px;fill:#000000;fill-opacity:1;stroke-width:0.264583"
+         x="43.43985"
+         y="178.32098">AQ:Age</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52778px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="43.43985"
+       y="178.32098"
+       id="text11278-3-6-0-31-5-2-6-9-7"
+       inkscape:transform-center-x="58.463792"
+       inkscape:transform-center-y="-118.83626"
+       clip-path="url(#clipPath314021-7-9-06-2-1)"
+       transform="rotate(-44.049307,111.32911,263.60691)"><tspan
+         sodipodi:role="line"
+         id="tspan11276-6-2-9-9-6-7-1-7-4"
+         style="font-size:3.52778px;fill:#000000;fill-opacity:1;stroke-width:0.264583"
+         x="43.43985"
+         y="178.32098">AQ:Gender</tspan></text>
   </g>
 </svg>
