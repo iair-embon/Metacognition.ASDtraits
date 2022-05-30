@@ -5,8 +5,8 @@
 ###############
 ### library ###
 ###############
-library(tidyverse)
-library(ggtext)
+require(tidyverse)
+require(ggtext)
 
 
 # voy a la carpeta del proyecto
@@ -40,7 +40,7 @@ ggplot(mc.sorted, aes(x=s,y=value,color=name)) +
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         plot.margin = margin(1, 1,1, 1, "cm"),
-        legend.text =  element_text(size = 20),
+        legend.text =  element_text(size = 25),
         legend.position = c(0.7, 0.2),
         legend.background = element_blank(),
         legend.key = element_blank(),
@@ -52,4 +52,4 @@ ggplot(mc.sorted, aes(x=s,y=value,color=name)) +
         axis.title.y = element_blank())
 
 ggsave("Figures/Figuras_en_R/3a.png", 
-       width = 6, height = 4)
+       width = 10, height = 6)

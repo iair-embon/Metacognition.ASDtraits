@@ -1,5 +1,5 @@
 ########################
-### Regression model ### FIG 4
+### Regression model ### FIG 7
 ########################
 
 ###############
@@ -39,10 +39,13 @@ d1[d1 == "Masculino"] <- "1"
 d1[d1 == "Femenino"] <- "0"
 d1$Im <- as.integer(d1$Im)
 
-############ metacog y AQ
+############ confidence y AQ
+
+d1$m_c.norm <- (d1$m_c - mean(d1$m_c))/ sd(d1$m_c)
+#d1$sd_c.norm <- (d1$sd_c - mean(d1$sd_c))/ sd(d1$sd_c)
 
 # corro el modelo
-a=lm(mc ~ aq.norm +
+a=lm(m_c.norm ~ aq.norm +
        Im +
        edad.norm+
        aq.norm: Im+
@@ -50,7 +53,6 @@ a=lm(mc ~ aq.norm +
      data = d1) 
 summary(a)
 
-### FIG 4a
 
 plot_summs(a, coefs = c('AQ' = 'aq.norm',
                         'Gender[m]'='Im',
@@ -60,7 +62,7 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm',
            colors = "black")+
   ylab("") +
   xlab("Regression coefficient") +
-  scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
+  #scale_x_continuous(breaks=seq(-0.03,0.03,0.02))+
   theme_bw() +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -68,20 +70,20 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm',
         panel.border = element_blank(),
         plot.margin = margin(1, 1,1, 1, "cm"),
         panel.background = element_blank(),
-        axis.text.x = element_text(size = 30),
-        axis.text.y = element_text(size = 30), 
-        axis.title.y = element_text(size = 30),
-        axis.title.x = element_text(size = 30))
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25), 
+        axis.title.y = element_text(size = 25),
+        axis.title.x = element_text(size = 25))
 
-ggsave("Figures/Figuras_en_R/4a.png", 
+ggsave("Figures/Figuras_en_R/7a.png", 
        width = 10, height = 6)
 
 ## regression line and scatter plot
-ggplot(d1, aes(x=aq, y=mc)) + 
+ggplot(d1, aes(x=aq.norm, y=m_c.norm)) + 
   geom_point()+
   geom_abline(intercept = unname(coefficients(a)[1]), 
               slope = unname(coefficients(a)[2]))+
-  ylab("AUROC2") +
+  ylab("Confidence mean") +
   xlab("AQ") +
   theme(axis.line = element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -94,5 +96,5 @@ ggplot(d1, aes(x=aq, y=mc)) +
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30))
 
-ggsave("Figures/Figuras_en_R/4b.png", 
+ggsave("Figures/Figuras_en_R/7b.png", 
        width = 10, height = 6)
