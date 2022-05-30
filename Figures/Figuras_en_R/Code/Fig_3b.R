@@ -65,5 +65,5 @@ g <- plot_grid(gF, gM,
                label_size = 24)
 
 
-ggsave("Figures/Figuras_en_R/3b.png", g,
+ggsave("Figures/Figuras_en_R/Figures/3b.png", g,
        width = 14, height = 8, bg = "white")

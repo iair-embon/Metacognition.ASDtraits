@@ -75,5 +75,5 @@ plot_summs(a_log, coefs = c('AQ' = 'confidence_key.norm:AQ.norm',
         axis.title.y = element_text(size = 30),
         axis.title.x = element_text(size = 30))
 
-ggsave("Figures/Figuras_en_R/5.png", 
+ggsave("Figures/Figuras_en_R/Figures/5.png", 
        width = 10, height = 6)

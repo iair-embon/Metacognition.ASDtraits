@@ -122,5 +122,5 @@ g <- plot_grid(pA, pC, pB, pD,
           label_size = 24)
 
 
-ggsave("Figures/Figuras_en_R/2.png", g,
+ggsave("Figures/Figuras_en_R/Figures/2.png", g,
        width = 6, height = 8, bg = "white")

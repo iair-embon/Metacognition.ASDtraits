@@ -42,7 +42,6 @@ d1$Im <- as.integer(d1$Im)
 ############ confidence y AQ
 
 d1$m_c.norm <- (d1$m_c - mean(d1$m_c))/ sd(d1$m_c)
-#d1$sd_c.norm <- (d1$sd_c - mean(d1$sd_c))/ sd(d1$sd_c)
 
 # corro el modelo
 a=lm(m_c.norm ~ aq.norm +
@@ -75,7 +74,7 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm',
         axis.title.y = element_text(size = 25),
         axis.title.x = element_text(size = 25))
 
-ggsave("Figures/Figuras_en_R/7a.png", 
+ggsave("Figures/Figuras_en_R/Figures/7a.png", 
        width = 10, height = 6)
 
 ## regression line and scatter plot
@@ -96,5 +95,5 @@ ggplot(d1, aes(x=aq.norm, y=m_c.norm)) +
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30))
 
-ggsave("Figures/Figuras_en_R/7b.png", 
+ggsave("Figures/Figuras_en_R/Figures/7b.png", 
        width = 10, height = 6)

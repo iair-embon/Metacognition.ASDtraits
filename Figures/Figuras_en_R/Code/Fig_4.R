@@ -50,6 +50,8 @@ a=lm(mc ~ aq.norm +
      data = d1) 
 summary(a)
 
+save(a, file = "AUROC2_AQ_linear_model.RData")
+
 ### FIG 4a
 
 plot_summs(a, coefs = c('AQ' = 'aq.norm',
@@ -73,7 +75,7 @@ plot_summs(a, coefs = c('AQ' = 'aq.norm',
         axis.title.y = element_text(size = 30),
         axis.title.x = element_text(size = 30))
 
-ggsave("Figures/Figuras_en_R/4a.png", 
+ggsave("Figures/Figuras_en_R/Figures/4a.png", 
        width = 10, height = 6)
 
 ## regression line and scatter plot
@@ -94,5 +96,5 @@ ggplot(d1, aes(x=aq, y=mc)) +
         axis.text.y = element_text(size = 30),
         axis.title.y = element_text(size = 30))
 
-ggsave("Figures/Figuras_en_R/4b.png", 
+ggsave("Figures/Figuras_en_R/Figures/4b.png", 
        width = 10, height = 6)

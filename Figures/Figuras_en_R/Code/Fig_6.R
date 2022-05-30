@@ -79,5 +79,5 @@ plot_summs(a, coefs = c('Social Skill' = 'aq_social.norm',
         axis.title.y = element_text(size = 30),
         axis.title.x = element_text(size = 30))
 
-ggsave("Figures/Figuras_en_R/6.png", 
+ggsave("Figures/Figuras_en_R/Figures/6.png", 
        width = 10, height = 6)

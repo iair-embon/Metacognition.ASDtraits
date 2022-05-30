@@ -51,5 +51,5 @@ ggplot(mc.sorted, aes(x=s,y=value,color=name)) +
         axis.title.x = element_blank(),
         axis.title.y = element_blank())
 
-ggsave("Figures/Figuras_en_R/3a.png", 
+ggsave("Figures/Figuras_en_R/Figures/3a.png", 
        width = 10, height = 6)
