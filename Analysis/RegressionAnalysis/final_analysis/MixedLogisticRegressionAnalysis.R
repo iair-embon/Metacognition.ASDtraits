@@ -44,4 +44,4 @@ a_log <- glmer(discrimination_is_correct ~ confidence_key.norm +
                control=glmerControl(optimizer="bobyqa",
                                     optCtrl=list(maxfun=2e5)))
 
-save(a, file = "Data/Regression_Results/MixedLogisticRegressionAnalysis.RData")
+save(a_log, file = "Data/Regression_Results/MixedLogisticRegressionAnalysis.RData")
