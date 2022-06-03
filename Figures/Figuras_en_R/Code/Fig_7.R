@@ -40,10 +40,35 @@ ggsave("Figures/Figuras_en_R/Figures/7a.png",
        width = 10, height = 6)
 
 ## regression line and scatter plot
-ggplot(d1, aes(x=aq.norm, y=m_c.norm)) + 
+
+# load the dataframe
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+
+d.sin.normalizar.solo.FyM <- DF_list$d
+d1 = d.sin.normalizar.solo.FyM
+d1$aq.norm <- (d1$aq - mean(d1$aq))/ sd(d1$aq)
+d1$mc.norm <- (d1$mc - mean(d1$mc))/ sd(d1$mc)
+d1$edad.norm <- (d1$edad - mean(d1$edad))/ sd(d1$edad)
+d1[d1 == "Masculino"] <- "1"
+d1[d1 == "Femenino"] <- "0"
+d1$Im <- as.integer(d1$Im)
+d1$m_c.norm <- (d1$m_c - mean(d1$m_c))/ sd(d1$m_c)
+
+# convert the normalized AQ scores to the original scores
+intercept <- coefficients(a)[[1]]
+slope <- coefficients(a)[[2]]
+
+converted_intercept <- intercept-slope*mean(d1$aq)/sd(d1$aq)
+converted_slope <- slope/sd(d1$aq)
+
+# figure
+ggplot(d1, aes(x=aq, y=m_c.norm)) + 
   geom_point()+
-  geom_abline(intercept = unname(coefficients(a)[1]), 
-              slope = unname(coefficients(a)[2]))+
+  geom_abline(intercept = converted_intercept, 
+              slope = converted_slope)+
   ylab("Confidence mean") +
   xlab("AQ") +
   theme(axis.line = element_line(colour = "black"),
