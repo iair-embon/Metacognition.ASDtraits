@@ -1,0 +1,332 @@
+---
+title: "Logistic multilevel regression analysis"
+author: "Embon, Barttfeld & Solovey"
+date: "8/9/2021"
+output: html_document
+---
+
+## Levantar datos
+                                 
+```{r levantar datos, echo=TRUE}
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
+
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+
+# only male and female genders
+d <- df_total[df_total$genero == "Masculino" | df_total$genero == "Femenino",]
+
+# modifico las variables que me interesan modificar
+d[d == "Masculino"] <- 1
+d[d == "Femenino"] <- 0
+d$discrimination_is_correct <- ifelse(d$discrimination_is_correct == TRUE, 1, 0)
+d$sujetos <- factor(d$sujetos)
+d$confidence_key.norm <- (d$confidence_key - 1) / 3 
+d$mc.norm <- (d$mc - mean(d$mc)) / sd(d$mc)
+d$edad.norm <- (d$edad - mean(d$edad)) / sd(d$edad)
+d$AQ.norm <- (d$AQ - mean(d$AQ)) / sd(d$AQ)
+d$AQ_social.norm <- (d$AQ_social - mean(d$AQ_social)) / sd(d$AQ_social)
+d$AQ_atencion_switch.norm  <- (d$AQ_atencion_switch - mean(d$AQ_atencion_switch)) / sd(d$AQ_atencion_switch)
+d$AQ_atencion_detail.norm <- (d$AQ_atencion_detail - mean(d$AQ_atencion_detail)) / sd(d$AQ_atencion_detail)
+d$AQ_communication.norm <- (d$AQ_communication - mean(d$AQ_communication)) / sd(d$AQ_communication)
+d$AQ_imagination.norm <- (d$AQ_imagination - mean(d$AQ_imagination)) / sd(d$AQ_imagination)
+
+print(str(d))
+###############
+### library ###
+###############
+library(arm)
+library(dplyr)
+library(lme4)
+```
+
+##### Empiezo a correr modelos de regresiones
+
+## Modelo 1, regresion logistica clasica
+```{r modelo 1, echo=TRUE}
+
+
+a <- glm(discrimination_is_correct ~ confidence_key.norm +
+           AQ.norm +
+           genero +
+           edad.norm+
+           AQ.norm: genero+
+           AQ.norm:edad.norm,
+           family=binomial(link="logit"), 
+           data = d)
+
+# muestro los resultados
+print(summary(a))
+```
+
+## Modelo 2, regresión logística clásica para sub escalas
+```{r Modelo 2, echo=TRUE}
+## social
+a.1 <- glm(discrimination_is_correct ~ confidence_key.norm +
+           AQ_social.norm +
+           genero +
+           edad.norm+
+           AQ_social.norm: genero+
+           AQ_social.norm:edad.norm,
+           family=binomial(link="logit"), 
+           data = d)
+
+# muestro los resultados
+print(summary(a.1))
+
+## atencion switch
+a.2 <- glm(discrimination_is_correct ~ confidence_key.norm +
+           AQ_atencion_switch.norm +
+           genero +
+           edad.norm+
+           AQ_atencion_switch.norm: genero+
+           AQ_atencion_switch.norm:edad.norm,
+           family=binomial(link="logit"), 
+           data = d)
+
+# muestro los resultados
+print(summary(a.2))
+
+## atencion detail
+a.3 <- glm(discrimination_is_correct ~ confidence_key.norm +
+           AQ_atencion_detail.norm +
+           genero +
+           edad.norm+
+           AQ_atencion_detail.norm: genero+
+           AQ_atencion_detail.norm:edad.norm,
+           family=binomial(link="logit"), 
+           data = d)
+
+# muestro los resultados
+print(summary(a.3))
+
+## communication
+a.4 <- glm(discrimination_is_correct ~ confidence_key.norm +
+           AQ_communication.norm +
+           genero +
+           edad.norm+
+           AQ_communication.norm: genero+
+           AQ_communication.norm:edad.norm,
+           family=binomial(link="logit"), 
+           data = d)
+
+# muestro los resultados
+print(summary(a.4))
+
+## imagination
+a.5 <- glm(discrimination_is_correct ~ confidence_key.norm +
+           AQ_imagination.norm +
+           genero +
+           edad.norm+
+           AQ_imagination.norm: genero+
+           AQ_imagination.norm:edad.norm,
+           family=binomial(link="logit"), 
+           data = d)
+
+# muestro los resultados
+print(summary(a.5))
+```
+
+## Modelo 3, regresión logística mixta, sujetos var random, intercept varía por sujeto
+```{r modelo 3, echo=TRUE}
+
+a <- glmer(discrimination_is_correct ~ confidence_key +
+           AQ.norm +
+           genero +
+           edad.norm+
+           AQ.norm: genero+
+           AQ.norm:edad.norm +
+           (1|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a))
+print(coef(a))
+print(fixef(a))
+print(ranef(a))
+```
+
+## Modelo 4, regresión logística mixta para sub escalas, sujetos var random, intercept varía por sujeto
+```{r Modelo 4, echo=TRUE}
+## social
+a.1 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_social.norm +
+           genero +
+           edad.norm+
+           AQ_social.norm: genero+
+           AQ_social.norm:edad.norm+
+           (1|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.1))
+
+## atencion switch
+a.2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_atencion_switch.norm +
+           genero +
+           edad.norm+
+           AQ_atencion_switch.norm: genero+
+           AQ_atencion_switch.norm:edad.norm+
+           (1|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.2))
+
+## atencion detail
+a.3 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_atencion_detail.norm +
+           genero +
+           edad.norm+
+           AQ_atencion_detail.norm: genero+
+           AQ_atencion_detail.norm:edad.norm+
+           (1|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.3))
+
+## communication
+a.4 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_communication.norm +
+           genero +
+           edad.norm+
+           AQ_communication.norm: genero+
+           AQ_communication.norm:edad.norm+
+           (1|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.4))
+
+## imagination
+a.5 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_imagination.norm +
+           genero +
+           edad.norm+
+           AQ_imagination.norm: genero+
+           AQ_imagination.norm:edad.norm+
+           (1|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.5))
+```
+
+## Modelo 5, regresión logística mixta, sujetos var random, intercept y slope varían por sujeto
+```{r modelo 5, echo=TRUE}
+a <- glmer(discrimination_is_correct ~ confidence_key +
+           AQ.norm +
+           genero +
+           edad.norm+
+           AQ.norm: genero+
+           AQ.norm:edad.norm +
+           (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a))
+print(coef(a))
+print(fixef(a))
+print(ranef(a))
+```
+
+## Modelo 6, regresión logística mixta para sub escalas, sujetos var random, intercept y slope varían por sujeto
+```{r Modelo 6, echo=TRUE}
+## social
+a.1 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_social.norm +
+           genero +
+           edad.norm+
+           AQ_social.norm: genero+
+           AQ_social.norm:edad.norm+
+           (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.1))
+
+## atencion switch
+a.2 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_atencion_switch.norm +
+           genero +
+           edad.norm+
+           AQ_atencion_switch.norm: genero+
+           AQ_atencion_switch.norm:edad.norm+
+           (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.2))
+
+## atencion detail
+a.3 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_atencion_detail.norm +
+           genero +
+           edad.norm+
+           AQ_atencion_detail.norm: genero+
+           AQ_atencion_detail.norm:edad.norm+
+           (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.3))
+
+## communication
+a.4 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_communication.norm +
+           genero +
+           edad.norm+
+           AQ_communication.norm: genero+
+           AQ_communication.norm:edad.norm+
+           (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.4))
+
+## imagination
+a.5 <- glmer(discrimination_is_correct ~ confidence_key.norm +
+           AQ_imagination.norm +
+           genero +
+           edad.norm+
+           AQ_imagination.norm: genero+
+           AQ_imagination.norm:edad.norm+
+           (1 + confidence_key.norm|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a.5))
+```

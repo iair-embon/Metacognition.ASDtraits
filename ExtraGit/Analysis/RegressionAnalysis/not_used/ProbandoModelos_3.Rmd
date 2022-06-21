@@ -1,0 +1,94 @@
+---
+title: "Probando.Modelos"
+author: "Iair Embon"
+date: "25/4/2022"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Levanto datos y cargo librerias
+
+```{r levantar datos, echo=TRUE}
+
+# voy a la carpeta del proyecto
+root <- rprojroot::is_rstudio_project
+basename(getwd())
+
+####### data frames with filters already applied
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+load(file= filepath)
+
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+DF_list <- DataFrame_Filtered_already_applied(df_total)
+
+# only male and female genders
+d <- df_total[df_total$genero == "Masculino" | df_total$genero == "Femenino",]
+
+# modifico las variables que me interesan modificar
+d$genero <- ifelse(d$genero == "Masculino",1,0)
+d$discrimination_is_correct <- ifelse(d$discrimination_is_correct == TRUE, 1, 0)
+d$sujetos <- factor(d$sujetos)
+d$confidence_key.norm <- (d$confidence_key - 1) / 3 
+d$AQ.norm <-  (d$AQ - mean(d$AQ)) / sd(d$AQ)
+d$edad.norm <- (d$edad - mean(d$edad))/sd(d$edad)
+d$aq_social.norm <- (d$AQ_social - mean(d$AQ_social))/ sd(d$AQ_social)
+d$aq_at_sw.norm <- (d$AQ_atencion_switch - mean(d$AQ_atencion_switch))/ sd(d$AQ_atencion_switch)
+d$aq_at_de.norm <- (d$AQ_atencion_detail - mean(d$AQ_atencion_detail))/ sd(d$AQ_atencion_detail)
+d$aq_com.norm <- (d$AQ_communication - mean(d$AQ_communication))/ sd(d$AQ_communication)
+d$aq_im.norm <- (d$AQ_imagination - mean(d$AQ_imagination))/ sd(d$AQ_imagination)
+
+
+###############
+### library ###
+###############
+library(arm)
+library(dplyr)
+library(lme4)
+library(tibble)
+library(ggplot2)
+library(car)
+library(DescTools)
+library(gridExtra)
+library(faraway)
+library(knitr)
+library(performance)
+library(ResourceSelection)
+library(lattice)
+library(reshape2)
+```
+
+
+## Corro el modelo elegido pero ahora en vez de AQ.norm, va a estar cada
+## subescala normalizada.
+
+
+```{r reg log, echo=TRUE}
+a1 <- glmer(discrimination_is_correct ~               confidence_key.norm +
+              confidence_key.norm:aq_social.norm +
+              confidence_key.norm:aq_at_sw.norm +
+              confidence_key.norm:aq_at_de.norm +
+              confidence_key.norm:aq_com.norm +
+              confidence_key.norm:aq_im.norm +
+              confidence_key.norm:genero +
+              confidence_key.norm:edad.norm +
+              #confidence_key.norm:AQ.norm:genero +
+              #  confidence_key.norm:AQ.norm:genero +
+              (1|sujetos),
+           data = d,
+           family = binomial,
+           control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+# muestro los resultados
+print(summary(a1))
+print(fixef(a1))
+print(ranef(a1))  
+
+## ploteo los slope e intercept ordenados 
+dotplot(ranef(a1, which = "sujetos", condVar = TRUE), 
+                scales = list(y = list(alternating = 0)))
+
+# guardo metacog de cada sujeto en un df
+#metacog <-  ranef(a2)[["sujetos"]]
+```
