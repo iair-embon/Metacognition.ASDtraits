@@ -77,12 +77,12 @@ source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_CORREGIDA.R"
 #                                 cant_componentes_por_sujetos,
 #                                 ubicacion_comp_AQ,
 #                                 AQ)
-###### esta es la funcion corregida para aq
+###### this is the function for AQ
 puntaje_AQ_sujetos <- puntaje_AQ_corregido(cant_sujetos,
                                            cant_componentes_por_sujetos,
                                            ubicacion_comp_AQ,
                                            AQ)
-### esta es la funcion para sub escala social del aq
+### this is the function for the social subscale of AQ 
 source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_social.R"))
 
 puntaje_AQ_sujetos_social <- puntaje_AQ_social(cant_sujetos,
@@ -90,7 +90,7 @@ puntaje_AQ_sujetos_social <- puntaje_AQ_social(cant_sujetos,
                                            ubicacion_comp_AQ,
                                            AQ)
 
-### esta es la funcion para sub escala atencion switch del aq
+### this is the function for the attencion switch subscale of AQ
 source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_atencion_switch.R"))
 
 puntaje_AQ_sujetos_atencion_switch <- puntaje_AQ_atencion_switch(cant_sujetos,
@@ -98,7 +98,7 @@ puntaje_AQ_sujetos_atencion_switch <- puntaje_AQ_atencion_switch(cant_sujetos,
                                                ubicacion_comp_AQ,
                                                AQ)
 
-### esta es la funcion para sub escala atencion detail del aq
+### this is the function for the attencion to detail subscale of AQ
 source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_atencion_detail.R"))
 
 puntaje_AQ_sujetos_atencion_detail <- puntaje_AQ_atencion_detail(cant_sujetos,
@@ -107,7 +107,7 @@ puntaje_AQ_sujetos_atencion_detail <- puntaje_AQ_atencion_detail(cant_sujetos,
                                                                  AQ)
 
 
-### esta es la funcion para sub escala comunication del aq
+### ### this is the function for the comunication subscale of AQ
 source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_communication.R"))
 
 puntaje_AQ_sujetos_communication <- puntaje_AQ_communication(cant_sujetos,
@@ -115,7 +115,7 @@ puntaje_AQ_sujetos_communication <- puntaje_AQ_communication(cant_sujetos,
                                                                  ubicacion_comp_AQ,
                                                                  AQ)
 
-### esta es la funcion para sub escala comunication del aq
+### ### this is the function for the imagination subscale of AQ
 source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_imagination.R"))
 
 puntaje_AQ_sujetos_imagination <- puntaje_AQ_imagination(cant_sujetos,
@@ -335,24 +335,20 @@ df_exp_mod2 <- df_exp_mod %>%
 
 df_total <- df_DatosUnicos_mod2[0,]
 
-#  sujetos que quedaron
+#  existing subjects
 ExistingSubjects <- unique(df_exp_mod2$sujetos)
 
-# iterar por sujeto existente
 for (i in 1:length(ExistingSubjects)){
-  # saco la cantidad de trials del sujeto
+  
   sujeto_df_exp <- df_exp_mod2[df_exp_mod2$sujetos== ExistingSubjects[i],]
   cant_trials <- nrow(sujeto_df_exp)
   
-  # repito cada fila del sujeto segun la cantidad de trials que le quedaron
   sujeto_df_DatosUnicos_mod2 <- df_DatosUnicos_mod2[df_DatosUnicos_mod2$sujetos== ExistingSubjects[i],]
   df <- as.data.frame(lapply(sujeto_df_DatosUnicos_mod2, rep, cant_trials))
   
-  # lo agrego al df_total
   df_total <- rbind(df_total, df)
 }
 
-# combino las columnas de df_exp_mod2 que me interesan con el df_total
 df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discrimination_is_correct,
                   confidence_key = df_exp_mod2$confidence_key, 
                   trials = df_exp_mod2$trials,
@@ -422,11 +418,11 @@ for (i in 1:length(cant_trials_por_sujeto)) {
   cant_trials_por_sujeto[i] <- nrow(df_total[df_total$sujetos == existing_subject[i],])
 }
 
-# veo quienes son los que tienen menos trials que X
+# I see who are the ones who have fewer trials than X
 indices_cant_trials <- which(cant_trials_por_sujeto < 90)
 subj_pocos_trials<- existing_subject[indices_cant_trials]
 
-# los descarto
+# I discard them
 df_total <- df_total[! df_total$sujetos %in% subj_pocos_trials,]
 
 cat("Cantidad de sujetos luego de filtrar por trials insuficientes para calcular AUROC2: ", length(unique(df_total$sujetos)))
@@ -452,29 +448,22 @@ for (i in 1:Nsuj){
 
 todos_sujetos_mc <- c()
 
-# iterar por sujeto existente
 for (i in 1:length(ExistingSubjects)) {
-  # saco la cantidad de trials del sujeto
+  
   sujeto_df_exp <- df_total[df_total$sujetos == ExistingSubjects[i],]
   cant_trials <- nrow(sujeto_df_exp)
   
-  # repito cada valor de mc segun la cantidad de trials que le quedaron al sujeto
   sujeto_mc <-rep(mc[i],cant_trials)
   
-  # lo agrego a un vector que tenga los mc de todos los sujetos por cantidad de trials
   todos_sujetos_mc <- c(todos_sujetos_mc,sujeto_mc)
 }
 
-# lo agrego al df_total
 df_total$mc <- todos_sujetos_mc
 
-####### filter by mc
-# filtro para los que tienen metacog menores a 0.5
+####### filter those who have an AUROC2 less than 1.5 standard deviations from the mean
 mean_mc <- mean(mc)
 sd_mc <-sd(mc)
 df_total <- df_total[df_total$mc >= mean_mc - sd_mc* 1.5,]
-# a partir de cuanto quiero dejar de metacog (otra forma de filtrar)
-# d.sin.normalizar.mc.filter <- d.sin.normalizar[d.sin.normalizar$mc >= 0.4,] 
 
 cat("Cantidad de sujetos luego de filtrar por AUROC2: ", length(unique(df_total$sujetos)))
 
@@ -495,6 +484,3 @@ save(df_total,file = filepath)
 # # RESULTS_EXP2+3
 #filepath <- root$find_file("Data/Exp2+3/df_total.Rda")
 #save(df_total,file = filepath)
-
-# save the df in .txt format, it is saved in the mail folder
-#write.table(df_total, file= 'df_total.txt')
