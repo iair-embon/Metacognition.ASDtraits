@@ -18,9 +18,6 @@ basename(getwd())
 filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
 load(file= filepath)
 
-source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
-DF_list <- DataFrame_Filtered_already_applied(df_total)
-
 # only male and female genders
 d <- df_total[df_total$genero == "Masculino" | df_total$genero == "Femenino",]
 
