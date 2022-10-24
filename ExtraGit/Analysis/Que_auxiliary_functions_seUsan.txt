@@ -1,0 +1,185 @@
+Se usan:
+
+***** DataPreprocessing.R: *****
+
+content<-readLines(root$find_file("Data/Results_Exp1/jatos_results_20201129132347.txt"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/initial_df.R"))
+--
+content<-readLines(root$find_file("Data/Exp2+3/jatos_results_20210824144041.txt"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_CORREGIDA.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_social.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_atencion_switch.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_atencion_detail.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_communication.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/Nueva_funcion_AQ_imagination.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/numeriza_col_horasSuenos.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/unifica_col_medicacion.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/unifica_col_affeccionPsico.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/unifica_col_TeEscuchamos.R"))
+--
+guarda en
+filepath <- root$find_file("Data/All_exp_inclusion_criteria/df_total.Rda")
+save(df_total,file = filepath)
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/discard_by_x_same_confidence_new.R"))
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/auroc2.R"))
+--
+guarda en
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+save(df_total,file = filepath)
+
+
+***** T_test_AQ.R: *****
+
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+
+***** AQ_subscales_linear_model.R *****
+
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+--
+guarda en
+save(a, file = "Data/Regression_Results/AQ_subscales_linear_model.RData")
+
+***** AUROC2_linear_model.R *****
+
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+--
+guarda en
+save(a, file = "Data/Regression_Results/AUROC2_AQ_linear_model.RData")
+
+***** ConfidenceMean_linear_model.R *****
+
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+--
+guarda en
+save(a, file = "Data/Regression_Results/ConfidenceMean_AQ_linear_model.RData")
+
+***** MixedLogisticRegressionAnalysis.R *****
+
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+--
+guarda en
+save(a_log, file = "Data/Regression_Results/MixedLogisticRegressionAnalysis.RData")
+
+
+***** Fig_2.R *****
+
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/2.png", g,
+
+***** Fig_3a.R *****
+
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+--
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/3a.png", 
+       width = 10, height = 6)
+
+***** Fig_3b.R *****
+
+filepath <- root$find_file("Data/All_exp_exclusion_criteria/df_total.Rda")
+--
+source(root$find_file("Analysis/AuxiliaryFunctions/DataFrame_Filtered_already_applied.R"))
+--
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/3b.png", g,
+       width = 14, height = 8, bg = "white")
+
+***** Fig_4.R *****
+
+filepath <- root$find_file("Data/Regression_Results/AUROC2_AQ_linear_model.RData")
+--
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/4a.png", 
+--
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/4b.png", 
+
+***** Fig_5.R *****
+
+filepath <- root$find_file("Data/Regression_Results/MixedLogisticRegressionAnalysis.RData")
+--
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/5.png", 
+
+***** Fig_6.R *****
+
+filepath <- root$find_file("Data/Regression_Results/AQ_subscales_linear_model.RData")
+--
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/6.png", 
+
+***** Fig_7.R *****
+
+filepath <- root$find_file("Data/Regression_Results/ConfidenceMean_AQ_linear_model.RData")
+--
+guarda en
+ggsave("Figures/Figuras_en_R/Figures/7a.png", 
+
+***** Table1.R *****
+
+filepath <- root$find_file("Data/Regression_Results/AUROC2_AQ_linear_model.RData")
+--
+guarda en
+gt::gtsave(as_gt(table1), file = "Tables/AUROC2_linear_model.png")
+
+***** Table2.R *****
+
+filepath <- root$find_file("Data/Regression_Results/MixedLogisticRegressionAnalysis.RData")
+--
+guarda en
+gt::gtsave(as_gt(table2), file = "Tables/MixedLogisticRegressionAnalysis.png")
+
+***** Table3.R *****
+
+filepath <- root$find_file("Data/Regression_Results/AQ_subscales_linear_model.RData")
+--
+guarda en
+gt::gtsave(as_gt(table3), file = "Tables/AQ_subscales_linear_model.png")
+
+***** Table4.R *****
+
+filepath <- root$find_file("Data/Regression_Results/ConfidenceMean_AQ_linear_model.RData")
+--
+guarda en
+gt::gtsave(as_gt(table4), file = "Tables/ConfidenceMean_AQ_linear_model.png")
+
+***** numeriza_col_horasSuenos.R *****
+
+otro_filepath <- (root$find_file("Analysis/AuxiliaryFunctions/df_string_y_numeric_horasSueno.Rda"))
+
+***** unifica_col_affeccionPsico.R ******
+
+otro_filepath <- (root$find_file("Analysis/AuxiliaryFunctions/df_string_y_stringMod_affeccionPsico.Rda"))
+
+***** unifica_col_medicacion.R *****
+
+otro_filepath <- (root$find_file("Analysis/AuxiliaryFunctions/df_string_y_stringMod_medicacion.Rda"))
+
+***** unifica_col_TeEscuchamos.R *****
+
+otro_filepath <- (root$find_file("Analysis/AuxiliaryFunctions/df_string_y_stringMod_TeEscuchamos.Rda"))
