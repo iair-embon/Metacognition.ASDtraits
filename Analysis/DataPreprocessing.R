@@ -349,15 +349,11 @@ for (i in 1:length(ExistingSubjects)){
   df_total <- rbind(df_total, df)
 }
 
-<<<<<<< HEAD
 # combino las columnas de df_exp_mod2 que me interesan con el df_total
 df_total <- cbind(df_total, 
                   dots_num_left = df_exp_mod2$dots_num_left,
                   dots_num_right = df_exp_mod2$dots_num_right,
-                  discrimination_is_correct = df_exp_mod2$discrimination_is_correct,
-=======
-df_total <- cbind(df_total, discrimination_is_correct = df_exp_mod2$discrimination_is_correct,
->>>>>>> 03cb5c9b044899ae6188a67eb382213914f5f918
+                  df_total, discrimination_is_correct = df_exp_mod2$discrimination_is_correct,
                   confidence_key = df_exp_mod2$confidence_key, 
                   trials = df_exp_mod2$trials,
                   diferencia_puntitos = df_exp_mod2$diferencia_puntitos, 
