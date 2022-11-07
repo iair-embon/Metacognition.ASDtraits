@@ -6,7 +6,8 @@ library(dplyr)
 # load dataframe
 root <- rprojroot::is_rstudio_project
 basename(getwd())
-load("./Data/All_exp_exclusion_criteria/df_total.Rda")
+# load("./Data/All_exp_exclusion_criteria/df_total.Rda")
+load("./Data/All_exp_inclusion_criteria/df_total.Rda")
 
 ## filter by gender
 df_total <- df_total %>%
